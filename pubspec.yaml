@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   syncfusion_flutter_gauges: ^27.1.58
   fl_chart: ^0.69.0
+  firebase_core: ^3.8.0
+  firebase_auth: ^5.3.3
 
 dev_dependencies:
   flutter_test:

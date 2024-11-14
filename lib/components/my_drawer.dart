@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -39,7 +40,7 @@ class _MyDrawerState extends State<MyDrawer> {
             ],
           ),
           ListTile(
-            onTap: () => exit(0),
+            onTap: () async => await FirebaseAuth.instance.signOut(),
             leading: Icon(Icons.exit_to_app_outlined),
             title: Text("Exit"),
           ),
