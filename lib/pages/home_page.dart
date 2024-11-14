@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(217, 217, 217, 217),
+        // backgroundColor: const Color.fromARGB(217, 217, 217, 217),
         title: appBarTitles[btmNavIdx],
         actions: [
           // usr button

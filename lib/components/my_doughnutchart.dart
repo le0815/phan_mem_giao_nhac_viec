@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class MyDoughnutchart extends StatelessWidget {
@@ -8,8 +9,8 @@ class MyDoughnutchart extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // label doughnut segment
-        Row(
+        ListView(
+          scrollDirection: Axis.horizontal,
           children: [
             // label doughnut segment
             Container(
@@ -20,13 +21,9 @@ class MyDoughnutchart extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            const SizedBox(
-              width: 8,
-            ),
+            AddHorizontalSpace(8),
             const Text("Completed"),
-            const SizedBox(
-              width: 12,
-            ),
+            AddHorizontalSpace(12),
             // label doughnut segment
             Container(
               width: 27,
@@ -36,14 +33,10 @@ class MyDoughnutchart extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            const SizedBox(
-              width: 8,
-            ),
+            AddHorizontalSpace(8),
             const Text("Doing"),
 
-            const SizedBox(
-              width: 12,
-            ),
+            AddHorizontalSpace(12),
             // label doughnut segment
             Container(
               width: 27,
@@ -53,10 +46,10 @@ class MyDoughnutchart extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            const SizedBox(
-              width: 8,
+            AddHorizontalSpace(8),
+            const Text(
+              "Over due",
             ),
-            const Text("Over due"),
           ],
         ),
         SfRadialGauge(

@@ -19,7 +19,6 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color.fromARGB(217, 217, 217, 217),
       ),
       home: HomePage(),
-
       //route for navigation page
       routes: {
         "/body_home": (context) => const BodyHome(),
