@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "266911386977",
+    "project_id": "nckhflutter",
+    "storage_bucket": "nckhflutter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:266911386977:android:a8e281bc9bfc39cc008920",
+        "android_client_info": {
+          "package_name": "com.example.phan_mem_giao_nhac_viec"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_qsTYpE6k-mZmY8De9KeHG3xBcQybNhQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
