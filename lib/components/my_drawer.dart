@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:phan_mem_giao_nhac_viec/services/auth/auth_service.dart';
 
 class MyDrawer extends StatefulWidget {
   const MyDrawer({super.key});
@@ -40,7 +41,10 @@ class _MyDrawerState extends State<MyDrawer> {
             ],
           ),
           ListTile(
-            onTap: () async => await FirebaseAuth.instance.signOut(),
+            onTap: () async {
+              var authService = AuthService();
+              await authService.SignOut();
+            },
             leading: Icon(Icons.exit_to_app_outlined),
             title: Text("Exit"),
           ),
