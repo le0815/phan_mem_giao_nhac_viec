@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
@@ -90,34 +89,8 @@ class RegisterPage extends StatelessWidget {
                   ),
                   // register btn
                   AddVerticalSpace(20),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          onPressed: () {
-                            log("usrname: ${usrNameTextController.text}");
-                            log("pwd: ${pwdTextController.text}");
-                            log("confirm: ${confirmTextController.text}");
-                            OnRegister();
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 14),
-                            child: Text(
-                              "Register",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  RegisterButton(usrNameTextController, pwdTextController,
+                      confirmTextController, OnRegister),
                   AddVerticalSpace(20),
                   // Have an account? Login now.
                   Row(
@@ -141,6 +114,41 @@ class RegisterPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Row RegisterButton(
+      TextEditingController usrNameTextController,
+      TextEditingController pwdTextController,
+      TextEditingController confirmTextController,
+      Future<Null> OnRegister()) {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: () {
+              log("usrname: ${usrNameTextController.text}");
+              log("pwd: ${pwdTextController.text}");
+              log("confirm: ${confirmTextController.text}");
+              OnRegister();
+            },
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 14),
+              child: Text(
+                "Register",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
