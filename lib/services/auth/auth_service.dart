@@ -21,6 +21,14 @@ class AuthService {
   }
 
   // sign out
+  Future<void> SignOut() async {
+    try {
+      await _firebaseAuth.signOut();
+    } catch (e) {
+      log("error while signing out");
+      throw Exception(e);
+    }
+  }
 
   // register
   Future<UserCredential> RegisterWithEmailAndPassword(
