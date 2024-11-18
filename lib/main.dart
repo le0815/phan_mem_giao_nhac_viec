@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/auth_page.dart';
+import 'package:phan_mem_giao_nhac_viec/services/auth/auth_gate.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_create.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_home.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_message.dart';

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/home_page.dart';
+import 'package:phan_mem_giao_nhac_viec/services/auth/login_or_register.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/login_page.dart';
 
 class AuthPage extends StatelessWidget {
@@ -14,7 +15,7 @@ class AuthPage extends StatelessWidget {
         if (snapshot.hasData) {
           return const HomePage();
         } else {
-          return const LoginPage();
+          return const LoginOrRegisterPage();
         }
       },
     );

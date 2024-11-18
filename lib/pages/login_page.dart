@@ -2,11 +2,15 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
+import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
+import 'package:phan_mem_giao_nhac_viec/services/auth/auth_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final Function() onTap;
+  const LoginPage({super.key, required this.onTap});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -16,25 +20,36 @@ class _LoginPageState extends State<LoginPage> {
   var usrNameTextController = TextEditingController();
   var pwdTextController = TextEditingController();
 
-  OnSignIn() async {
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: usrNameTextController.text, password: pwdTextController.text);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    OnSignIn() async {
+      // show loading indicator
+      MyLoadingIndicator(context);
+
+      final authService = AuthService();
+
+      try {
+        await authService.SignInWithEmailAndPassword(
+            usrNameTextController.text, pwdTextController.text);
+
+        // close loading indicator
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
+      } catch (e) {
+        // close loading indicator
+        if (context.mounted) {
+          Navigator.pop(context);
+          MyAlertDialog(context, e.toString());
+        }
+        log('error while sign in: $e.');
+      }
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -84,7 +99,24 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ],
-                )
+                ),
+                AddVerticalSpace(20),
+                // not have an account yet? register now.
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: widget.onTap,
+                      child: const Text(
+                        "Not have an account yet? Register now.",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
