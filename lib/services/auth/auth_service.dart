@@ -4,6 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  User? _user;
+
+  User? get user => _user;
 
   // sign in
   Future<UserCredential> SignInWithEmailAndPassword(
@@ -13,6 +16,9 @@ class AuthService {
     try {
       UserCredential userCredential = await _firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
+
+      _user = userCredential.user;
+
       return userCredential;
     } on FirebaseAuthException catch (e) {
       log('error while signin: ${e.code}.');
