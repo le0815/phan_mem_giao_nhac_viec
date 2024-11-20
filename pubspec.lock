@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  carousel_slider_plus:
+    dependency: transitive
+    description:
+      name: carousel_slider_plus
+      sha256: "6e3dbb21bca29383ade8a155d3c1acb0233a3068348905189978d714495d2df5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.0.2"
   characters:
     dependency: transitive
     description:
@@ -176,6 +184,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  horizontal_week_calendar:
+    dependency: "direct main"
+    description:
+      name: horizontal_week_calendar
+      sha256: "8a8bb0e746f89e14b1d3227ab13958e69428d65d43d8a680d71fdb8243f06c42"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.18"
   http_parser:
     dependency: transitive
     description:
