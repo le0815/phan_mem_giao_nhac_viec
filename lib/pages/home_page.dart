@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_drawer.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/body_create.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/body_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_home.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_message.dart';
 import 'dart:developer';
@@ -16,13 +16,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Widget> bodyComponents = [
     const BodyHome(),
-    const BodyCreate(),
+    const BodyTask(),
     const BodyMessage()
   ];
 
   var appBarTitles = {
     0: const Text('Workspace Name'),
-    1: const Text('Create'),
+    1: const Text('My task'),
     2: const Text('Messages')
   };
   int btmNavIdx = 0;
@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add_box_outlined),
-            label: "Create",
+            label: "Tasks",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.inbox_outlined),

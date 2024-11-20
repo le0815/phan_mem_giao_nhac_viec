@@ -16,7 +16,7 @@ class AuthService {
     try {
       UserCredential userCredential = await _firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
-
+      log("signing");
       _user = userCredential.user;
 
       return userCredential;
