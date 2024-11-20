@@ -18,7 +18,11 @@ class MyTextfield extends StatelessWidget {
         filled: true,
         fillColor: Colors.white,
         hintText: textFieldHint,
-        border: const UnderlineInputBorder(borderSide: BorderSide.none),
+        hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+        border: OutlineInputBorder(
+          borderSide: BorderSide(width: 1, color: Colors.grey),
+          borderRadius: BorderRadius.circular(8),
+        ),
         // icon: Icon(Icons.remove_red_eye_outlined),
       ),
     );

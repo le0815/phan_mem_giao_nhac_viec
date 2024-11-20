@@ -25,11 +25,12 @@ class _BodyTaskState extends State<BodyTask> {
                   TaskOverView(),
                 ],
               ),
+              // add new task
               Positioned(
                 bottom: 10,
                 right: 10,
                 child: FloatingActionButton(
-                  onPressed: () {},
+                  onPressed: () => Navigator.pushNamed(context, "/add_task"),
                   child: Icon(
                     Icons.add,
                   ),
