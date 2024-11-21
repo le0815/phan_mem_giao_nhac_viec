@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 
@@ -27,7 +28,11 @@ class TaskService extends ChangeNotifier {
       // clear previous result
       _result.clear();
 
-      var data = await _firebaseFirestore.collection('Task').get();
+      // get task of current user by uid
+      var data = await _firebaseFirestore
+          .collection('Task')
+          .where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          .get();
 
       for (var element in data.docs) {
         _result[_result.length] = element.data();

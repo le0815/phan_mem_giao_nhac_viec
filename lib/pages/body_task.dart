@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:horizontal_week_calendar/horizontal_week_calendar.dart';
+import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_task_overview.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:provider/provider.dart';
@@ -15,11 +17,24 @@ class _BodyTaskState extends State<BodyTask> {
   final taskService = TaskService();
 
   @override
-  void initState() {
-    // TODO: implement initState
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     // get task from database
-    taskService.GetTaskFromDb();
-    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      GetTaskFromDb(context);
+    });
+  }
+
+  GetTaskFromDb(BuildContext context) async {
+    // show loading indicator
+    MyLoadingIndicator(context);
+
+    await taskService.GetTaskFromDb();
+
+    // close loading indicator
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -49,7 +64,9 @@ class _BodyTaskState extends State<BodyTask> {
                         onPressed: () async {
                           await Navigator.pushNamed(context, "/add_task");
                           // reload page to load new task
-                          value.GetTaskFromDb();
+                          if (context.mounted) {
+                            GetTaskFromDb(context);
+                          }
                         },
                         child: const Icon(
                           Icons.add,

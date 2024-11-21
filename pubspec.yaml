@@ -43,6 +43,7 @@ dependencies:
   horizontal_week_calendar: ^0.0.18
   cloud_firestore: ^5.5.0
   provider: ^6.1.2
+  slideable: ^0.0.2
 
 dev_dependencies:
   flutter_test:
