@@ -41,6 +41,8 @@ dependencies:
   firebase_auth: ^5.3.3
   firebase_messaging: ^15.1.5
   horizontal_week_calendar: ^0.0.18
+  cloud_firestore: ^5.5.0
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:

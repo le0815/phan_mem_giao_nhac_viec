@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:horizontal_week_calendar/horizontal_week_calendar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_task_overview.dart';
+import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
+import 'package:provider/provider.dart';
 
 class BodyTask extends StatefulWidget {
   const BodyTask({super.key});
@@ -10,49 +12,73 @@ class BodyTask extends StatefulWidget {
 }
 
 class _BodyTaskState extends State<BodyTask> {
+  final taskService = TaskService();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    // get task from database
+    taskService.GetTaskFromDb();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Column(
-        children: [
-          Expanded(
-            child: Stack(children: [
-              Column(
-                children: [
-                  // week calendar
-                  WeekCalendar(),
-                  TaskOverView(),
-                ],
-              ),
-              // add new task
-              Positioned(
-                bottom: 10,
-                right: 10,
-                child: FloatingActionButton(
-                  onPressed: () => Navigator.pushNamed(context, "/add_task"),
-                  child: Icon(
-                    Icons.add,
+    return ChangeNotifierProvider(
+      create: (context) => taskService,
+      child: Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            Expanded(
+              child: Stack(children: [
+                Column(
+                  children: [
+                    // week calendar
+                    WeekCalendar(),
+                    TaskOverView(),
+                  ],
+                ),
+                // add new task
+                Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: Consumer<TaskService>(
+                    builder: (context, value, child) {
+                      return FloatingActionButton(
+                        onPressed: () async {
+                          await Navigator.pushNamed(context, "/add_task");
+                          // reload page to load new task
+                          value.GetTaskFromDb();
+                        },
+                        child: const Icon(
+                          Icons.add,
+                        ),
+                      );
+                    },
                   ),
                 ),
-              ),
-            ]),
-          ),
-        ],
+              ]),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Expanded TaskOverView() {
     return Expanded(
-      child: ListView.builder(
-        itemCount: 1,
-        itemBuilder: (context, index) {
-          return const MyTaskOverview(
-            header: "Test",
-            body:
-                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-            due: "18 - Nov",
+      child: Consumer<TaskService>(
+        builder: (context, value, child) {
+          return ListView.builder(
+            itemCount: value.result.length,
+            itemBuilder: (context, index) {
+              return MyTaskOverview(
+                header: value.result[index]['title'],
+                body: value.result[index]['description'],
+                due: "18 - Nov",
+              );
+            },
           );
         },
       ),
