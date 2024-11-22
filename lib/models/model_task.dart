@@ -1,15 +1,28 @@
 class ModelTask {
-  final String titleTask;
-  final String descriptionTask;
+  String titleTask;
+  String descriptionTask;
   final String uid;
+  final String? idTask;
 
   ModelTask({
     required this.titleTask,
     required this.descriptionTask,
     required this.uid,
+    this.idTask,
   });
 
   Map<String, dynamic> ToMap() {
-    return {"title": titleTask, "description": descriptionTask, "uid": uid};
+    return (idTask == null)
+        ? {
+            "title": titleTask,
+            "description": descriptionTask,
+            "uid": uid,
+          }
+        : {
+            "title": titleTask,
+            "description": descriptionTask,
+            "uid": uid,
+            "idTask": idTask
+          };
   }
 }

@@ -3,7 +3,9 @@ import 'package:flutter/scheduler.dart';
 import 'package:horizontal_week_calendar/horizontal_week_calendar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_task_tile_overview.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:provider/provider.dart';
@@ -56,6 +58,18 @@ class _BodyTaskState extends State<BodyTask> {
     }
   }
 
+  OpenTaskDetail(ModelTask modelTask, String idTask) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MyTaskTileDetail(
+          modelTask: modelTask,
+          idTask: idTask,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -70,7 +84,7 @@ class _BodyTaskState extends State<BodyTask> {
                   children: [
                     // week calendar
                     WeekCalendar(),
-                    TaskOverView(),
+                    TaskTileOverView(),
                   ],
                 ),
                 // add new task
@@ -102,7 +116,7 @@ class _BodyTaskState extends State<BodyTask> {
     );
   }
 
-  Expanded TaskOverView() {
+  Expanded TaskTileOverView() {
     return Expanded(
       child: Consumer<TaskService>(
         builder: (context, value, child) {
@@ -114,6 +128,18 @@ class _BodyTaskState extends State<BodyTask> {
                 body: value.result[index].data()['description'],
                 due: "18 - Nov",
                 onRemove: () => RemoveTaskFromDb(value.result[index].id),
+                onTap: () async {
+                  await OpenTaskDetail(
+                    ModelTask(
+                      titleTask: value.result[index].data()['title'],
+                      descriptionTask:
+                          value.result[index].data()['description'],
+                      uid: value.result[index].data()['uid'],
+                    ),
+                    value.result[index].id,
+                  );
+                  value.GetTaskFromDb();
+                },
               );
             },
           );
