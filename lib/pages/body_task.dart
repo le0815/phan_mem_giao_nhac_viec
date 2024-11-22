@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:horizontal_week_calendar/horizontal_week_calendar.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_task_overview.dart';
+import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
+import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
+import 'package:phan_mem_giao_nhac_viec/components/my_task_tile_overview.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:provider/provider.dart';
 
@@ -15,11 +19,41 @@ class _BodyTaskState extends State<BodyTask> {
   final taskService = TaskService();
 
   @override
-  void initState() {
-    // TODO: implement initState
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     // get task from database
-    taskService.GetTaskFromDb();
-    super.initState();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      GetTaskFromDb(context);
+    });
+  }
+
+  GetTaskFromDb(BuildContext context) async {
+    // show loading indicator
+    MyLoadingIndicator(context);
+    await taskService.GetTaskFromDb();
+    // close loading indicator
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
+  }
+
+  RemoveTaskFromDb(String taskId) async {
+    try {
+      // show loading indicator
+      MyLoadingIndicator(context);
+      await taskService.RemoveTaskFromDb(taskId);
+      // close loading indicator
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      // close loading indicator
+      if (context.mounted) {
+        Navigator.pop(context);
+        // show err dialog
+        MyAlertDialog(context, e.toString());
+      }
+    }
   }
 
   @override
@@ -48,8 +82,10 @@ class _BodyTaskState extends State<BodyTask> {
                       return FloatingActionButton(
                         onPressed: () async {
                           await Navigator.pushNamed(context, "/add_task");
-                          // reload page to load new task
-                          value.GetTaskFromDb();
+                          // // reload page to load new task
+                          if (context.mounted) {
+                            GetTaskFromDb(context);
+                          }
                         },
                         child: const Icon(
                           Icons.add,
@@ -73,10 +109,11 @@ class _BodyTaskState extends State<BodyTask> {
           return ListView.builder(
             itemCount: value.result.length,
             itemBuilder: (context, index) {
-              return MyTaskOverview(
-                header: value.result[index]['title'],
-                body: value.result[index]['description'],
+              return MyTaskTileOverview(
+                header: value.result[index].data()['title'],
+                body: value.result[index].data()['description'],
                 due: "18 - Nov",
+                onRemove: () => RemoveTaskFromDb(value.result[index].id),
               );
             },
           );

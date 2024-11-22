@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_elevated_button_long.dart';
@@ -28,6 +29,7 @@ class AddTask extends StatelessWidget {
           ModelTask(
             titleTask: taskTitleController.text.trim(),
             descriptionTask: taskDescriptionController.text.trim(),
+            uid: FirebaseAuth.instance.currentUser!.uid,
           ),
         );
         log("upload task is ok");
@@ -69,12 +71,13 @@ class AddTask extends StatelessWidget {
                   textFieldHint: "Description",
                   textController: taskDescriptionController),
 
+              // submit
               Row(
                 children: [
                   Expanded(
                     child: MyElevatedButtonLong(
-                      onPress: () async {
-                        await UploadTask();
+                      onPress: () {
+                        UploadTask();
                       },
                       title: "Submit",
                     ),

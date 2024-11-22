@@ -22,9 +22,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        scaffoldBackgroundColor: const Color.fromARGB(217, 217, 217, 217),
-      ),
+      // theme: ThemeData(
+      //     scaffoldBackgroundColor: const Color.fromARGB(217, 217, 217, 217),
+      //     colorScheme: ColorScheme.light(
+      //       // primary: Colors.white,
+      //       surface: Colors.white,
+      //     )),
       home: const AuthPage(),
       //route for navigation page
       routes: {
