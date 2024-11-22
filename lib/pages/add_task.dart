@@ -71,12 +71,13 @@ class AddTask extends StatelessWidget {
                   textFieldHint: "Description",
                   textController: taskDescriptionController),
 
+              // submit
               Row(
                 children: [
                   Expanded(
                     child: MyElevatedButtonLong(
-                      onPress: () async {
-                        await UploadTask();
+                      onPress: () {
+                        UploadTask();
                       },
                       title: "Submit",
                     ),

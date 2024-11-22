@@ -16,6 +16,8 @@ class TaskService extends ChangeNotifier {
   Future<void> AddTaskToDb(ModelTask task) async {
     try {
       await _firebaseFirestore.collection("Task").add(task.ToMap());
+      // reload to fetch latest update
+      GetTaskFromDb();
     } catch (e) {
       log("err while uploading task: $e");
       throw Exception(e);
@@ -35,8 +37,8 @@ class TaskService extends ChangeNotifier {
           .get();
 
       for (var element in data.docs) {
-        _result[_result.length] = element.data();
-        log("data: ${element.data()}");
+        _result[_result.length] = element;
+        log("data: $element");
       }
       notifyListeners();
       log("task data: $_result");
@@ -45,5 +47,16 @@ class TaskService extends ChangeNotifier {
       throw Exception(e);
     }
   }
+
   // delete task
+  Future<void> RemoveTaskFromDb(String taskId) async {
+    try {
+      await _firebaseFirestore.collection("Task").doc(taskId).delete();
+      // reload to fetch latest update
+      GetTaskFromDb();
+    } catch (e) {
+      log("err while removing task: $e");
+      throw Exception(e);
+    }
+  }
 }
