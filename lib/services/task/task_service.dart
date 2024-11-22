@@ -59,4 +59,19 @@ class TaskService extends ChangeNotifier {
       throw Exception(e);
     }
   }
+
+  // delete task
+  Future<void> UpdateTaskFromDb(String taskId, ModelTask modelTask) async {
+    try {
+      await _firebaseFirestore
+          .collection("Task")
+          .doc(taskId)
+          .update(modelTask.ToMap());
+      // reload to fetch latest update
+      GetTaskFromDb();
+    } catch (e) {
+      log("err while updating task: $e");
+      throw Exception(e);
+    }
+  }
 }

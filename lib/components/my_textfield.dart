@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 
 class MyTextfield extends StatelessWidget {
-  final String textFieldHint;
+  final String? textFieldHint;
   final TextEditingController textController;
+  final int maxLines;
+  final bool readOnly;
 
   const MyTextfield({
     super.key,
-    required this.textFieldHint,
+    this.textFieldHint,
+    this.maxLines = 1,
+    this.readOnly = false,
     required this.textController,
   });
 
@@ -14,6 +18,8 @@ class MyTextfield extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
       controller: textController,
+      readOnly: readOnly,
+      maxLines: maxLines,
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white,

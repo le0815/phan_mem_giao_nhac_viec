@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
 import 'package:phan_mem_giao_nhac_viec/services/auth/auth_gate.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_task.dart';
