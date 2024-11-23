@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
 import 'package:phan_mem_giao_nhac_viec/services/auth/auth_gate.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_task.dart';
@@ -35,7 +34,7 @@ class MyApp extends StatelessWidget {
         "/body_home": (context) => const BodyHome(),
         "/body_task": (context) => const BodyTask(),
         "/body_message": (context) => const BodyMessage(),
-        "/add_task": (context) => const AddTask(),
+        "/add_task": (context) => AddTask(),
       },
     );
   }

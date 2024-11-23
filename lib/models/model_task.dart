@@ -1,13 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ModelTask {
   String titleTask;
   String descriptionTask;
+  Timestamp? due;
+  final Timestamp createAt;
   final String uid;
   final String? idTask;
 
   ModelTask({
+    required this.createAt,
     required this.titleTask,
     required this.descriptionTask,
     required this.uid,
+    this.due,
     this.idTask,
   });
 
@@ -17,12 +23,16 @@ class ModelTask {
             "title": titleTask,
             "description": descriptionTask,
             "uid": uid,
+            "createAt": createAt,
+            "due": due
           }
         : {
             "title": titleTask,
             "description": descriptionTask,
             "uid": uid,
-            "idTask": idTask
+            "idTask": idTask,
+            "createAt": createAt,
+            "due": due
           };
   }
 }

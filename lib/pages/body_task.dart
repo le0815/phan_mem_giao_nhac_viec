@@ -131,11 +131,12 @@ class _BodyTaskState extends State<BodyTask> {
                 onTap: () async {
                   await OpenTaskDetail(
                     ModelTask(
-                      titleTask: value.result[index].data()['title'],
-                      descriptionTask:
-                          value.result[index].data()['description'],
-                      uid: value.result[index].data()['uid'],
-                    ),
+                        titleTask: value.result[index].data()['title'],
+                        descriptionTask:
+                            value.result[index].data()['description'],
+                        uid: value.result[index].data()['uid'],
+                        createAt: value.result[index].data()['createAt'],
+                        due: value.result[index].data()['due']),
                     value.result[index].id,
                   );
                   value.GetTaskFromDb();
