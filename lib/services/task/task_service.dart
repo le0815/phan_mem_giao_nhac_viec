@@ -9,15 +9,14 @@ class TaskService extends ChangeNotifier {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
   final _result = {};
+  final _resultByDate = {};
 
   Map get result => _result;
-
+  Map get resultByDate => _resultByDate;
   // add task
   Future<void> AddTaskToDb(ModelTask task) async {
     try {
       await _firebaseFirestore.collection("Task").add(task.ToMap());
-      // reload to fetch latest update
-      GetTaskFromDb();
     } catch (e) {
       log("err while uploading task: $e");
       throw Exception(e);
@@ -40,7 +39,7 @@ class TaskService extends ChangeNotifier {
         _result[_result.length] = element;
         log("data: $element");
       }
-      notifyListeners();
+      // notifyListeners();
       log("task data: $_result");
     } catch (e) {
       log("error while getting task from db: ${e.toString()}");
@@ -49,11 +48,11 @@ class TaskService extends ChangeNotifier {
   }
 
   // delete task
-  Future<void> RemoveTaskFromDb(String taskId) async {
+  Future<void> RemoveTaskFromDb(String taskId, DateTime currentDate) async {
     try {
       await _firebaseFirestore.collection("Task").doc(taskId).delete();
       // reload to fetch latest update
-      GetTaskFromDb();
+      GetTaskByDay(currentDate);
     } catch (e) {
       log("err while removing task: $e");
       throw Exception(e);
@@ -74,4 +73,32 @@ class TaskService extends ChangeNotifier {
       throw Exception(e);
     }
   }
+
+  Future<void> GetTaskByDay(DateTime time) async {
+    // get latest update task from db
+    await GetTaskFromDb();
+    // clear the previous resultByDate
+    _resultByDate.clear();
+
+    // loop for get task with createAt itself match to the current time
+    for (var element in _result.values) {
+      // element
+      Timestamp timeCreateOfTask = element.data()["createAt"];
+      // convert to date only
+      var dateOnlyTimeCreateOfTask = ConvertToDateOnly(
+          DateTime.fromMillisecondsSinceEpoch(
+              timeCreateOfTask.millisecondsSinceEpoch));
+      var dateOnlyCurrentTime = ConvertToDateOnly(time);
+
+      if (dateOnlyCurrentTime.compareTo(dateOnlyTimeCreateOfTask) == 0) {
+        _resultByDate[_resultByDate.length] = element;
+      }
+    }
+    notifyListeners();
+  }
+}
+
+DateTime ConvertToDateOnly(DateTime time) {
+  return time.copyWith(
+      hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:horizontal_week_calendar/horizontal_week_calendar.dart';
@@ -6,7 +8,6 @@ import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_task_tile_overview.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:provider/provider.dart';
 
@@ -19,20 +20,21 @@ class BodyTask extends StatefulWidget {
 
 class _BodyTaskState extends State<BodyTask> {
   final taskService = TaskService();
-
+  // use list object to changeable value after pass to function
+  List<DateTime> currentDate = [DateTime.now()];
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // get task from database
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      GetTaskFromDb(context);
+      GetTaskByDay(context, currentDate[0]);
     });
   }
 
-  GetTaskFromDb(BuildContext context) async {
+  GetTaskByDay(BuildContext context, DateTime currentDate) async {
     // show loading indicator
     MyLoadingIndicator(context);
-    await taskService.GetTaskFromDb();
+    await taskService.GetTaskByDay(currentDate);
     // close loading indicator
     if (context.mounted) {
       Navigator.pop(context);
@@ -43,7 +45,7 @@ class _BodyTaskState extends State<BodyTask> {
     try {
       // show loading indicator
       MyLoadingIndicator(context);
-      await taskService.RemoveTaskFromDb(taskId);
+      await taskService.RemoveTaskFromDb(taskId, currentDate[0]);
       // close loading indicator
       if (context.mounted) {
         Navigator.pop(context);
@@ -83,7 +85,10 @@ class _BodyTaskState extends State<BodyTask> {
                 Column(
                   children: [
                     // week calendar
-                    WeekCalendar(),
+                    WeekCalendar(
+                      // pass list object here to can changable value of object
+                      currentDate: currentDate,
+                    ),
                     TaskTileOverView(),
                   ],
                 ),
@@ -98,7 +103,7 @@ class _BodyTaskState extends State<BodyTask> {
                           await Navigator.pushNamed(context, "/add_task");
                           // // reload page to load new task
                           if (context.mounted) {
-                            GetTaskFromDb(context);
+                            GetTaskByDay(context, currentDate[0]);
                           }
                         },
                         child: const Icon(
@@ -120,37 +125,58 @@ class _BodyTaskState extends State<BodyTask> {
     return Expanded(
       child: Consumer<TaskService>(
         builder: (context, value, child) {
-          return ListView.builder(
-            itemCount: value.result.length,
-            itemBuilder: (context, index) {
-              return MyTaskTileOverview(
-                header: value.result[index].data()['title'],
-                body: value.result[index].data()['description'],
-                due: "18 - Nov",
-                onRemove: () => RemoveTaskFromDb(value.result[index].id),
-                onTap: () async {
-                  await OpenTaskDetail(
-                    ModelTask(
-                        titleTask: value.result[index].data()['title'],
-                        descriptionTask:
-                            value.result[index].data()['description'],
-                        uid: value.result[index].data()['uid'],
-                        createAt: value.result[index].data()['createAt'],
-                        due: value.result[index].data()['due']),
-                    value.result[index].id,
-                  );
-                  value.GetTaskFromDb();
-                },
-              );
-            },
-          );
+          return value.resultByDate.isEmpty
+              ? const Text("Nothing to show here!")
+              : ListView.builder(
+                  itemCount: value.resultByDate.length,
+                  itemBuilder: (context, index) {
+                    return MyTaskTileOverview(
+                      header: value.resultByDate[index].data()['title'],
+                      body: value.resultByDate[index].data()['description'],
+                      due: "18 - Nov",
+                      onRemove: () =>
+                          RemoveTaskFromDb(value.resultByDate[index].id),
+                      onTap: () async {
+                        await OpenTaskDetail(
+                          ModelTask(
+                              titleTask:
+                                  value.resultByDate[index].data()['title'],
+                              descriptionTask: value.resultByDate[index]
+                                  .data()['description'],
+                              uid: value.resultByDate[index].data()['uid'],
+                              createAt:
+                                  value.resultByDate[index].data()['createAt'],
+                              due: value.resultByDate[index].data()['due']),
+                          value.result[index].id,
+                        );
+                        // reload task
+                        value.GetTaskByDay(currentDate[0]);
+                      },
+                    );
+                  },
+                );
         },
       ),
     );
   }
+}
 
-  HorizontalWeekCalendar WeekCalendar() {
+class WeekCalendar extends StatelessWidget {
+  List<DateTime> currentDate;
+  WeekCalendar({
+    super.key,
+    required this.currentDate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final taskService = Provider.of<TaskService>(context, listen: false);
     return HorizontalWeekCalendar(
+      onDateChange: (date) {
+        currentDate[0] = date;
+        log("current date: $currentDate");
+        taskService.GetTaskByDay(currentDate[0]);
+      },
       initialDate: DateTime.now(),
       minDate: DateTime(2024),
       maxDate: DateTime(2025),
