@@ -6,10 +6,9 @@
 ![Screenshot 2024-11-07 at 16-12-59 localhost _ localhost _ NCKH phpMyAdmin 5 2 1](https://github.com/user-attachments/assets/b9453917-187b-46d7-8bef-848980b128bf)
 
 ## Các công nghệ sử dụng:
-- framework: flutter, fast api
-- api, database deployment: ubuntu server + nginx
+- framework: flutter
 - ide: visual studio code
-- database: mysql
+- database: firebase
 
 ## Ứng dụng tham khảo:  
 ClickUp (https://play.google.com/store/apps/details?id=co.mangotechnologies.clickup&pli=1) 
