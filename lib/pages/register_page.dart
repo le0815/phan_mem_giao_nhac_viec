@@ -39,12 +39,12 @@ class RegisterPage extends StatelessWidget {
         if (context.mounted) {
           Navigator.pop(context);
         }
-        // login to the app
-        log("logging");
-        await authService.SignInWithEmailAndPassword(
-          usrNameTextController.text,
-          pwdTextController.text,
-        );
+        // // login to the app
+        // log("logging");
+        // await authService.SignInWithEmailAndPassword(
+        //   usrNameTextController.text,
+        //   pwdTextController.text,
+        // );
       } catch (e) {
         // close loading indicator
         if (context.mounted) {
