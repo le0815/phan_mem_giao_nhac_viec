@@ -25,7 +25,7 @@ class RegisterPage extends StatelessWidget {
       }
 
       // loading indicator
-      MyLoadingIndicator(context);
+      // MyLoadingIndicator(context);
 
       final authService = AuthService();
 
@@ -35,23 +35,12 @@ class RegisterPage extends StatelessWidget {
           usrNameTextController.text,
           pwdTextController.text,
         );
-        // close loading indicator
-        if (context.mounted) {
-          Navigator.pop(context);
-        }
-        // // login to the app
-        // log("logging");
-        // await authService.SignInWithEmailAndPassword(
-        //   usrNameTextController.text,
-        //   pwdTextController.text,
-        // );
       } catch (e) {
-        // close loading indicator
-        if (context.mounted) {
-          Navigator.pop(context);
+        // show error
+        if(context.mounted)
+        {
           MyAlertDialog(context, e.toString());
         }
-
         log('error while register: ${e.toString()}.');
       }
     }

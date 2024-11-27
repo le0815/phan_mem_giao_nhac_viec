@@ -23,23 +23,14 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     OnSignIn() async {
-      // show loading indicator
-      MyLoadingIndicator(context);
-
       final authService = AuthService();
 
       try {
         await authService.SignInWithEmailAndPassword(
             usrNameTextController.text, pwdTextController.text);
-
-        // close loading indicator
-        if (context.mounted) {
-          Navigator.pop(context);
-        }
       } catch (e) {
-        // close loading indicator
+        // show error
         if (context.mounted) {
-          Navigator.pop(context);
           MyAlertDialog(context, e.toString());
         }
         log('error while sign in: $e.');
