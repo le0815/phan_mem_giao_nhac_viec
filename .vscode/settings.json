@@ -1,3 +1,5 @@
 {
-    "cmake.sourceDirectory": "/home/ha/Desktop/Flutter/phan_mem_giao_nhac_viec/linux/flutter"
+    "cmake.sourceDirectory": "/home/ha/Desktop/Flutter/phan_mem_giao_nhac_viec/linux/flutter",
+    "IDX.aI.enableInlineCompletion": true,
+    "IDX.aI.enableCodebaseIndexing": true
 }
