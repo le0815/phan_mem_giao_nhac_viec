@@ -3,7 +3,10 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_message_overview_tile.dart';
+import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/services/chat/chat_service.dart';
+import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
+import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 
 class BodyMessage extends StatelessWidget {
   const BodyMessage({super.key});
@@ -69,24 +72,48 @@ class BodyMessage extends StatelessWidget {
   }
 
   Future<dynamic> AddNewChatDialog(BuildContext context) {
+    TextEditingController textEditingController = TextEditingController();
+
     return showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Add new Chat!"),
+          title: const Text("Add new Chat!"),
           content: Column(
             children: [
-              TextField(
-                decoration: InputDecoration(
-                  hintText: "Enter chat name",
-                ),
-              ),
               // search user to add to this chat
-              TextField(
-                decoration: InputDecoration(
-                  hintText: "Search user to add",
-                ),
+              MyTextfield(
+                textController: textEditingController,
+                textFieldHint: "Enter chat name",
               ),
+              AddVerticalSpace(10),
+              // search user to add to this chat
+              MyTextfield(
+                textController: textEditingController,
+                textFieldHint: "Search user to add",
+                prefixIcon: const Icon(Icons.search_outlined),
+              ),
+              // query user to add to this chat
+              FutureBuilder(
+                future: DatabaseService.searchUser(textEditingController.text),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  final docs = snapshot.data!.docs;
+                  return ListView.builder(
+                    itemCount: docs.length,
+                    itemBuilder: (context, index) {
+                      return MyMessageOverviewTile(
+                        chatName: (docs[index].data() as Map?)?["email"],
+                        msg: "sample",
+                      );
+                    },
+                  );
+                },
+              )
             ],
           ),
           // save or cancel action
