@@ -1,5 +1,9 @@
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_message_overview_tile.dart';
+import 'package:phan_mem_giao_nhac_viec/services/chat/chat_service.dart';
 
 class BodyMessage extends StatelessWidget {
   const BodyMessage({super.key});
@@ -10,16 +14,7 @@ class BodyMessage extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       child: Stack(
         children: [
-          // list message
-          ListView.builder(
-            itemCount: 3,
-            itemBuilder: (context, index) {
-              return const MyMessageOverviewTile(
-                chatName: "Test Chat Name",
-                msg: "test msg 😍",
-              );
-            },
-          ),
+          getChatGroupStream(),
           // float add new chat button
           Positioned(
             bottom: 10,
@@ -33,6 +28,43 @@ class BodyMessage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  StreamBuilder<QuerySnapshot<Object?>> getChatGroupStream() {
+    return StreamBuilder(
+      stream: ChatService.groupChatStream(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          log("loading chat group from database: - ${DateTime.now()}");
+          // show loading indicator
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (!snapshot.hasData) {
+          return const Center(
+            child: Text(
+              'No message here',
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.black54,
+              ),
+            ),
+          );
+        }
+        final docs = snapshot.data!.docs;
+        // list message
+        return ListView.builder(
+          itemCount: docs.length,
+          itemBuilder: (context, index) {
+            return MyMessageOverviewTile(
+              chatName: (docs[index].data() as Map?)?["title"],
+              msg: (docs[index].data() as Map?)?["msg"],
+            );
+          },
+        );
+      },
     );
   }
 
