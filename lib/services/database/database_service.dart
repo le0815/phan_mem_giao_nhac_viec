@@ -1,10 +1,27 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
-class DatabaseService {
-  static final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+class DatabaseService extends ChangeNotifier {
+  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
-  static Future<QuerySnapshot> searchUser(String searchPhrase) {
-    return _firebaseFirestore.collection("User").where("email", arrayContains: searchPhrase).get();
+  var _result = {};
+  get result => _result;
+
+  searchUser(String searchPhrase) async {
+    // clear the previous result
+    _result.clear();
+
+    var result = await _firebaseFirestore
+        .collection("User")
+        .where("email", isEqualTo: searchPhrase)
+        .get();
+    
+    for (var element in result.docs) {
+        _result[_result.length] = element;
+        log("data: $element");
+      }
+    notifyListeners();
   }
-  
 }
