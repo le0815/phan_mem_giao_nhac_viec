@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class DatabaseService extends ChangeNotifier {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
-  var _result = {};
+  final _result = {};
   get result => _result;
 
   searchUser(String searchPhrase) async {
@@ -14,7 +14,7 @@ class DatabaseService extends ChangeNotifier {
     _result.clear();
 
     var result = await _firebaseFirestore
-        .collection("User")
+        .collection("User")        
         .where("email", isEqualTo: searchPhrase)
         .get();
     

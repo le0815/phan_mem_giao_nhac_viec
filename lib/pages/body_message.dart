@@ -14,30 +14,22 @@ class BodyMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<DatabaseService>(
-      create: (context) => DatabaseService(),
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Stack(
-          children: [
-            getChatGroupStream(),
-            // float add new chat button
-            Positioned(
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Stack(
+        children: [
+          getChatGroupStream(),
+          // float add new chat button
+          Positioned(
               bottom: 10,
               right: 10,
-              child: Consumer<DatabaseService>(
-                builder: (context, value, child) {
-                  return FloatingActionButton(
-                    onPressed: () {
-                      AddNewChatDialog(context, value);
-                    },
-                    child: const Icon(Icons.add),
-                  );
+              child: FloatingActionButton(
+                onPressed: () {
+                  AddNewChatDialog(context);
                 },
-              ),
-            ),
-          ],
-        ),
+                child: const Icon(Icons.add),
+              )),
+        ],
       ),
     );
   }
@@ -79,7 +71,7 @@ class BodyMessage extends StatelessWidget {
     );
   }
 
-  Future<dynamic> AddNewChatDialog(BuildContext context, var value) {
+  Future<dynamic> AddNewChatDialog(BuildContext context) {
     TextEditingController searchPhaseController = TextEditingController();
     TextEditingController chatNameController = TextEditingController();
     var _searchResultProvider = DatabaseService();
@@ -97,33 +89,40 @@ class BodyMessage extends StatelessWidget {
                   textFieldHint: "Enter chat name",
                 ),
                 AddVerticalSpace(10),
-                // search user to add to this chat
-                MyTextfield(
-                  textController: searchPhaseController,
-                  textFieldHint: "Search user to add",
-                  prefixIcon: const Icon(Icons.search_outlined),
-                  onPressed: () {
-                    _searchResultProvider
-                        .searchUser(searchPhaseController.text);
+                // enter user searchPhase
+                Consumer<DatabaseService>(
+                  builder: (context, value, child) {
+                    return MyTextfield(
+                      textController: searchPhaseController,
+                      textFieldHint: "Search user to add",
+                      prefixIcon: const Icon(Icons.search_outlined),
+                      onPressed: () {
+                        value.searchUser(searchPhaseController.text);
+                      },
+                    );
                   },
                 ),
+                AddVerticalSpace(10),
                 // query user to add to this chat
                 SizedBox(
-                    height: double.maxFinite,
-                    width: double.maxFinite,
-                    child: value.result.isEmpty
-                        ? const Text("Nothing to show here!")
-                        : ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: value.result.length,
-                            itemBuilder: (context, index) {
-                              return MyMessageOverviewTile(
-                                chatName: (value.result[index].data()
-                                    as Map?)?["email"],
-                                msg: "sample",
-                              );
-                            },
-                          ))
+                  width: double.maxFinite,
+                  height: 300,
+                  child: Consumer<DatabaseService>(
+                    builder: (context, value, child) {
+                      return value.result.isEmpty
+                          ? const Text("Try search something!")
+                          : ListView.builder(
+                              itemCount: value.result.length,
+                              itemBuilder: (context, index) {
+                                return MyMessageOverviewTile(
+                                  chatName: value.result[index].data()["email"],
+                                  msg: "sample",
+                                );
+                              },
+                            );
+                    },
+                  ),
+                ),
               ],
             ),
           ),
