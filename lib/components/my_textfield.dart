@@ -5,9 +5,13 @@ class MyTextfield extends StatelessWidget {
   final TextEditingController textController;
   final int maxLines;
   final bool readOnly;
+  final Function()? onPressed;
+  final Widget? prefixIcon;
 
   const MyTextfield({
     super.key,
+    this.prefixIcon,
+    this.onPressed,
     this.textFieldHint,
     this.maxLines = 1,
     this.readOnly = false,
@@ -21,6 +25,7 @@ class MyTextfield extends StatelessWidget {
       readOnly: readOnly,
       maxLines: maxLines,
       decoration: InputDecoration(
+        prefixIcon: prefixIcon != null ? IconButton(onPressed: onPressed, icon: prefixIcon!) : null,
         filled: true,
         fillColor: Colors.white,
         hintText: textFieldHint,

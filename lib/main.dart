@@ -5,6 +5,8 @@ import 'package:phan_mem_giao_nhac_viec/pages/body_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_home.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_message.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -20,22 +22,29 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      // theme: ThemeData(
-      //     scaffoldBackgroundColor: const Color.fromARGB(217, 217, 217, 217),
-      //     colorScheme: ColorScheme.light(
-      //       // primary: Colors.white,
-      //       surface: Colors.white,
-      //     )),
-      home: const AuthPage(),
-      //route for navigation page
-      routes: {
-        "/body_home": (context) => const BodyHome(),
-        "/body_task": (context) => const BodyTask(),
-        "/body_message": (context) => const BodyMessage(),
-        "/add_task": (context) => AddTask(),
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<DatabaseService>(
+            create: (context) => DatabaseService()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        // theme: ThemeData(
+        //     scaffoldBackgroundColor: const Color.fromARGB(217, 217, 217, 217),
+        //     colorScheme: ColorScheme.light(
+        //       // primary: Colors.white,
+        //       surface: Colors.white,
+        //     )),
+        home: const AuthPage(),
+        //route for navigation page
+        routes: {
+          "/body_home": (context) => const BodyHome(),
+          "/body_task": (context) => const BodyTask(),
+          "/body_message": (context) => const BodyMessage(),
+          "/add_task": (context) => AddTask(),
+        },
+      ),
     );
   }
 }
+  

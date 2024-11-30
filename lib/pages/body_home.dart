@@ -1,6 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_doughnutchart.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 
 class BodyHome extends StatelessWidget {
