@@ -56,9 +56,9 @@ class MyDoughnutchart extends StatelessWidget {
           axes: [
             RadialAxis(
               radiusFactor: 0.65,
-              axisLineStyle: AxisLineStyle(
+              axisLineStyle: const AxisLineStyle(
                 thickness: 25,
-                color: const Color.fromARGB(15, 0, 0, 0),
+                color: Color.fromARGB(15, 0, 0, 0),
               ),
               startAngle: 270,
               endAngle: 270,

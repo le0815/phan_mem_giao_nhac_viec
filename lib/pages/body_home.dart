@@ -7,7 +7,7 @@ class BodyHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Column(
         children: [
           // search box
@@ -31,7 +31,7 @@ class BodyHome extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
         hintText: "Search",
-        hintStyle: TextStyle(color: Colors.black38),
+        hintStyle: const TextStyle(color: Colors.black38),
         filled: true,
         fillColor: Colors.grey[350]!.withOpacity(0.6),
       ),
@@ -66,7 +66,7 @@ class BodyHome extends StatelessWidget {
 
   Container TodayTask() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
