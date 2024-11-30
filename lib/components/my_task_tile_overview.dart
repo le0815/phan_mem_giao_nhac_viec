@@ -34,7 +34,7 @@ class MyTaskTileOverview extends StatelessWidget {
               child: GestureDetector(
                 onTap: onTap,
                 child: Container(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     color: Colors.amber[200],

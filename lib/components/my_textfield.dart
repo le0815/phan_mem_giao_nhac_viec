@@ -31,7 +31,7 @@ class MyTextfield extends StatelessWidget {
         hintText: textFieldHint,
         hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
         border: OutlineInputBorder(
-          borderSide: BorderSide(width: 1, color: Colors.grey),
+          borderSide: const BorderSide(width: 1, color: Colors.grey),
           borderRadius: BorderRadius.circular(8),
         ),
         // icon: Icon(Icons.remove_red_eye_outlined),

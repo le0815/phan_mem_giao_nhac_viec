@@ -12,7 +12,8 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var usrNameTextController = TextEditingController();
+    var userNameTextController = TextEditingController();
+    var emailTextController = TextEditingController();
     var pwdTextController = TextEditingController();
     var confirmTextController = TextEditingController();
 
@@ -31,8 +32,9 @@ class RegisterPage extends StatelessWidget {
       try {
         // create account
         await authService.RegisterWithEmailAndPassword(
-          usrNameTextController.text,
+          emailTextController.text,
           pwdTextController.text,
+          userNameTextController.text,
         );
       } catch (e) {
         // show error
@@ -58,10 +60,16 @@ class RegisterPage extends StatelessWidget {
                     style: TextStyle(fontSize: 24),
                   ),
                   AddVerticalSpace(40),
-                  // usr name
+                  // User Name
                   MyTextfield(
                     textFieldHint: "User Name",
-                    textController: usrNameTextController,
+                    textController: userNameTextController,
+                  ),
+                  AddVerticalSpace(20),
+                  // Email Address
+                  MyTextfield(
+                    textFieldHint: "Email Address",
+                    textController: emailTextController,
                   ),
                   AddVerticalSpace(20),
                   // pwd
@@ -77,7 +85,7 @@ class RegisterPage extends StatelessWidget {
                   ),
                   // register btn
                   AddVerticalSpace(20),
-                  RegisterButton(usrNameTextController, pwdTextController,
+                  RegisterButton(emailTextController, pwdTextController,
                       confirmTextController, OnRegister),
                   AddVerticalSpace(20),
                   // Have an account? Login now.
@@ -106,7 +114,7 @@ class RegisterPage extends StatelessWidget {
   }
 
   Row RegisterButton(
-      TextEditingController usrNameTextController,
+      TextEditingController emailTextController,
       TextEditingController pwdTextController,
       TextEditingController confirmTextController,
       Future<Null> OnRegister()) {
@@ -122,7 +130,7 @@ class RegisterPage extends StatelessWidget {
               ),
             ),
             onPressed: () {
-              log("usrname: ${usrNameTextController.text}");
+              log("usrname: ${emailTextController.text}");
               log("pwd: ${pwdTextController.text}");
               log("confirm: ${confirmTextController.text}");
               OnRegister();
