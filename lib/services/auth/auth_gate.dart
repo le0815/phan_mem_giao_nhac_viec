@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
 
 import 'package:phan_mem_giao_nhac_viec/pages/home_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/auth/login_or_register.dart';
