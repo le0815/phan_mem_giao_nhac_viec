@@ -1,9 +1,12 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_message_overview_tile.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
+import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/chat_box_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/chat/chat_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
@@ -35,8 +38,9 @@ class BodyMessage extends StatelessWidget {
   }
 
   StreamBuilder<QuerySnapshot<Object?>> getChatGroupStream() {
+    final currentUID = FirebaseAuth.instance.currentUser!.uid;
     return StreamBuilder(
-      stream: ChatService.groupChatStream(),
+      stream: ChatService.groupChatStream(currentUID),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           log("loading chat group from database: - ${DateTime.now()}");
@@ -61,9 +65,21 @@ class BodyMessage extends StatelessWidget {
         return ListView.builder(
           itemCount: docs.length,
           itemBuilder: (context, index) {
-            return MyMessageOverviewTile(
-              chatName: (docs[index].data() as Map?)?["title"],
-              msg: (docs[index].data() as Map?)?["msg"],
+            return GestureDetector(
+              // open chat page
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ChatBoxPage(chatDocId: docs[index].id)),
+                );
+              },
+              child: MyMessageOverviewTile(
+                chatName: (docs[index].data() as Map?)?["chatName"],
+                // (docs[index].data() as Map?)?["msg"]
+                msg: "Test",
+              ),
             );
           },
         );
@@ -74,7 +90,9 @@ class BodyMessage extends StatelessWidget {
   Future<dynamic> AddNewChatDialog(BuildContext context) {
     TextEditingController searchPhaseController = TextEditingController();
     TextEditingController chatNameController = TextEditingController();
-    // var _searchResultProvider = DatabaseService();
+    final _userTileGlobalKey = GlobalKey<MyUserTileOverviewState>();
+    var iudMember = [FirebaseAuth.instance.currentUser!.uid];
+
     return showDialog(
       context: context,
       builder: (context) {
@@ -114,11 +132,20 @@ class BodyMessage extends StatelessWidget {
                           : ListView.builder(
                               itemCount: value.result.length,
                               itemBuilder: (context, index) {
-                                return SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: MyMessageOverviewTile(
-                                    chatName:
-                                        value.result[index].data()["email"],
+                                return GestureDetector(
+                                  onTap: () {
+                                    // change color of user tile when tapped
+                                    final userTile =
+                                        _userTileGlobalKey.currentState!;
+                                    userTile.changeState();
+                                    // add uid to members
+                                    iudMember
+                                        .add(value.result[index].id.toString());
+                                  },
+                                  child: MyUserTileOverview(
+                                    key: _userTileGlobalKey,
+                                    userName:
+                                        value.result[index].data()["userName"],
                                     msg: "sample",
                                   ),
                                 );
@@ -137,7 +164,15 @@ class BodyMessage extends StatelessWidget {
               child: const Text("Cancel"),
             ),
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                // add chat to database
+                ChatService.createNewChat(
+                  chatName: chatNameController.text.trim(),
+                  members: iudMember,
+                  timeUpdate: Timestamp.now(),
+                );
+                Navigator.pop(context);
+              },
               child: const Text("Add"),
             ),
           ],
