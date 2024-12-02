@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_message_overview_tile.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/chat_box_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/chat/chat_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
@@ -63,10 +64,21 @@ class BodyMessage extends StatelessWidget {
         return ListView.builder(
           itemCount: docs.length,
           itemBuilder: (context, index) {
-            return MyMessageOverviewTile(
-              chatName: (docs[index].data() as Map?)?["chatName"],
-              // (docs[index].data() as Map?)?["msg"]
-              msg: "Test",
+            return GestureDetector(
+              // open chat page
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ChatBoxPage(chatDocId: docs[index].id)),
+                );
+              },
+              child: MyMessageOverviewTile(
+                chatName: (docs[index].data() as Map?)?["chatName"],
+                // (docs[index].data() as Map?)?["msg"]
+                msg: "Test",
+              ),
             );
           },
         );
@@ -79,7 +91,7 @@ class BodyMessage extends StatelessWidget {
     TextEditingController chatNameController = TextEditingController();
     final _userTileGlobalKey = GlobalKey<MyUserTileOverviewState>();
     var iudMember = [FirebaseAuth.instance.currentUser!.uid];
-    var _chatService = ChatService();
+
     return showDialog(
       context: context,
       builder: (context) {
@@ -153,7 +165,7 @@ class BodyMessage extends StatelessWidget {
             TextButton(
               onPressed: () {
                 // add chat to database
-                _chatService.createNewChat(
+                ChatService.createNewChat(
                   chatName: chatNameController.text.trim(),
                   members: iudMember,
                   timeUpdate: Timestamp.now(),

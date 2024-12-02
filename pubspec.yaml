@@ -45,6 +45,7 @@ dependencies:
   provider: ^6.1.2
   slideable: ^0.0.2
   omni_datetime_picker: ^2.0.5
+  flutter_chat_bubble: ^2.0.2
 
 dev_dependencies:
   flutter_test:
