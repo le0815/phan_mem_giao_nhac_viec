@@ -74,7 +74,7 @@ class BodyMessage extends StatelessWidget {
   Future<dynamic> AddNewChatDialog(BuildContext context) {
     TextEditingController searchPhaseController = TextEditingController();
     TextEditingController chatNameController = TextEditingController();
-    var _searchResultProvider = DatabaseService();
+    // var _searchResultProvider = DatabaseService();
     return showDialog(
       context: context,
       builder: (context) {
@@ -114,9 +114,13 @@ class BodyMessage extends StatelessWidget {
                           : ListView.builder(
                               itemCount: value.result.length,
                               itemBuilder: (context, index) {
-                                return MyMessageOverviewTile(
-                                  chatName: value.result[index].data()["email"],
-                                  msg: "sample",
+                                return SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: MyMessageOverviewTile(
+                                    chatName:
+                                        value.result[index].data()["email"],
+                                    msg: "sample",
+                                  ),
                                 );
                               },
                             );

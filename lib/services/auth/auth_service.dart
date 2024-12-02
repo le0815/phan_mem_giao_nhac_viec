@@ -54,7 +54,7 @@ class AuthService {
           .createUserWithEmailAndPassword(email: email, password: password);
       if (userCredential.credential != null) {
         _firebaseAuth.signInWithCredential(userCredential.credential!);
-      }      
+      }
       // save user data to db
       await SaveInfoToDatabase(
         userCredential,
@@ -69,13 +69,17 @@ class AuthService {
   }
 
   // save usr info to database with id of the doc is uid
-  Future<void> SaveInfoToDatabase(UserCredential userCredential, String userName) async {
+  Future<void> SaveInfoToDatabase(
+      UserCredential userCredential, String userName) async {
     try {
       log("start uploading user info to database");
       await _firebaseFirestore
           .collection("User")
           .doc(userCredential.user!.uid)
-          .set(ModelUser(email: userCredential.user!.email.toString(), userName: userName).ToMap());
+          .set(ModelUser(
+            email: userCredential.user!.email.toString(),
+            userName: userName,
+          ).ToMap());
     } catch (e) {
       log("err while uploading user info to database: $e");
       throw Exception(e);
