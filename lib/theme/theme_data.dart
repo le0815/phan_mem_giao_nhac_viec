@@ -20,7 +20,7 @@ final ThemeData appTheme = ThemeData(
 
   colorScheme: ColorScheme.fromSwatch().copyWith(
     primary:
-        const Color(0xFFDA16D6D6), // Màu chủ đạo cho các nút và icon nổi bật
+        const Color(0xffda16d6d6), // Màu chủ đạo cho các nút và icon nổi bật
     secondary:
         const Color(0xFF6200EE), // Màu phụ, sử dụng cho icon hoặc nhấn mạnh
     error: Colors.redAccent, // Màu cảnh báo, cho các phần tử như Overdue
@@ -36,7 +36,7 @@ final ThemeData appTheme = ThemeData(
 
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      backgroundColor: Color(0xFFDA16D6D6), // Màu nền cho ElevatedButton
+      backgroundColor: const Color(0xffda16d6d6), // Màu nền cho ElevatedButton
       foregroundColor: Colors.white, // Màu chữ của ElevatedButton
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),

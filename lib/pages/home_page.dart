@@ -44,16 +44,16 @@ class _HomePageState extends State<HomePage> {
                 decoration: BoxDecoration(
                     color: const Color.fromARGB(217, 217, 217, 217),
                     borderRadius: BorderRadius.circular(16)),
-                child: Center(child: Text("H")),
+                child: const Center(child: Text("H")),
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           )
         ],
       ),
-      drawer: MyDrawer(),
+      drawer: const MyDrawer(),
       body: bodyComponents[btmNavIdx],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: btmNavIdx,

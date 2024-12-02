@@ -21,20 +21,20 @@ class _MyDrawerState extends State<MyDrawer> {
         children: [
           Column(
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 50,
               ),
               ListTile(
                 onTap: () => Navigator.pushNamed(context, "/body_home"),
-                leading: Icon(Icons.home_outlined),
-                title: Text("Home"),
+                leading: const Icon(Icons.home_outlined),
+                title: const Text("Home"),
               ),
               ListTile(
                 onTap: () => Navigator.pushNamed(context, "/body_message"),
-                leading: Icon(Icons.inbox_outlined),
-                title: Text("Messages"),
+                leading: const Icon(Icons.inbox_outlined),
+                title: const Text("Messages"),
               ),
-              ListTile(
+              const ListTile(
                 leading: Icon(Icons.settings_sharp),
                 title: Text("Settings"),
               ),
@@ -45,8 +45,8 @@ class _MyDrawerState extends State<MyDrawer> {
               var authService = AuthService();
               await authService.SignOut();
             },
-            leading: Icon(Icons.exit_to_app_outlined),
-            title: Text("Exit"),
+            leading: const Icon(Icons.exit_to_app_outlined),
+            title: const Text("Exit"),
           ),
         ],
       ),
