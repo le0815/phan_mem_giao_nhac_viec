@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_chat.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_message.dart';
 
@@ -8,10 +9,11 @@ class ChatService {
   static const _collectionName = "Chat";
   static const _messageCollection = "Message";
 
-  static Stream<QuerySnapshot> groupChatStream() {
+  static Stream<QuerySnapshot> groupChatStream(String currentUID) {
     return _firebaseFirestore
         .collection(_collectionName)
-        .orderBy('timeUpdate', descending: true)
+        .where("members", arrayContains: currentUID)
+        // .orderBy('timeUpdate', descending: true)
         .snapshots();
   }
 
@@ -20,14 +22,14 @@ class ChatService {
         .collection(_collectionName)
         .doc(chatCollection)
         .collection(_messageCollection)
-        .orderBy('timeSend', descending: true)
+        .orderBy('timeSend', descending: false)
         .snapshots();
   }
 
   static Future<void> sendMessage({required ModelMessage modelMessage}) async {
     await _firebaseFirestore
         .collection(_collectionName)
-        .doc(modelMessage.chatCollection)
+        .doc(modelMessage.chatCollectionID)
         .collection(modelMessage.messageCollection)
         .add(modelMessage.toMap());
   }

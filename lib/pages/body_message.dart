@@ -38,8 +38,9 @@ class BodyMessage extends StatelessWidget {
   }
 
   StreamBuilder<QuerySnapshot<Object?>> getChatGroupStream() {
+    final currentUID = FirebaseAuth.instance.currentUser!.uid;
     return StreamBuilder(
-      stream: ChatService.groupChatStream(),
+      stream: ChatService.groupChatStream(currentUID),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           log("loading chat group from database: - ${DateTime.now()}");

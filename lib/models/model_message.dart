@@ -3,13 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class ModelMessage {
   final String message;
   final Timestamp timeSend;
-  final String chatCollection;
+  final String chatCollectionID;
   final String messageCollection;
   final String senderUID;
 
   ModelMessage({
     required this.message,
-    required this.chatCollection,
+    required this.chatCollectionID,
     required this.messageCollection,
     required this.timeSend,
     required this.senderUID,

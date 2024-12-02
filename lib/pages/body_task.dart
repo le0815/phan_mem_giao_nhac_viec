@@ -126,7 +126,9 @@ class _BodyTaskState extends State<BodyTask> {
       child: Consumer<TaskService>(
         builder: (context, value, child) {
           return value.resultByDate.isEmpty
-              ? const Text("Nothing to show here!")
+              ? const Center(
+                  child: Text("Nothing to show here!"),
+                )
               : ListView.builder(
                   itemCount: value.resultByDate.length,
                   itemBuilder: (context, index) {
