@@ -24,14 +24,15 @@ class BodyMessage extends StatelessWidget {
           getChatGroupStream(),
           // float add new chat button
           Positioned(
-              bottom: 10,
-              right: 10,
-              child: FloatingActionButton(
-                onPressed: () {
-                  AddNewChatDialog(context);
-                },
-                child: const Icon(Icons.add),
-              )),
+            bottom: 10,
+            right: 10,
+            child: FloatingActionButton(
+              onPressed: () {
+                AddNewChatDialog(context);
+              },
+              child: const Icon(Icons.add),
+            ),
+          ),
         ],
       ),
     );

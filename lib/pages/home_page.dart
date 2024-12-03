@@ -4,6 +4,7 @@ import 'package:phan_mem_giao_nhac_viec/components/my_drawer.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_home.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_message.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/body_workspace.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,13 +17,15 @@ class _HomePageState extends State<HomePage> {
   List<Widget> bodyComponents = [
     const BodyHome(),
     const BodyTask(),
-    const BodyMessage()
+    const BodyMessage(),
+    const BodyWorkspace(),
   ];
 
   var appBarTitles = {
     0: const Text('Workspace Name'),
     1: const Text('My task'),
-    2: const Text('Messages')
+    2: const Text('Messages'),
+    3: const Text('My workspace'),
   };
   int btmNavIdx = 0;
 
@@ -57,6 +60,7 @@ class _HomePageState extends State<HomePage> {
       drawer: const MyDrawer(),
       body: bodyComponents[btmNavIdx],
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         currentIndex: btmNavIdx,
         onTap: (value) {
           setState(() {
@@ -75,6 +79,10 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.inbox_outlined),
             label: "Message",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.groups_2_outlined),
+            label: "Workspace",
           ),
         ],
       ),
