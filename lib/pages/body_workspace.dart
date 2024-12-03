@@ -12,17 +12,60 @@ class BodyWorkspace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String currentUID = FirebaseAuth.instance.currentUser!.uid;
     return Padding(
       padding: EdgeInsets.all(8),
       child: Stack(
         children: [
-          addFloatingButton(context),
+          StreamBuilder(
+            stream: WorkspaceService.workspaceStream(currentUID),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // show loading indicator
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              if (!snapshot.hasData) {
+                return const Center(
+                  child: Text(
+                    'No workspace here!',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.black54,
+                    ),
+                  ),
+                );
+              }
+              final docs = snapshot.data!.docs;
+              return ListView.builder(
+                itemCount: docs.length,
+                itemBuilder: (context, index) {
+                  return docs.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'No workspace here!',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        )
+                      : MyWorkspaceOverviewTile(
+                          workspaceName:
+                              (docs[index].data() as Map?)?["workspaceName"],
+                        );
+                },
+              );
+            },
+          ),
+          addFloatingButton(context, currentUID),
         ],
       ),
     );
   }
 
-  Positioned addFloatingButton(BuildContext context) {
+  Positioned addFloatingButton(BuildContext context, String currentUID) {
     return Positioned(
       bottom: 10,
       right: 10,
@@ -32,7 +75,7 @@ class BodyWorkspace extends StatelessWidget {
             context: context,
             builder: (context) {
               var workspaceNameController = TextEditingController();
-              return popUpDialog(workspaceNameController, context);
+              return popUpDialog(workspaceNameController, context, currentUID);
             },
           );
         },
@@ -41,9 +84,8 @@ class BodyWorkspace extends StatelessWidget {
     );
   }
 
-  AlertDialog popUpDialog(
-      TextEditingController workspaceNameController, BuildContext context) {
-    String currentUID = FirebaseAuth.instance.currentUser!.uid;
+  AlertDialog popUpDialog(TextEditingController workspaceNameController,
+      BuildContext context, String currentUID) {
     return AlertDialog(
       title: const Text(
         "Create new workspace",
@@ -60,14 +102,16 @@ class BodyWorkspace extends StatelessWidget {
           child: const Text("Cancel"),
         ),
         TextButton(
-          onPressed: () {
+          onPressed: () async {
             WorkspaceService.createWorkspace(
               currentUID: currentUID,
               modelWorkspace: ModelWorkspace(
                 workspaceName: workspaceNameController.text,
                 createAt: Timestamp.now(),
+                members: [currentUID],
               ),
             );
+
             Navigator.pop(context);
           },
           child: const Text("Add"),
