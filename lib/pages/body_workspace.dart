@@ -66,6 +66,7 @@ class BodyWorkspace extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => WorkspacePage(
+                            workspaceID: docs[index].id,
                             modelWorkspace: ModelWorkspace(
                                 createAt:
                                     (docs[index].data() as Map?)?["createAt"],

@@ -29,8 +29,6 @@ class _AddTaskState extends State<AddTask> {
     final TaskService taskService = TaskService();
 
     Future<void> UploadTask() async {
-      // show loading indicator
-      const MyLoadingIndicator();
       try {
         await taskService.AddTaskToDb(
           ModelTask(
@@ -44,16 +42,10 @@ class _AddTaskState extends State<AddTask> {
 
         // close loading indicator
         if (context.mounted) {
-          // close loading indicator
-          Navigator.pop(context);
           // close add task page
           Navigator.pop(context);
         }
       } catch (e) {
-        // close loading indicator
-        if (context.mounted) {
-          Navigator.pop(context);
-        }
         MyAlertDialog(context, e.toString());
         log(e.toString());
       }
