@@ -139,7 +139,7 @@ class BodyMessage extends StatelessWidget {
                                     final userTile =
                                         _userTileGlobalKey.currentState!;
                                     userTile.changeState();
-                                    // add uid to members
+                                    // add uid to members of chat
                                     iudMember
                                         .add(value.result[index].id.toString());
                                   },

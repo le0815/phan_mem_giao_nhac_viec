@@ -22,6 +22,25 @@ class WorkspaceService {
     });
   }
 
+  static addUser(
+      {required String docID,
+      required String uid,
+      required List newMemberList}) async {
+    // first get doc ref
+    var mainCollection =
+        await _firebaseFirestore.collection(_collectionName).doc(docID);
+
+    // update member
+    await mainCollection.update({
+      "members": newMemberList,
+    });
+
+    // add 'MembersDetail' subcollection after create main docs
+    await mainCollection.collection("MembersDetail").doc(uid).set({
+      "role": MyWorkspaceRole.member.index,
+    });
+  }
+
   static Stream<QuerySnapshot> workspaceStream(String currentUID) {
     return _firebaseFirestore
         .collection(_collectionName)
