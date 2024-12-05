@@ -8,11 +8,6 @@ import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 class TaskService extends ChangeNotifier {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
-  final _result = {};
-  final _resultByDate = {};
-
-  Map get result => _result;
-  Map get resultByDate => _resultByDate;
   // add task
   Future<void> AddTaskToDb(ModelTask task) async {
     try {
@@ -24,27 +19,19 @@ class TaskService extends ChangeNotifier {
   }
 
   // get task
-  Future<void> GetTaskFromDb() async {
-    try {
-      // clear previous result
-      _result.clear();
+  Future<Map> GetTaskFromDb() async {
+    // get task of current user by uid
+    var data = await _firebaseFirestore
+        .collection('Task')
+        .where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+        .get();
 
-      // get task of current user by uid
-      var data = await _firebaseFirestore
-          .collection('Task')
-          .where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-          .get();
-
-      for (var element in data.docs) {
-        _result[_result.length] = element;
-        log("data: $element");
-      }
-      // notifyListeners();
-      log("task data: $_result");
-    } catch (e) {
-      log("error while getting task from db: ${e.toString()}");
-      throw Exception(e);
+    var result = {};
+    for (var element in data.docs) {
+      result[result.length] = element;
+      log("data: $element");
     }
+    return result;
   }
 
   // delete task
@@ -67,21 +54,20 @@ class TaskService extends ChangeNotifier {
           .doc(taskId)
           .update(modelTask.ToMap());
       // reload to fetch latest update
-      GetTaskFromDb();
+      // GetTaskFromDb();
     } catch (e) {
       log("err while updating task: $e");
       throw Exception(e);
     }
   }
 
-  Future<void> GetTaskByDay(DateTime time) async {
+  Future<Map> GetTaskByDay(DateTime time) async {
     // get latest update task from db
-    await GetTaskFromDb();
-    // clear the previous resultByDate
-    _resultByDate.clear();
+    var result = await GetTaskFromDb();
+    var resultByDate = {};
 
     // loop for get task with createAt itself match to the current time
-    for (var element in _result.values) {
+    for (var element in result.values) {
       // element
       Timestamp timeCreateOfTask = element.data()["createAt"];
       // convert to date only
@@ -91,10 +77,11 @@ class TaskService extends ChangeNotifier {
       var dateOnlyCurrentTime = ConvertToDateOnly(time);
 
       if (dateOnlyCurrentTime.compareTo(dateOnlyTimeCreateOfTask) == 0) {
-        _resultByDate[_resultByDate.length] = element;
+        resultByDate[resultByDate.length] = element;
       }
     }
-    notifyListeners();
+    return resultByDate;
+    // notifyListeners();
   }
 }
 
