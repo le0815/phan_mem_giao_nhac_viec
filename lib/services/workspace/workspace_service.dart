@@ -16,7 +16,7 @@ class WorkspaceService {
     var mainCollection = await _firebaseFirestore
         .collection(_collectionName)
         .add(modelWorkspace.toMap());
-    // add 'member' subcollection after create main docs
+    // add 'MembersDetail' subcollection after create main docs
     await mainCollection.collection("MembersDetail").doc(currentUID).set({
       "role": MyWorkspaceRole.owner.index,
     });

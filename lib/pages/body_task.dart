@@ -33,7 +33,7 @@ class _BodyTaskState extends State<BodyTask> {
 
   GetTaskByDay(BuildContext context, DateTime currentDate) async {
     // show loading indicator
-    MyLoadingIndicator(context);
+    MyLoadingIndicator();
     await taskService.GetTaskByDay(currentDate);
     // close loading indicator
     if (context.mounted) {
@@ -44,7 +44,7 @@ class _BodyTaskState extends State<BodyTask> {
   RemoveTaskFromDb(String taskId) async {
     try {
       // show loading indicator
-      MyLoadingIndicator(context);
+      MyLoadingIndicator();
       await taskService.RemoveTaskFromDb(taskId, currentDate[0]);
       // close loading indicator
       if (context.mounted) {

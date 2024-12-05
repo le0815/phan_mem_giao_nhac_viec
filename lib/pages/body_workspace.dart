@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_workspace_overview_tile.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/workspace_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
-import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 
 class BodyWorkspace extends StatelessWidget {
   const BodyWorkspace({super.key});
@@ -17,51 +17,74 @@ class BodyWorkspace extends StatelessWidget {
       padding: EdgeInsets.all(8),
       child: Stack(
         children: [
-          StreamBuilder(
-            stream: WorkspaceService.workspaceStream(currentUID),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                // show loading indicator
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-              if (!snapshot.hasData) {
-                return const Center(
-                  child: Text(
-                    'No workspace here!',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.black54,
-                    ),
-                  ),
-                );
-              }
-              final docs = snapshot.data!.docs;
-              return ListView.builder(
-                itemCount: docs.length,
-                itemBuilder: (context, index) {
-                  return docs.isEmpty
-                      ? const Center(
-                          child: Text(
-                            'No workspace here!',
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.black54,
-                            ),
-                          ),
-                        )
-                      : MyWorkspaceOverviewTile(
-                          workspaceName:
-                              (docs[index].data() as Map?)?["workspaceName"],
-                        );
-                },
-              );
-            },
-          ),
+          workspaceStream(currentUID),
           addFloatingButton(context, currentUID),
         ],
       ),
+    );
+  }
+
+  StreamBuilder<QuerySnapshot<Object?>> workspaceStream(String currentUID) {
+    return StreamBuilder(
+      stream: WorkspaceService.workspaceStream(currentUID),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // show loading indicator
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (!snapshot.hasData) {
+          return const Center(
+            child: Text(
+              'No workspace here!',
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.black54,
+              ),
+            ),
+          );
+        }
+        final docs = snapshot.data!.docs;
+        return ListView.builder(
+          itemCount: docs.length,
+          itemBuilder: (context, index) {
+            return docs.isEmpty
+                ? const Center(
+                    child: Text(
+                      'No workspace here!',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  )
+                // navigate to workspace detail page
+                : GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => WorkspacePage(
+                            modelWorkspace: ModelWorkspace(
+                                createAt:
+                                    (docs[index].data() as Map?)?["createAt"],
+                                workspaceName: (docs[index].data()
+                                    as Map?)?["workspaceName"],
+                                members:
+                                    (docs[index].data() as Map?)?["members"]),
+                          ),
+                        ),
+                      );
+                    },
+                    child: MyWorkspaceOverviewTile(
+                      workspaceName:
+                          (docs[index].data() as Map?)?["workspaceName"],
+                    ),
+                  );
+          },
+        );
+      },
     );
   }
 

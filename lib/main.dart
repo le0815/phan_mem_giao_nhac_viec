@@ -1,3 +1,4 @@
+import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/chat_box_page.dart';
@@ -28,22 +29,25 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<DatabaseService>(
             create: (context) => DatabaseService()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        // theme: ThemeData(
-        //     scaffoldBackgroundColor: const Color.fromARGB(217, 217, 217, 217),
-        //     colorScheme: ColorScheme.light(
-        //       // primary: Colors.white,
-        //       surface: Colors.white,
-        //     )),
-        home: const AuthPage(),
-        //route for navigation page
-        routes: {
-          "/body_home": (context) => const BodyHome(),
-          "/body_task": (context) => const BodyTask(),
-          "/body_message": (context) => const BodyMessage(),
-          "/add_task": (context) => AddTask(),
-        },
+      child: CalendarControllerProvider(
+        controller: EventController(),
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          // theme: ThemeData(
+          //     scaffoldBackgroundColor: const Color.fromARGB(217, 217, 217, 217),
+          //     colorScheme: ColorScheme.light(
+          //       // primary: Colors.white,
+          //       surface: Colors.white,
+          //     )),
+          home: const AuthPage(),
+          //route for navigation page
+          routes: {
+            "/body_home": (context) => const BodyHome(),
+            "/body_task": (context) => const BodyTask(),
+            "/body_message": (context) => const BodyMessage(),
+            "/add_task": (context) => AddTask(),
+          },
+        ),
       ),
     );
   }
