@@ -6,7 +6,6 @@ import 'package:phan_mem_giao_nhac_viec/components/my_workspace_overview_tile.da
 import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/workspace_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
-import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 
 class BodyWorkspace extends StatelessWidget {
   const BodyWorkspace({super.key});
@@ -66,7 +65,16 @@ class BodyWorkspace extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => WorkspacePage()),
+                          builder: (context) => WorkspacePage(
+                            modelWorkspace: ModelWorkspace(
+                                createAt:
+                                    (docs[index].data() as Map?)?["createAt"],
+                                workspaceName: (docs[index].data()
+                                    as Map?)?["workspaceName"],
+                                members:
+                                    (docs[index].data() as Map?)?["members"]),
+                          ),
+                        ),
                       );
                     },
                     child: MyWorkspaceOverviewTile(

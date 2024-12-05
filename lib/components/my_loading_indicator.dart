@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-MyLoadingIndicator(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    },
-  );
+class MyLoadingIndicator extends StatelessWidget {
+  const MyLoadingIndicator({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
 }

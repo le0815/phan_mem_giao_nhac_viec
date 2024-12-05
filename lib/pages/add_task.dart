@@ -30,7 +30,7 @@ class _AddTaskState extends State<AddTask> {
 
     Future<void> UploadTask() async {
       // show loading indicator
-      MyLoadingIndicator(context);
+      const MyLoadingIndicator();
       try {
         await taskService.AddTaskToDb(
           ModelTask(
