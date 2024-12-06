@@ -6,17 +6,17 @@ import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 
-class MyTaskTileDetail extends StatefulWidget {
+class DetailTaskPage extends StatefulWidget {
   final ModelTask modelTask;
   final String idTask;
-  const MyTaskTileDetail(
+  const DetailTaskPage(
       {super.key, required this.modelTask, required this.idTask});
 
   @override
-  State<MyTaskTileDetail> createState() => _MyTaskTileDetailState();
+  State<DetailTaskPage> createState() => _DetailTaskPageState();
 }
 
-class _MyTaskTileDetailState extends State<MyTaskTileDetail> {
+class _DetailTaskPageState extends State<DetailTaskPage> {
   final TextEditingController textTitleController = TextEditingController();
   final TextEditingController textDescriptionController =
       TextEditingController();
@@ -27,8 +27,8 @@ class _MyTaskTileDetailState extends State<MyTaskTileDetail> {
   @override
   void initState() {
     // TODO: implement initState
-    textTitleController.text = widget.modelTask.titleTask;
-    textDescriptionController.text = widget.modelTask.descriptionTask;
+    textTitleController.text = widget.modelTask.title;
+    textDescriptionController.text = widget.modelTask.description;
     super.initState();
   }
 
@@ -38,8 +38,8 @@ class _MyTaskTileDetailState extends State<MyTaskTileDetail> {
       isEdit = false;
       try {
         // update new data to model
-        widget.modelTask.titleTask = textTitleController.text;
-        widget.modelTask.descriptionTask = textDescriptionController.text;
+        widget.modelTask.title = textTitleController.text;
+        widget.modelTask.description = textDescriptionController.text;
 
         await taskService.UpdateTaskFromDb(widget.idTask, widget.modelTask);
         if (context.mounted) {

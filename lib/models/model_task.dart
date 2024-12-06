@@ -1,20 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ModelTask {
-  String titleTask;
-  String descriptionTask;
+  late String title;
+  late String description;
   String? assigner;
   String? workspaceID;
   Timestamp? due;
   Timestamp? startTime;
-  final Timestamp createAt;
-  final String uid;
+  late Timestamp createAt;
+  late String uid;
   // final String? idTask;
 
   ModelTask({
     required this.createAt,
-    required this.titleTask,
-    required this.descriptionTask,
+    required this.title,
+    required this.description,
     required this.uid,
     this.due,
     this.assigner,
@@ -23,26 +23,21 @@ class ModelTask {
     // this.idTask,
   });
 
+  ModelTask.fromMap(Map<String, dynamic> object) {
+    title = object["title"];
+    description = object["description"];
+    assigner = object["assigner"];
+    workspaceID = object["workspaceID"];
+    due = object["due"];
+    startTime = object["startTime"];
+    createAt = object["createAt"];
+    uid = object["uid"];
+  }
+
   Map<String, dynamic> ToMap() {
-    // return (idTask == null)
-    //     ? {
-    //         "title": titleTask,
-    //         "description": descriptionTask,
-    //         "uid": uid,
-    //         "createAt": createAt,
-    //         "due": due
-    //       }
-    //     : {
-    //         "title": titleTask,
-    //         "description": descriptionTask,
-    //         "uid": uid,
-    //         "idTask": idTask,
-    //         "createAt": createAt,
-    //         "due": due
-    //       };
     return {
-      "title": titleTask,
-      "description": descriptionTask,
+      "title": title,
+      "description": description,
       "uid": uid,
       "assigner": assigner,
       "workspaceID": workspaceID,

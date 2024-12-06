@@ -44,7 +44,7 @@ class _BodyTaskState extends State<BodyTask> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MyTaskTileDetail(
+        builder: (context) => DetailTaskPage(
           modelTask: modelTask,
           idTask: idTask,
         ),
@@ -134,8 +134,8 @@ class _BodyTaskState extends State<BodyTask> {
                 onTap: () async {
                   await OpenTaskDetail(
                     ModelTask(
-                        titleTask: result[index].data()['title'],
-                        descriptionTask: result[index].data()['description'],
+                        title: result[index].data()['title'],
+                        description: result[index].data()['description'],
                         uid: result[index].data()['uid'],
                         createAt: result[index].data()['createAt'],
                         due: result[index].data()['due']),

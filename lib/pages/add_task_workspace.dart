@@ -40,8 +40,8 @@ class _AddTaskWorkspaceState extends State<AddTaskWorkspace> {
       try {
         await taskService.AddTaskToDb(
           ModelTask(
-            titleTask: widget.taskTitleController.text.trim(),
-            descriptionTask: widget.taskDescriptionController.text.trim(),
+            title: widget.taskTitleController.text.trim(),
+            description: widget.taskDescriptionController.text.trim(),
             uid: uid,
             createAt: Timestamp.now(),
             due: widget.due,

@@ -26,6 +26,22 @@ class DatabaseService extends ChangeNotifier {
     notifyListeners();
   }
 
+  // get task
+  Future<Map> GetTasksFromWorkspace(String workspaceID) async {
+    // get task of current user by uid
+    var data = await _firebaseFirestore
+        .collection('Task')
+        .where("workspaceID", isEqualTo: workspaceID)
+        .get();
+
+    var result = {};
+    for (var element in data.docs) {
+      result[result.length] = element;
+      log("data: $element");
+    }
+    return result;
+  }
+
   Future<ModelUser> getUserByUID(String uid) async {
     var result =
         await _firebaseFirestore.collection(_userCollectionPath).doc(uid).get();

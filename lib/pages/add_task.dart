@@ -32,8 +32,8 @@ class _AddTaskState extends State<AddTask> {
       try {
         await taskService.AddTaskToDb(
           ModelTask(
-              titleTask: widget.taskTitleController.text.trim(),
-              descriptionTask: widget.taskDescriptionController.text.trim(),
+              title: widget.taskTitleController.text.trim(),
+              description: widget.taskDescriptionController.text.trim(),
               uid: FirebaseAuth.instance.currentUser!.uid,
               createAt: Timestamp.now(),
               due: widget.due,
