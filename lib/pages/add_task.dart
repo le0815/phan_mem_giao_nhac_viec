@@ -6,16 +6,24 @@ import 'package:flutter/material.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_elevated_button_long.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_snackbar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 
 class AddTask extends StatefulWidget {
-  AddTask({super.key});
-  Timestamp? createAt;
+  final List<ModelUser>? memberList;
+  final String? workspaceID;
+  bool isWorkspace;
+  AddTask({
+    super.key,
+    this.memberList,
+    this.workspaceID,
+    this.isWorkspace = false,
+  });
+  Timestamp? startTime;
   Timestamp? due;
   var taskTitleController = TextEditingController();
   var taskDescriptionController = TextEditingController();
@@ -24,19 +32,29 @@ class AddTask extends StatefulWidget {
 }
 
 class _AddTaskState extends State<AddTask> {
+  String? selectedUser;
+
   @override
   Widget build(BuildContext context) {
     final TaskService taskService = TaskService();
 
-    Future<void> UploadTask() async {
+    Future<void> UploadTask({required String? uid}) async {
       try {
         await taskService.AddTaskToDb(
           ModelTask(
-              titleTask: widget.taskTitleController.text.trim(),
-              descriptionTask: widget.taskDescriptionController.text.trim(),
-              uid: FirebaseAuth.instance.currentUser!.uid,
-              createAt: widget.createAt!,
-              due: widget.due),
+            title: widget.taskTitleController.text.trim(),
+            description: widget.taskDescriptionController.text.trim(),
+            uid: widget.isWorkspace
+                ? uid!
+                : FirebaseAuth.instance.currentUser!.uid,
+            createAt: Timestamp.now(),
+            due: widget.due,
+            startTime: widget.startTime,
+            assigner: widget.isWorkspace
+                ? FirebaseAuth.instance.currentUser!.uid
+                : null,
+            workspaceID: widget.isWorkspace ? widget.workspaceID : null,
+          ),
         );
         log("upload task is ok");
 
@@ -54,17 +72,17 @@ class _AddTaskState extends State<AddTask> {
     GetDates() async {
       List<DateTime>? dateTimeList =
           await showOmniDateTimeRangePicker(context: context);
-      if (dateTimeList == null) {
-        return;
-      }
-      widget.createAt = Timestamp.fromMillisecondsSinceEpoch(
-          dateTimeList[0].millisecondsSinceEpoch);
-      widget.due = Timestamp.fromMillisecondsSinceEpoch(
-          dateTimeList[1].millisecondsSinceEpoch);
 
-      // if createAt > due =>
+      if (dateTimeList != null) {
+        widget.startTime = Timestamp.fromMillisecondsSinceEpoch(
+            dateTimeList[0].millisecondsSinceEpoch);
+        widget.due = Timestamp.fromMillisecondsSinceEpoch(
+            dateTimeList[1].millisecondsSinceEpoch);
+      }
+
+      // if startTime > due => show error and reselect
       if (DateTime.fromMillisecondsSinceEpoch(
-                  widget.createAt!.millisecondsSinceEpoch)
+                  widget.startTime!.millisecondsSinceEpoch)
               .compareTo(DateTime.fromMillisecondsSinceEpoch(
                   widget.due!.millisecondsSinceEpoch)) ==
           1) {
@@ -95,6 +113,32 @@ class _AddTaskState extends State<AddTask> {
                 InputField(widget.taskTitleController,
                     widget.taskDescriptionController),
 
+                widget.isWorkspace
+                    ? // assign task to the member
+                    Row(
+                        children: [
+                          Text("Assign to: "),
+                          DropdownButton(
+                            value: selectedUser,
+                            items: List.generate(
+                              widget.memberList!.length,
+                              (int index) => DropdownMenuItem(
+                                value: widget.memberList![index].uid,
+                                child: Text(
+                                  widget.memberList![index].userName,
+                                ),
+                              ),
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedUser = value.toString();
+                              });
+                            },
+                          ),
+                        ],
+                      )
+                    : AddVerticalSpace(1),
+
                 // datetime picker for due
                 DateTimePicker(GetDates),
 
@@ -104,7 +148,17 @@ class _AddTaskState extends State<AddTask> {
                     Expanded(
                       child: MyElevatedButtonLong(
                         onPress: () {
-                          UploadTask();
+                          // if user was not selected -> show error
+                          if (widget.isWorkspace) {
+                            if (selectedUser == null) {
+                              MySnackBar(context, "User must be selected");
+                              return;
+                            }
+                            UploadTask(uid: selectedUser!);
+                          } else {
+                            // not workspace mode
+                            UploadTask(uid: null);
+                          }
                         },
                         title: "Submit",
                       ),
@@ -136,9 +190,9 @@ class _AddTaskState extends State<AddTask> {
             children: [
               AddHorizontalSpace(10),
               // createAt
-              Text(widget.createAt == null
+              Text(widget.startTime == null
                   ? ""
-                  : "Create At: ${DateTime.fromMillisecondsSinceEpoch(widget.createAt!.millisecondsSinceEpoch).toLocal()}"),
+                  : "Start: ${DateTime.fromMillisecondsSinceEpoch(widget.startTime!.millisecondsSinceEpoch).toLocal()}"),
               // due
               Text(widget.due == null
                   ? ""

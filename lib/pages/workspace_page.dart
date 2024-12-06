@@ -1,13 +1,16 @@
 import 'dart:developer';
 
 import 'package:calendar_view/calendar_view.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
@@ -24,35 +27,97 @@ class WorkspacePage extends StatefulWidget {
   });
 
   @override
-  State<WorkspacePage> createState() => _WorkspacePageState();
+  State<WorkspacePage> createState() => WorkspacePageState();
 }
 
-class _WorkspacePageState extends State<WorkspacePage> {
-  final event = CalendarEventData(
-    date: DateTime.now(),
-    title: "Project meeting",
-    description: "Today is project meeting.",
-    startTime: DateTime(
-        DateTime.now().year, DateTime.now().month, DateTime.now().day, 18, 30),
-    endTime: DateTime(
-        DateTime.now().year, DateTime.now().month, DateTime.now().day, 22),
-  );
-  final databaseService = DatabaseService();
+class WorkspacePageState extends State<WorkspacePage> {
+  // final event = CalendarEventData(
+  //   date: DateTime.now(),
+  //   title: "Project meeting",
+  //   description: "Today is project meeting.",
+  //   startTime: DateTime(
+  //       DateTime.now().year, DateTime.now().month, DateTime.now().day, 18, 30),
+  //   endTime: DateTime(
+  //       DateTime.now().year, DateTime.now().month, DateTime.now().day, 22),
+  // );
 
+  final databaseService = DatabaseService();
+  List<CalendarEventData> events = [];
+  List<ModelUser> membersOfWorkspace = [];
+  var calendarController;
   Future<List> getUsers() async {
     final List<ModelUser> userList = [];
     for (var element in widget.modelWorkspace.members) {
       var result = await databaseService.getUserByUID(element);
       userList.add(result);
     }
+    membersOfWorkspace = userList;
     return userList;
+  }
+
+  clearTaskResult() {
+// clear the previous task
+    if (events.isNotEmpty) {
+      calendarController.removeAll(events);
+      events.clear();
+    }
+  }
+
+  getAllTasks() async {
+    clearTaskResult();
+
+    Map taskResult =
+        await databaseService.GetTasksFromWorkspace(widget.workspaceID);
+    // get event form database
+    taskResult.forEach(
+      (key, value) {
+        CalendarEventData event;
+        // if task have due
+        if (value.data()["startTime"] != null) {
+          event = CalendarEventData(
+            title: value.data()["title"],
+            // startTime: value.data()["startTime"],
+            date: DateTime.fromMillisecondsSinceEpoch(
+                (value.data()["startTime"] as Timestamp)
+                    .millisecondsSinceEpoch),
+            endDate: DateTime.fromMillisecondsSinceEpoch(
+                (value.data()["due"] as Timestamp).millisecondsSinceEpoch),
+            event: {
+              "modelTask": value.data(),
+              "id": value.id,
+            },
+          );
+        } else {
+          // if task have no due
+          event = CalendarEventData(
+            title: value.data()["title"],
+            date: DateTime.fromMillisecondsSinceEpoch(
+                (value.data()["createAt"] as Timestamp).millisecondsSinceEpoch),
+            event: {
+              "modelTask": value.data(),
+              "id": value.id,
+            },
+          );
+        }
+        events.add(event);
+      },
+    );
+    // broadcast events
+    CalendarControllerProvider.of(context).controller.addAll(events);
+  }
+
+  @override
+  void didChangeDependencies() {
+    calendarController = CalendarControllerProvider.of(context).controller;
+    getAllTasks();
+    super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Workspace name"),
+        title: Text(widget.modelWorkspace.workspaceName),
         actions: [
           PopupMenuButton(
             icon: const Icon(Icons.add), // Icon for the button
@@ -76,9 +141,45 @@ class _WorkspacePageState extends State<WorkspacePage> {
         child: Column(
           children: [
             // show workspace task overview
-            const SizedBox(
+            SizedBox(
               height: 500,
-              child: MonthView(),
+              child: MonthView(
+                onEventTap: (event, date) async {
+                  log("event: ${event.event as Map}");
+                  // navigation to detail task page
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailTaskPage(
+                        modelTask: ModelTask.fromMap(
+                            (event.event as Map)["modelTask"]),
+                        idTask: (event.event as Map)["id"],
+                        isWorkspace: true,
+                        workspaceName: widget.modelWorkspace.workspaceName,
+                        memberList: membersOfWorkspace,
+                      ),
+                    ),
+                  );
+                  // reload task overview
+                  getAllTasks();
+                },
+                onDateLongPress: (date) async {
+                  // navigation to add task page
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddTask(
+                        memberList: membersOfWorkspace,
+                        workspaceID: widget.workspaceID,
+                        isWorkspace: true,
+                      ),
+                    ),
+                  );
+                  // reload task overview
+                  getAllTasks();
+                  log("cell long press date: $date");
+                },
+              ),
             ),
             // show members of workspace
             Container(

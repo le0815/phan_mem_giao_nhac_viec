@@ -18,7 +18,7 @@ class _HomePageState extends State<HomePage> {
     const BodyHome(),
     const BodyTask(),
     const BodyMessage(),
-    const BodyWorkspace(),
+    BodyWorkspace(),
   ];
 
   var appBarTitles = {

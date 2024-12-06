@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +10,8 @@ import 'package:phan_mem_giao_nhac_viec/pages/workspace_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
 
 class BodyWorkspace extends StatelessWidget {
-  const BodyWorkspace({super.key});
+  BodyWorkspace({super.key});
+  final workspaceDetailGlobalKey = GlobalKey<WorkspacePageState>();
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +69,7 @@ class BodyWorkspace extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => WorkspacePage(
+                            key: workspaceDetailGlobalKey,
                             workspaceID: docs[index].id,
                             modelWorkspace: ModelWorkspace(
                                 createAt:
@@ -76,6 +80,12 @@ class BodyWorkspace extends StatelessWidget {
                                     (docs[index].data() as Map?)?["members"]),
                           ),
                         ),
+                      ).then(
+                        (value) {
+                          // clear task overview after switch back
+                          workspaceDetailGlobalKey.currentState!
+                              .clearTaskResult();
+                        },
                       );
                     },
                     child: MyWorkspaceOverviewTile(

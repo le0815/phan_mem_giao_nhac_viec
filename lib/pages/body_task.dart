@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:horizontal_week_calendar/horizontal_week_calendar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_task_tile_overview.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
@@ -44,7 +45,7 @@ class _BodyTaskState extends State<BodyTask> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MyTaskTileDetail(
+        builder: (context) => DetailTaskPage(
           modelTask: modelTask,
           idTask: idTask,
         ),
@@ -88,7 +89,11 @@ class _BodyTaskState extends State<BodyTask> {
                   right: 10,
                   child: FloatingActionButton(
                     onPressed: () async {
-                      await Navigator.pushNamed(context, "/add_task");
+                      // await Navigator.pushNamed(context, "/add_task");
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AddTask()),
+                      );
                       // // reload page to load new task
                       setState(() {});
                     },
@@ -134,13 +139,15 @@ class _BodyTaskState extends State<BodyTask> {
                 onTap: () async {
                   await OpenTaskDetail(
                     ModelTask(
-                        titleTask: result[index].data()['title'],
-                        descriptionTask: result[index].data()['description'],
+                        title: result[index].data()['title'],
+                        description: result[index].data()['description'],
                         uid: result[index].data()['uid'],
                         createAt: result[index].data()['createAt'],
                         due: result[index].data()['due']),
                     result[index].id,
                   );
+                  // reload task overview
+                  setState(() {});
                 },
               );
             },
