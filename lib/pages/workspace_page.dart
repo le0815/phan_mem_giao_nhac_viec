@@ -9,7 +9,7 @@ import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/add_task_workspace.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
@@ -107,11 +107,6 @@ class WorkspacePageState extends State<WorkspacePage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void didChangeDependencies() {
     calendarController = CalendarControllerProvider.of(context).controller;
     getAllTasks();
@@ -122,7 +117,7 @@ class WorkspacePageState extends State<WorkspacePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Workspace name"),
+        title: Text(widget.modelWorkspace.workspaceName),
         actions: [
           PopupMenuButton(
             icon: const Icon(Icons.add), // Icon for the button
@@ -159,6 +154,9 @@ class WorkspacePageState extends State<WorkspacePage> {
                         modelTask: ModelTask.fromMap(
                             (event.event as Map)["modelTask"]),
                         idTask: (event.event as Map)["id"],
+                        isWorkspace: true,
+                        workspaceName: widget.modelWorkspace.workspaceName,
+                        memberList: membersOfWorkspace,
                       ),
                     ),
                   );
@@ -170,9 +168,10 @@ class WorkspacePageState extends State<WorkspacePage> {
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AddTaskWorkspace(
+                      builder: (context) => AddTask(
                         memberList: membersOfWorkspace,
                         workspaceID: widget.workspaceID,
+                        isWorkspace: true,
                       ),
                     ),
                   );
