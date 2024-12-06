@@ -8,6 +8,7 @@ import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/add_task_workspace.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
@@ -38,13 +39,14 @@ class _WorkspacePageState extends State<WorkspacePage> {
         DateTime.now().year, DateTime.now().month, DateTime.now().day, 22),
   );
   final databaseService = DatabaseService();
-
+  List<ModelUser> membersOfWorkspace = [];
   Future<List> getUsers() async {
     final List<ModelUser> userList = [];
     for (var element in widget.modelWorkspace.members) {
       var result = await databaseService.getUserByUID(element);
       userList.add(result);
     }
+    membersOfWorkspace = userList;
     return userList;
   }
 
@@ -76,9 +78,22 @@ class _WorkspacePageState extends State<WorkspacePage> {
         child: Column(
           children: [
             // show workspace task overview
-            const SizedBox(
+            SizedBox(
               height: 500,
-              child: MonthView(),
+              child: MonthView(
+                onDateLongPress: (date) {
+                  // navigation to add task page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AddTaskWorkspace(
+                              memberList: membersOfWorkspace,
+                              workspaceID: widget.workspaceID,
+                            )),
+                  );
+                  log("cell long press date: $date");
+                },
+              ),
             ),
             // show members of workspace
             Container(

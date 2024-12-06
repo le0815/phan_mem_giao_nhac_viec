@@ -6,38 +6,49 @@ import 'package:flutter/material.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_elevated_button_long.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_snackbar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 
-class AddTask extends StatefulWidget {
-  AddTask({super.key});
+class AddTaskWorkspace extends StatefulWidget {
+  final List<ModelUser> memberList;
+  final String workspaceID;
+  AddTaskWorkspace({
+    super.key,
+    required this.memberList,
+    required this.workspaceID,
+  });
   Timestamp? startTime;
   Timestamp? due;
   var taskTitleController = TextEditingController();
   var taskDescriptionController = TextEditingController();
   @override
-  State<AddTask> createState() => _AddTaskState();
+  State<AddTaskWorkspace> createState() => _AddTaskWorkspaceState();
 }
 
-class _AddTaskState extends State<AddTask> {
+class _AddTaskWorkspaceState extends State<AddTaskWorkspace> {
+  String? selectedUser;
+
   @override
   Widget build(BuildContext context) {
     final TaskService taskService = TaskService();
 
-    Future<void> UploadTask() async {
+    Future<void> UploadTask({required String uid}) async {
       try {
         await taskService.AddTaskToDb(
           ModelTask(
-              titleTask: widget.taskTitleController.text.trim(),
-              descriptionTask: widget.taskDescriptionController.text.trim(),
-              uid: FirebaseAuth.instance.currentUser!.uid,
-              createAt: Timestamp.now(),
-              due: widget.due,
-              startTime: widget.startTime),
+            titleTask: widget.taskTitleController.text.trim(),
+            descriptionTask: widget.taskDescriptionController.text.trim(),
+            uid: uid,
+            createAt: Timestamp.now(),
+            due: widget.due,
+            startTime: widget.startTime,
+            assigner: FirebaseAuth.instance.currentUser!.uid,
+            workspaceID: widget.workspaceID,
+          ),
         );
         log("upload task is ok");
 
@@ -96,6 +107,30 @@ class _AddTaskState extends State<AddTask> {
                 InputField(widget.taskTitleController,
                     widget.taskDescriptionController),
 
+                // assign task to the member
+                Row(
+                  children: [
+                    Text("Assign to: "),
+                    DropdownButton(
+                      value: selectedUser,
+                      items: List.generate(
+                        widget.memberList.length,
+                        (int index) => DropdownMenuItem(
+                          value: widget.memberList[index].uid,
+                          child: Text(
+                            widget.memberList[index].userName,
+                          ),
+                        ),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedUser = value.toString();
+                        });
+                      },
+                    ),
+                  ],
+                ),
+
                 // datetime picker for due
                 DateTimePicker(GetDates),
 
@@ -105,7 +140,12 @@ class _AddTaskState extends State<AddTask> {
                     Expanded(
                       child: MyElevatedButtonLong(
                         onPress: () {
-                          UploadTask();
+                          // if user was not selected -> show error
+                          if (selectedUser == null) {
+                            MySnackBar(context, "User must be selected");
+                            return;
+                          }
+                          UploadTask(uid: selectedUser!);
                         },
                         title: "Submit",
                       ),

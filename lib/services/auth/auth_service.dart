@@ -73,13 +73,12 @@ class AuthService {
       UserCredential userCredential, String userName) async {
     try {
       log("start uploading user info to database");
-      await _firebaseFirestore
-          .collection("User")
-          .doc(userCredential.user!.uid)
-          .set(ModelUser(
-            email: userCredential.user!.email.toString(),
-            userName: userName,
-          ).ToMap());
+      String uid = userCredential.user!.uid;
+      await _firebaseFirestore.collection("User").doc(uid).set(ModelUser(
+              email: userCredential.user!.email.toString(),
+              userName: userName,
+              uid: uid)
+          .ToMap());
     } catch (e) {
       log("err while uploading user info to database: $e");
       throw Exception(e);

@@ -6,6 +6,7 @@ class ModelTask {
   String? assigner;
   String? workspaceID;
   Timestamp? due;
+  Timestamp? startTime;
   final Timestamp createAt;
   final String uid;
   // final String? idTask;
@@ -18,6 +19,7 @@ class ModelTask {
     this.due,
     this.assigner,
     this.workspaceID,
+    this.startTime,
     // this.idTask,
   });
 
@@ -45,7 +47,8 @@ class ModelTask {
       "assigner": assigner,
       "workspaceID": workspaceID,
       "createAt": createAt,
-      "due": due
+      "due": due,
+      "startTime": startTime,
     };
   }
 }
