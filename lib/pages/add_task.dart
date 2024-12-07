@@ -64,7 +64,11 @@ class _AddTaskState extends State<AddTask> {
           Navigator.pop(context);
         }
       } catch (e) {
-        MyAlertDialog(context, e.toString());
+        MyAlertDialog(
+          context,
+          msg: e.toString(),
+          onOkay: () => Navigator.pop(context),
+        );
         log(e.toString());
       }
     }

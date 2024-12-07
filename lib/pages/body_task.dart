@@ -36,7 +36,11 @@ class _BodyTaskState extends State<BodyTask> {
     } catch (e) {
       if (context.mounted) {
         // show err dialog
-        MyAlertDialog(context, e.toString());
+        MyAlertDialog(
+          context,
+          msg: e.toString(),
+          onOkay: () => Navigator.pop(context),
+        );
       }
     }
   }

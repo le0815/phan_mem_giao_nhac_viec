@@ -77,7 +77,11 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
           MySnackBar(context, "Task Modified");
         }
       } catch (e) {
-        MyAlertDialog(context, e.toString());
+        MyAlertDialog(
+          context,
+          msg: e.toString(),
+          onOkay: () => Navigator.pop(context),
+        );
       }
 
       // MySnackbar(context);

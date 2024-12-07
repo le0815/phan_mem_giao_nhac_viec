@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-MyAlertDialog(BuildContext context, String msg) {
+MyAlertDialog(BuildContext context,
+    {required String msg, required Function()? onOkay}) {
+  ;
   showDialog(
     context: context,
     builder: (context) {
@@ -9,7 +11,7 @@ MyAlertDialog(BuildContext context, String msg) {
         title: Text(msg),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: onOkay,
             child: const Text("Okay"),
           )
         ],
