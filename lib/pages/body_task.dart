@@ -32,11 +32,15 @@ class _BodyTaskState extends State<BodyTask> {
 
   RemoveTaskFromDb(String taskId) async {
     try {
-      await taskService.RemoveTaskFromDb(taskId, currentDate);
+      await taskService.RemoveTaskFromDb(taskId);
     } catch (e) {
       if (context.mounted) {
         // show err dialog
-        MyAlertDialog(context, e.toString());
+        MyAlertDialog(
+          context,
+          msg: e.toString(),
+          onOkay: () => Navigator.pop(context),
+        );
       }
     }
   }
@@ -46,6 +50,20 @@ class _BodyTaskState extends State<BodyTask> {
       context,
       MaterialPageRoute(
         builder: (context) => DetailTaskPage(
+          onRemove: () {
+            // show alert
+            MyAlertDialog(
+              context,
+              msg: "Are you sure want to delete this task?",
+              onOkay: () {
+                RemoveTaskFromDb(idTask);
+                // close alert dialog
+                Navigator.pop(context);
+                // switch back to right before screen
+                Navigator.pop(context);
+              },
+            );
+          },
           modelTask: modelTask,
           idTask: idTask,
         ),
@@ -134,6 +152,7 @@ class _BodyTaskState extends State<BodyTask> {
                 due: "18 - Nov",
                 onRemove: () async {
                   await RemoveTaskFromDb(result[index].id);
+                  // reload task
                   setState(() {});
                 },
                 onTap: () async {

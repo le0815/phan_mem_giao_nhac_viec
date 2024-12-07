@@ -14,6 +14,7 @@ import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 class DetailTaskPage extends StatefulWidget {
   final ModelTask modelTask;
   final String idTask;
+  final Function() onRemove;
   bool isWorkspace;
   String? workspaceName;
   final List<ModelUser>? memberList;
@@ -21,6 +22,7 @@ class DetailTaskPage extends StatefulWidget {
     super.key,
     required this.modelTask,
     required this.idTask,
+    required this.onRemove,
     this.isWorkspace = false,
     this.workspaceName,
     this.memberList,
@@ -77,7 +79,11 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
           MySnackBar(context, "Task Modified");
         }
       } catch (e) {
-        MyAlertDialog(context, e.toString());
+        MyAlertDialog(
+          context,
+          msg: e.toString(),
+          onOkay: () => Navigator.pop(context),
+        );
       }
 
       // MySnackbar(context);
@@ -122,6 +128,12 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
           IconButton(
             onPressed: OnEdit,
             icon: isEdit ? const Icon(Icons.check) : const Icon(Icons.edit),
+          ),
+          IconButton(
+            onPressed: () {
+              widget.onRemove();
+            },
+            icon: const Icon(Icons.delete_outline),
           )
         ],
       ),

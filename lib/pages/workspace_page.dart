@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:calendar_view/calendar_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
@@ -12,6 +13,7 @@ import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
+import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 import 'package:provider/provider.dart';
@@ -42,6 +44,7 @@ class WorkspacePageState extends State<WorkspacePage> {
   // );
 
   final databaseService = DatabaseService();
+  final taskService = TaskService();
   List<CalendarEventData> events = [];
   List<ModelUser> membersOfWorkspace = [];
   var calendarController;
@@ -106,6 +109,25 @@ class WorkspacePageState extends State<WorkspacePage> {
     CalendarControllerProvider.of(context).controller.addAll(events);
   }
 
+  RemoveTaskFromDb(String taskId) async {
+    try {
+      await taskService.RemoveTaskFromDb(taskId);
+    } catch (e) {
+      if (context.mounted) {
+        // show err dialog
+        MyAlertDialog(
+          context,
+          msg: e.toString(),
+          onOkay: () => Navigator.pop(context),
+        );
+      }
+    }
+  }
+
+  deleteWorkspace(String workspaceID) async {
+    await databaseService.deleteWorkspace(workspaceID);
+  }
+
   @override
   void didChangeDependencies() {
     calendarController = CalendarControllerProvider.of(context).controller;
@@ -120,18 +142,42 @@ class WorkspacePageState extends State<WorkspacePage> {
         title: Text(widget.modelWorkspace.workspaceName),
         actions: [
           PopupMenuButton(
-            icon: const Icon(Icons.add), // Icon for the button
+            icon: const Icon(Icons.menu), // Icon for the button
             onSelected: (value) {
               // Handle selected value
               if (value == 0) {
                 addMemberDialog(
                     context, widget.modelWorkspace.members, widget.workspaceID);
               }
+              // delete workspace
+              if (value == 1) {
+                // show alert
+                MyAlertDialog(
+                  context,
+                  msg: "Are you sure want to delete this workspace?",
+                  onOkay: () {
+                    deleteWorkspace(widget.workspaceID);
+                    // close alert dialog
+                    Navigator.pop(context);
+                    // close workspace page
+                    Navigator.pop(context);
+                  },
+                );
+              }
             },
             itemBuilder: (context) => [
               const PopupMenuItem(
                 value: 0,
                 child: Text('Add member'),
+              ),
+              const PopupMenuItem(
+                value: 1,
+                child: Text(
+                  'Delete workspace',
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
+                ),
               ),
             ],
           )
@@ -151,6 +197,20 @@ class WorkspacePageState extends State<WorkspacePage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => DetailTaskPage(
+                        onRemove: () {
+                          // show alert
+                          MyAlertDialog(
+                            context,
+                            msg: "Are you sure want to delete this task?",
+                            onOkay: () {
+                              RemoveTaskFromDb((event.event as Map)["id"]);
+                              // close alert dialog
+                              Navigator.pop(context);
+                              // switch back to right before screen
+                              Navigator.pop(context);
+                            },
+                          );
+                        },
                         modelTask: ModelTask.fromMap(
                             (event.event as Map)["modelTask"]),
                         idTask: (event.event as Map)["id"],
@@ -240,7 +300,6 @@ class WorkspacePageState extends State<WorkspacePage> {
   addMemberDialog(
       BuildContext context, List currentMemberUID, String workspaceID) {
     TextEditingController searchPhaseController = TextEditingController();
-    TextEditingController chatNameController = TextEditingController();
     final _userTileGlobalKey = GlobalKey<MyUserTileOverviewState>();
     return showDialog(
       context: context,

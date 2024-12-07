@@ -30,7 +30,11 @@ class _LoginPageState extends State<LoginPage> {
       } catch (e) {
         // show error
         if (context.mounted) {
-          MyAlertDialog(context, e.toString());
+          MyAlertDialog(
+            context,
+            msg: e.toString(),
+            onOkay: () => Navigator.pop(context),
+          );
         }
         log('error while sign in: $e.');
       }

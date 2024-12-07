@@ -20,7 +20,11 @@ class RegisterPage extends StatelessWidget {
     OnRegister() async {
       if (pwdTextController.text != confirmTextController.text) {
         log("pwd must match");
-        MyAlertDialog(context, "Password must match!");
+        MyAlertDialog(
+          context,
+          msg: "Password must match!",
+          onOkay: () => Navigator.pop(context),
+        );
         return;
       }
 
@@ -38,9 +42,12 @@ class RegisterPage extends StatelessWidget {
         );
       } catch (e) {
         // show error
-        if(context.mounted)
-        {
-          MyAlertDialog(context, e.toString());
+        if (context.mounted) {
+          MyAlertDialog(
+            context,
+            msg: e.toString(),
+            onOkay: () => Navigator.pop(context),
+          );
         }
         log('error while register: ${e.toString()}.');
       }
