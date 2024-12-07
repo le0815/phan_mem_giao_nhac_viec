@@ -35,11 +35,9 @@ class TaskService extends ChangeNotifier {
   }
 
   // delete task
-  Future<void> RemoveTaskFromDb(String taskId, DateTime currentDate) async {
+  Future<void> RemoveTaskFromDb(String taskId) async {
     try {
       await _firebaseFirestore.collection("Task").doc(taskId).delete();
-      // reload to fetch latest update
-      GetTaskByDay(currentDate);
     } catch (e) {
       log("err while removing task: $e");
       throw Exception(e);

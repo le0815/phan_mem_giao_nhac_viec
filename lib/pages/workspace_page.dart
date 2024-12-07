@@ -13,6 +13,7 @@ import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
+import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 import 'package:provider/provider.dart';
@@ -43,6 +44,7 @@ class WorkspacePageState extends State<WorkspacePage> {
   // );
 
   final databaseService = DatabaseService();
+  final taskService = TaskService();
   List<CalendarEventData> events = [];
   List<ModelUser> membersOfWorkspace = [];
   var calendarController;
@@ -105,6 +107,21 @@ class WorkspacePageState extends State<WorkspacePage> {
     );
     // broadcast events
     CalendarControllerProvider.of(context).controller.addAll(events);
+  }
+
+  RemoveTaskFromDb(String taskId) async {
+    try {
+      await taskService.RemoveTaskFromDb(taskId);
+    } catch (e) {
+      if (context.mounted) {
+        // show err dialog
+        MyAlertDialog(
+          context,
+          msg: e.toString(),
+          onOkay: () => Navigator.pop(context),
+        );
+      }
+    }
   }
 
   deleteWorkspace(String workspaceID) async {
@@ -180,6 +197,20 @@ class WorkspacePageState extends State<WorkspacePage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => DetailTaskPage(
+                        onRemove: () {
+                          // show alert
+                          MyAlertDialog(
+                            context,
+                            msg: "Are you sure want to delete this task?",
+                            onOkay: () {
+                              RemoveTaskFromDb((event.event as Map)["id"]);
+                              // close alert dialog
+                              Navigator.pop(context);
+                              // switch back to right before screen
+                              Navigator.pop(context);
+                            },
+                          );
+                        },
                         modelTask: ModelTask.fromMap(
                             (event.event as Map)["modelTask"]),
                         idTask: (event.event as Map)["id"],
