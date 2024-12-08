@@ -5,6 +5,7 @@ import 'package:phan_mem_giao_nhac_viec/pages/body_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_home.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_message.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_workspace.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/user_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,6 +15,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   List<Widget> bodyComponents = [
     const BodyHome(),
     const BodyTask(),
@@ -28,10 +30,14 @@ class _HomePageState extends State<HomePage> {
     3: const Text('My workspace'),
   };
   int btmNavIdx = 0;
+  refreshHomePage() {
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         // backgroundColor: const Color.fromARGB(217, 217, 217, 217),
         title: appBarTitles[btmNavIdx],
@@ -41,6 +47,12 @@ class _HomePageState extends State<HomePage> {
             triggerMode: TooltipTriggerMode.longPress,
             message: FirebaseAuth.instance.currentUser!.uid,
             child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const UserPage()),
+                );
+              },
               child: Container(
                 width: 30,
                 height: 30,

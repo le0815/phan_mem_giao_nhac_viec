@@ -162,7 +162,8 @@ class _BodyTaskState extends State<BodyTask> {
                         description: result[index].data()['description'],
                         uid: result[index].data()['uid'],
                         createAt: result[index].data()['createAt'],
-                        due: result[index].data()['due']),
+                        due: result[index].data()['due'],
+                        state: result[index].data()['state']),
                     result[index].id,
                   );
                   // reload task overview

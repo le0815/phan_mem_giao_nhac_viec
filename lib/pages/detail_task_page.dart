@@ -99,6 +99,11 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
       List<DateTime>? dateTimeList =
           await showOmniDateTimeRangePicker(context: context);
 
+      // if datetime is not set => return
+      if (dateTimeList == null) {
+        return;
+      }
+
       if (dateTimeList != null) {
         startTime = Timestamp.fromMillisecondsSinceEpoch(
             dateTimeList[0].millisecondsSinceEpoch);

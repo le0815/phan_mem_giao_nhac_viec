@@ -1,8 +1,7 @@
-import 'dart:io';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/body_message.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/body_task.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/home_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/auth/auth_service.dart';
 
 class MyDrawer extends StatefulWidget {
@@ -25,14 +24,49 @@ class _MyDrawerState extends State<MyDrawer> {
                 height: 50,
               ),
               ListTile(
-                onTap: () => Navigator.pushNamed(context, "/body_home"),
+                onTap: () {
+                  Navigator.pop(context); // Close the drawer
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                  );
+                },
                 leading: const Icon(Icons.home_outlined),
                 title: const Text("Home"),
               ),
               ListTile(
-                onTap: () => Navigator.pushNamed(context, "/body_message"),
-                leading: const Icon(Icons.inbox_outlined),
+                onTap: () {
+                  Navigator.pop(context); // Close the drawer
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const BodyTask()),
+                  );
+                },
+                leading: const Icon(Icons.add_box_outlined),
+                title: const Text("Task"),
+              ),
+              ListTile(
+                onTap: () {
+                  Navigator.pop(context); // Close the drawer
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const BodyMessage()),
+                  );
+                },
+                leading: const Icon(Icons.message_outlined),
                 title: const Text("Messages"),
+              ),
+              ListTile(
+                onTap: () {
+                  Navigator.pop(context); // Close the drawer
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                  );
+                },
+                leading: const Icon(Icons.groups_2_outlined),
+                title: const Text("Group"),
               ),
               const ListTile(
                 leading: Icon(Icons.settings_sharp),

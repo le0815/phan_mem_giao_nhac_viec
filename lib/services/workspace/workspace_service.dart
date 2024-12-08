@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_workspace_role.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
 
 class WorkspaceService {

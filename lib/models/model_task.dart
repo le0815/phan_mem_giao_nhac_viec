@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 
 class ModelTask {
   late String title;
   late String description;
+  late int state;
   String? assigner;
   String? workspaceID;
   Timestamp? due;
@@ -16,6 +18,7 @@ class ModelTask {
     required this.title,
     required this.description,
     required this.uid,
+    required this.state,
     this.due,
     this.assigner,
     this.workspaceID,
@@ -32,6 +35,7 @@ class ModelTask {
     startTime = object["startTime"];
     createAt = object["createAt"];
     uid = object["uid"];
+    state = object["state"];
   }
 
   Map<String, dynamic> ToMap() {
@@ -44,6 +48,7 @@ class ModelTask {
       "createAt": createAt,
       "due": due,
       "startTime": startTime,
+      "state": state,
     };
   }
 }
