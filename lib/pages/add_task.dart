@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
+import 'package:phan_mem_giao_nhac_viec/components/my_date_time_select.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_elevated_button_long.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_snackbar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
@@ -85,47 +86,20 @@ class _AddTaskState extends State<AddTask> {
     }
 
     GetDates() async {
-      List<DateTime>? dateTimeList =
-          await showOmniDateTimeRangePicker(context: context);
-
-      if (dateTimeList != null) {
-        widget.startTime = Timestamp.fromMillisecondsSinceEpoch(
-            dateTimeList[0].millisecondsSinceEpoch);
-        widget.due = Timestamp.fromMillisecondsSinceEpoch(
-            dateTimeList[1].millisecondsSinceEpoch);
-      }
-
-      // if startTime > due => show error and reselect
-      if (DateTime.fromMillisecondsSinceEpoch(
-                  widget.startTime!.millisecondsSinceEpoch)
-              .compareTo(DateTime.fromMillisecondsSinceEpoch(
-                  widget.due!.millisecondsSinceEpoch)) ==
-          1) {
-        log("Start time must be equal or greater than end time");
-        if (context.mounted) {
-          MySnackBar(
-              context, "Start time must be equal or greater than end time");
+      try {
+        var result = await myDateTimeSelect(context);
+        widget.startTime = result[0];
+        widget.due = result[1];
+      } catch (e) {
+        log("message: $e");
+        log("myDateTimeException: ${myDateTimeException[0]}");
+        // if datetime was not set => switch back to screen
+        if (e.toString() == myDateTimeException[0].toString()) {
+          return;
+        } else {
+          await GetDates();
         }
-        return GetDates();
       }
-
-// if selected time must be greater than or equal to the current time
-      if (DateTime.fromMillisecondsSinceEpoch(
-                      widget.startTime!.millisecondsSinceEpoch)
-                  .compareTo(DateTime.now()) ==
-              -1 ||
-          DateTime.fromMillisecondsSinceEpoch(
-                      widget.due!.millisecondsSinceEpoch)
-                  .compareTo(DateTime.now()) ==
-              -1) {
-        log("Selected time must be equal or greater than current time");
-        if (context.mounted) {
-          MySnackBar(context,
-              "Selected time must be equal or greater than current time");
-        }
-        return GetDates();
-      }
-
       setState(() {});
     }
 

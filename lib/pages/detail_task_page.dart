@@ -4,8 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
+import 'package:phan_mem_giao_nhac_viec/components/my_date_time_select.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_snackbar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
@@ -96,32 +98,17 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
   @override
   Widget build(BuildContext context) {
     GetDates() async {
-      List<DateTime>? dateTimeList =
-          await showOmniDateTimeRangePicker(context: context);
-
-      // if datetime is not set => return
-      if (dateTimeList == null) {
-        return;
-      }
-
-      if (dateTimeList != null) {
-        startTime = Timestamp.fromMillisecondsSinceEpoch(
-            dateTimeList[0].millisecondsSinceEpoch);
-        due = Timestamp.fromMillisecondsSinceEpoch(
-            dateTimeList[1].millisecondsSinceEpoch);
-      }
-
-      // if startTime > due => show error and reselect
-      if (DateTime.fromMillisecondsSinceEpoch(startTime!.millisecondsSinceEpoch)
-              .compareTo(DateTime.fromMillisecondsSinceEpoch(
-                  due!.millisecondsSinceEpoch)) ==
-          1) {
-        log("Start time must be equal or greater than end time");
-        if (context.mounted) {
-          MySnackBar(
-              context, "Start time must be equal or greater than end time");
+      try {
+        var result = await myDateTimeSelect(context);
+        startTime = result[0];
+        due = result[1];
+      } catch (e) {
+        // if datetime was not set => switch back to screen
+        if (e.toString() == myDateTimeException[0].toString()) {
+          return;
+        } else {
+          await GetDates();
         }
-        return GetDates();
       }
       setState(() {});
     }
