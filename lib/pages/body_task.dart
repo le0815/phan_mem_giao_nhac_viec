@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:horizontal_week_calendar/horizontal_week_calendar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_task_tile_overview.dart';
@@ -146,10 +147,16 @@ class _BodyTaskState extends State<BodyTask> {
           return ListView.builder(
             itemCount: result.length,
             itemBuilder: (context, index) {
+              var modelTask = ModelTask(
+                  title: result[index].data()['title'],
+                  description: result[index].data()['description'],
+                  uid: result[index].data()['uid'],
+                  createAt: result[index].data()['createAt'],
+                  due: result[index].data()['due'],
+                  state: result[index].data()['state']);
               return MyTaskTileOverview(
-                header: result[index].data()['title'],
-                body: result[index].data()['description'],
-                due: "18 - Nov",
+                modelTask: modelTask,
+                color: myTaskColor[modelTask.state],
                 onRemove: () async {
                   await RemoveTaskFromDb(result[index].id);
                   // reload task
@@ -157,13 +164,7 @@ class _BodyTaskState extends State<BodyTask> {
                 },
                 onTap: () async {
                   await OpenTaskDetail(
-                    ModelTask(
-                        title: result[index].data()['title'],
-                        description: result[index].data()['description'],
-                        uid: result[index].data()['uid'],
-                        createAt: result[index].data()['createAt'],
-                        due: result[index].data()['due'],
-                        state: result[index].data()['state']),
+                    modelTask,
                     result[index].id,
                   );
                   // reload task overview

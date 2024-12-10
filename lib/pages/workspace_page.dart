@@ -7,6 +7,7 @@ import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
@@ -78,6 +79,7 @@ class WorkspacePageState extends State<WorkspacePage> {
         // if task have due
         if (value.data()["startTime"] != null) {
           event = CalendarEventData(
+            color: myTaskColor[value.data()["state"]],
             title: value.data()["title"],
             // startTime: value.data()["startTime"],
             date: DateTime.fromMillisecondsSinceEpoch(
@@ -93,6 +95,7 @@ class WorkspacePageState extends State<WorkspacePage> {
         } else {
           // if task have no due
           event = CalendarEventData(
+            color: myTaskColor[value.data()["state"]],
             title: value.data()["title"],
             date: DateTime.fromMillisecondsSinceEpoch(
                 (value.data()["createAt"] as Timestamp).millisecondsSinceEpoch),
