@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:horizontal_week_calendar/horizontal_week_calendar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
@@ -94,12 +95,23 @@ class _BodyTaskState extends State<BodyTask> {
                       },
                       initialDate: DateTime.now(),
                       minDate: DateTime(2024),
-                      maxDate: DateTime(2025),
+                      maxDate: DateTime(2028),
                       borderRadius: BorderRadius.circular(8),
                       showNavigationButtons: false,
                     ),
                     // task overview per day
                     TaskTileOverView(),
+                    // const Expanded(
+                    //   child: DayView(
+
+                    //     startHour: 1,
+                    //     endHour: 24,
+                    //     heightPerMinute: 1,
+                    //     liveTimeIndicatorSettings:
+                    //         LiveTimeIndicatorSettings(color: Colors.red),
+                    //     dayTitleBuilder: DayHeader.hidden, // hidden header
+                    //   ),
+                    // ),
                   ],
                 ),
                 // add new task

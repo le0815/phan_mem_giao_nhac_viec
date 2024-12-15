@@ -7,6 +7,7 @@ import 'package:phan_mem_giao_nhac_viec/components/my_message_tile.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_message.dart';
 import 'package:phan_mem_giao_nhac_viec/services/chat/chat_service.dart';
+import 'package:phan_mem_giao_nhac_viec/services/firebase_messaging/firebase_messaging_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 
 class ChatBoxPage extends StatefulWidget {
@@ -22,12 +23,13 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
 
   Future<void> sendMessage(String message) async {
     await ChatService.sendMessage(
-        modelMessage: ModelMessage(
-            message: message,
-            chatCollectionID: widget.chatDocId,
-            messageCollection: "Message",
-            timeSend: Timestamp.now(),
-            senderUID: currentUID));
+      modelMessage: ModelMessage(
+          message: message,
+          chatCollectionID: widget.chatDocId,
+          messageCollection: "Message",
+          timeSend: Timestamp.now(),
+          senderUID: currentUID),
+    );
   }
 
   @override
@@ -68,6 +70,15 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
               onPressed: () {
                 if (messageTextController.text.isNotEmpty) {
                   sendMessage(messageTextController.text);
+
+                  // notify to user in chat box
+                  FirebaseMessagingService.instance.sendNotification(
+                    receiverToken:
+                        "fOf0E_q5Ro-Sy6Pk3Kdmdf:APA91bG70KRj0DQi-XwksdupFXEddydJ7V7ixvlTo16g92JlpS_qbbeyfzsGnu2QydkLkVHr9znsS9jmk4qf81VyuZ4_Nz0YroWqvtikFhpUH7OfiUaZud4",
+                    title: "You have new message!",
+                    body: messageTextController.text,
+                  );
+
                   messageTextController.clear();
                 }
               },
