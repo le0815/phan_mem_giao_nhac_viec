@@ -7,7 +7,7 @@ import 'package:phan_mem_giao_nhac_viec/components/my_message_tile.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_message.dart';
 import 'package:phan_mem_giao_nhac_viec/services/chat/chat_service.dart';
-import 'package:phan_mem_giao_nhac_viec/services/firebase_messaging/firebase_messaging_service.dart';
+import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 
 class ChatBoxPage extends StatefulWidget {
@@ -72,9 +72,9 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
                   sendMessage(messageTextController.text);
 
                   // notify to user in chat box
-                  FirebaseMessagingService.instance.sendNotification(
+                  NotificationService.instance.sendNotification(
                     receiverToken:
-                        "fOf0E_q5Ro-Sy6Pk3Kdmdf:APA91bG70KRj0DQi-XwksdupFXEddydJ7V7ixvlTo16g92JlpS_qbbeyfzsGnu2QydkLkVHr9znsS9jmk4qf81VyuZ4_Nz0YroWqvtikFhpUH7OfiUaZud4",
+                        "fnT_YrfKT-6e5eOcmYWA1U:APA91bHVO1nHkrlC31qPJEydwpXhxhMEuK0YPYVQx7BXbYMM3WIhmPZ1z_LF4DLs89wgNabKfnNZuPrZRUsJ5takJERxnSYsuzCQrwvq9BKloKYX-GAgfZg",
                     title: "You have new message!",
                     body: messageTextController.text,
                   );

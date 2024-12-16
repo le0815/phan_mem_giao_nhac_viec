@@ -26,16 +26,18 @@ class ModelTask {
     // this.idTask,
   });
 
-  ModelTask.fromMap(Map<String, dynamic> object) {
-    title = object["title"];
-    description = object["description"];
-    assigner = object["assigner"];
-    workspaceID = object["workspaceID"];
-    due = object["due"];
-    startTime = object["startTime"];
-    createAt = object["createAt"];
-    uid = object["uid"];
-    state = object["state"];
+  factory ModelTask.fromMap(Map<String, dynamic> object) {
+    return ModelTask(
+      title: object["title"],
+      description: object["description"],
+      assigner: object["assigner"],
+      workspaceID: object["workspaceID"],
+      due: object["due"],
+      startTime: object["startTime"],
+      createAt: object["createAt"],
+      uid: object["uid"],
+      state: object["state"],
+    );
   }
 
   Map<String, dynamic> ToMap() {

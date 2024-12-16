@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_doughnutchart.dart';
-import 'package:phan_mem_giao_nhac_viec/services/firebase_messaging/firebase_messaging_service.dart';
+import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
+import 'package:workmanager/workmanager.dart';
 
 class BodyHome extends StatelessWidget {
   const BodyHome({super.key});
@@ -49,7 +50,7 @@ class BodyHome extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Column(
+        child: Column(
           children: [
             Row(
               children: [
@@ -59,6 +60,17 @@ class BodyHome extends StatelessWidget {
             Divider(
               thickness: 1,
               color: Colors.black,
+            ),
+            OutlinedButton(
+              onPressed: () async {
+                var uniqueID = DateTime.now().second;
+                await Workmanager().registerOneOffTask(
+                  uniqueID.toString(),
+                  "test background task",
+                  initialDelay: Duration(seconds: 10),
+                );
+              },
+              child: Text("Background service"),
             ),
             // MyDoughnutchart(),
           ],
