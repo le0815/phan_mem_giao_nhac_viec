@@ -67,6 +67,7 @@ class _AddTaskState extends State<AddTask> {
                 : (widget.startTime!.compareTo(Timestamp.now()) == 1
                     ? MyTaskState.pending.name
                     : MyTaskState.inProgress.name),
+            timeUpdate: Timestamp.now(),
           ),
         );
         log("upload task is ok");

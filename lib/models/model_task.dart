@@ -1,16 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 
 class ModelTask {
-  late String title;
-  late String description;
-  late String state;
+  String title;
+  String description;
+  String state;
   String? assigner;
   String? workspaceID;
   Timestamp? due;
   Timestamp? startTime;
-  late Timestamp createAt;
-  late String uid;
+  Timestamp createAt;
+  String uid;
+  Timestamp timeUpdate;
   // final String? idTask;
 
   ModelTask({
@@ -19,6 +19,7 @@ class ModelTask {
     required this.description,
     required this.uid,
     required this.state,
+    required this.timeUpdate,
     this.due,
     this.assigner,
     this.workspaceID,
@@ -37,6 +38,7 @@ class ModelTask {
       createAt: object["createAt"],
       uid: object["uid"],
       state: object["state"],
+      timeUpdate: object["timeUpdate"],
     );
   }
 
@@ -51,6 +53,7 @@ class ModelTask {
       "due": due,
       "startTime": startTime,
       "state": state,
+      "timeUpdate": timeUpdate,
     };
   }
 }
