@@ -71,10 +71,6 @@ class _AddTaskState extends State<AddTask> {
         );
         log("upload task is ok");
 
-        log("start time: ${DateTime.fromMillisecondsSinceEpoch(
-          widget.startTime!.millisecondsSinceEpoch,
-        )}");
-
         // create alarm for the task
         // NotificationService.instance.scheduleBackgroundNotify(
         //   DateTime.fromMillisecondsSinceEpoch(

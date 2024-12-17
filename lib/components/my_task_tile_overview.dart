@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 
 import 'package:slideable/slideable.dart';
@@ -57,7 +58,9 @@ class MyTaskTileOverview extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        "\nDue: ${modelTask.due}",
+                        modelTask.due == null
+                            ? ""
+                            : "\nDue: ${DateFormat("HH:mm").format(modelTask.due!.toDate())}",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
