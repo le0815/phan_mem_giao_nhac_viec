@@ -7,6 +7,7 @@ import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
@@ -78,6 +79,7 @@ class WorkspacePageState extends State<WorkspacePage> {
         // if task have due
         if (value.data()["startTime"] != null) {
           event = CalendarEventData(
+            color: myTaskColor[value.data()["state"]],
             title: value.data()["title"],
             // startTime: value.data()["startTime"],
             date: DateTime.fromMillisecondsSinceEpoch(
@@ -93,6 +95,7 @@ class WorkspacePageState extends State<WorkspacePage> {
         } else {
           // if task have no due
           event = CalendarEventData(
+            color: myTaskColor[value.data()["state"]],
             title: value.data()["title"],
             date: DateTime.fromMillisecondsSinceEpoch(
                 (value.data()["createAt"] as Timestamp).millisecondsSinceEpoch),
@@ -241,6 +244,34 @@ class WorkspacePageState extends State<WorkspacePage> {
                 },
               ),
             ),
+            // show annotation for the calendar
+            AddVerticalSpace(8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      annotationColor(
+                          annotation: "Pending", color: Colors.yellow),
+                      annotationColor(
+                          annotation: "In progress", color: Colors.blue),
+                    ],
+                  ),
+                  AddHorizontalSpace(10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      annotationColor(
+                          annotation: "Completed", color: Colors.green),
+                      annotationColor(
+                          annotation: "Over due", color: Colors.red),
+                    ],
+                  ),
+                ],
+              ),
+            ),
             // show members of workspace
             Container(
               height: 500,
@@ -294,6 +325,26 @@ class WorkspacePageState extends State<WorkspacePage> {
           ],
         ),
       ),
+    );
+  }
+
+  Row annotationColor({required String annotation, required Color color}) {
+    return Row(
+      children: [
+        Container(
+          width: 32,
+          height: 13,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        AddHorizontalSpace(5),
+        Text(
+          annotation,
+          style: const TextStyle(fontSize: 12),
+        )
+      ],
     );
   }
 

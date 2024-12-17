@@ -1,10 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
-void main() async {
-  List test = ["adf"];
-  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-  await firebaseFirestore
-      .collection("Workspace")
-      .doc("YDdeNqOB7NUPkXEXDSBx")
-      .update({"members": test});
-}
+void main() async {}

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:phan_mem_giao_nhac_viec/components/my_doughnutchart.dart';
+import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
+import 'package:workmanager/workmanager.dart';
 
 class BodyHome extends StatelessWidget {
   const BodyHome({super.key});
@@ -14,7 +18,7 @@ class BodyHome extends StatelessWidget {
           SearchBox(),
           AddVerticalSpace(20),
           // today task
-          TodayTask(),
+          // TodayTask(),
           AddVerticalSpace(16),
           // Overview
           OverView()
@@ -46,7 +50,7 @@ class BodyHome extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Column(
+        child: Column(
           children: [
             Row(
               children: [
@@ -57,6 +61,28 @@ class BodyHome extends StatelessWidget {
               thickness: 1,
               color: Colors.black,
             ),
+            OutlinedButton(
+              onPressed: () async {
+                var uniqueID = DateTime.now().second;
+                await Workmanager().registerOneOffTask(
+                  uniqueID.toString(),
+                  "test background task",
+                  initialDelay: Duration(seconds: 10),
+                );
+              },
+              child: Text("Background service"),
+            ),
+            OutlinedButton(
+              onPressed: () async {
+                await NotificationService.instance.showNotify(
+                  id: 0,
+                  title: "message from background service",
+                  body:
+                      "I've been a rich man, I've been a poor man. And I choose rich every fucking time!",
+                );
+              },
+              child: Text("Send Notification"),
+            ),
             // MyDoughnutchart(),
           ],
         ),
@@ -65,19 +91,20 @@ class BodyHome extends StatelessWidget {
   }
 
   Container TodayTask() {
+    String currentDay = DateFormat('dd MMMM').format(DateTime.now());
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Column(
+      child: Column(
         children: [
           // date today will display here
           Row(
             children: [
               Text(
-                "Today - 13 Nov",
+                "Today - $currentDay",
                 style: TextStyle(fontWeight: FontWeight.bold),
               )
             ],
@@ -88,6 +115,10 @@ class BodyHome extends StatelessWidget {
             color: Colors.black54,
           ),
           Text("Your today task will be display here"),
+          ListTile(
+            leading: const Icon(Icons.circle),
+            title: const Text("Home"),
+          ),
         ],
       ),
     );

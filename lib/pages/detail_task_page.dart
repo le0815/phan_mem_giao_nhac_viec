@@ -4,8 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
+import 'package:phan_mem_giao_nhac_viec/components/my_date_time_select.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_snackbar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
@@ -96,27 +98,17 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
   @override
   Widget build(BuildContext context) {
     GetDates() async {
-      List<DateTime>? dateTimeList =
-          await showOmniDateTimeRangePicker(context: context);
-
-      if (dateTimeList != null) {
-        startTime = Timestamp.fromMillisecondsSinceEpoch(
-            dateTimeList[0].millisecondsSinceEpoch);
-        due = Timestamp.fromMillisecondsSinceEpoch(
-            dateTimeList[1].millisecondsSinceEpoch);
-      }
-
-      // if startTime > due => show error and reselect
-      if (DateTime.fromMillisecondsSinceEpoch(startTime!.millisecondsSinceEpoch)
-              .compareTo(DateTime.fromMillisecondsSinceEpoch(
-                  due!.millisecondsSinceEpoch)) ==
-          1) {
-        log("Start time must be equal or greater than end time");
-        if (context.mounted) {
-          MySnackBar(
-              context, "Start time must be equal or greater than end time");
+      try {
+        var result = await myDateTimeSelect(context);
+        startTime = result[0];
+        due = result[1];
+      } catch (e) {
+        // if datetime was not set => switch back to screen
+        if (e.toString() == myDateTimeException[0].toString()) {
+          return;
+        } else {
+          await GetDates();
         }
-        return GetDates();
       }
       setState(() {});
     }
@@ -156,7 +148,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
                 readOnly: !isEdit,
               ),
               AddVerticalSpace(10),
-              // task title
+              // task description
               const Text(
                 "Description",
                 style: TextStyle(
@@ -170,6 +162,18 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
                 readOnly: !isEdit,
               ),
               AddVerticalSpace(10),
+              // task state
+              Row(
+                children: [
+                  const Text(
+                    "State",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  AddHorizontalSpace(10),
+                  taskState(),
+                ],
+              ),
+              AddVerticalSpace(10),
               // created at
               Text(
                 "Created at: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.createAt.millisecondsSinceEpoch)}",
@@ -179,6 +183,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
                 ),
               ),
               // these field is for workspace only
+              // select member for workspace
               widget.isWorkspace
                   ? WorkspaceField(
                       key: workSpaceFiledGlobalKey,
@@ -198,10 +203,44 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
     );
   }
 
+  Widget taskState() {
+    return isEdit
+        ? // dropdown user in workspace
+        DropdownButton(
+            value: widget.modelTask.state,
+            items: List.generate(
+              MyTaskState.values.length,
+              (int index) => DropdownMenuItem(
+                value: MyTaskState.values[index].name,
+                child: Text(
+                  MyTaskState.values[index].name,
+                ),
+              ),
+            ),
+            onChanged: (value) {
+              setState(
+                () {
+                  // update task model state
+                  widget.modelTask.state = value.toString();
+                },
+              );
+            },
+          )
+        : Text(
+            widget.modelTask.state,
+            style: const TextStyle(
+              fontSize: 18,
+            ),
+          );
+  }
+
   GestureDetector DateTimePicker(Future<dynamic> GetDates()) {
     return GestureDetector(
       onTap: () async {
-        await GetDates();
+        // only edit mode can modify the time of the task
+        if (isEdit) {
+          await GetDates();
+        }
       },
       child: Row(
         mainAxisSize: MainAxisSize.max,
@@ -214,13 +253,18 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               AddHorizontalSpace(10),
-              // createAt
+              // startTime
+              // if time wasn't edited => show time of the task
               Text(startTime == null
-                  ? ""
+                  ? widget.modelTask.startTime == null
+                      ? ""
+                      : "Start: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.startTime!.millisecondsSinceEpoch).toLocal()}"
                   : "Start: ${DateTime.fromMillisecondsSinceEpoch(startTime!.millisecondsSinceEpoch).toLocal()}"),
               // due
               Text(due == null
-                  ? ""
+                  ? widget.modelTask.due == null
+                      ? ""
+                      : "Due: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.due!.millisecondsSinceEpoch).toLocal()}"
                   : "Due: ${DateTime.fromMillisecondsSinceEpoch(due!.millisecondsSinceEpoch).toLocal()}"),
             ],
           ),

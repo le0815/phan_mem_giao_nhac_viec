@@ -1,4 +1,0 @@
-enum MyWorkspaceRole {
-  owner,
-  member,
-}

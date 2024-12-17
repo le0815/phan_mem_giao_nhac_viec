@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 
 import 'package:slideable/slideable.dart';
 
 class MyTaskTileOverview extends StatelessWidget {
-  final String header;
-  final String body;
-  final String due;
+  final ModelTask modelTask;
+  final Color color;
   final Function() onRemove;
   final Function()? onTap;
   const MyTaskTileOverview({
     super.key,
-    required this.header,
-    required this.body,
-    required this.due,
+    required this.modelTask,
     required this.onRemove,
     required this.onTap,
+    required this.color,
   });
 
   @override
@@ -26,10 +26,12 @@ class MyTaskTileOverview extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Slideable(
-              backgroundColor: const Color.fromARGB(0, 255, 255, 255),
               items: [
                 ActionItems(
-                    icon: const Icon(Icons.delete_outline), onPress: onRemove)
+                  icon: const Icon(Icons.delete_outline),
+                  onPress: onRemove,
+                  backgroudColor: Colors.transparent,
+                )
               ],
               child: GestureDetector(
                 onTap: onTap,
@@ -37,26 +39,28 @@ class MyTaskTileOverview extends StatelessWidget {
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    color: Colors.amber[200],
+                    color: color,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        header,
+                        modelTask.title,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),
                       ),
                       Text(
-                        body,
+                        modelTask.description,
                         style: const TextStyle(),
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        "\nDue: $due",
+                        modelTask.due == null
+                            ? ""
+                            : "\nDue: ${DateFormat("HH:mm").format(modelTask.due!.toDate())}",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),

@@ -5,11 +5,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
+import 'package:phan_mem_giao_nhac_viec/components/my_date_time_select.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_elevated_button_long.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_snackbar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
+import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 
@@ -41,6 +44,8 @@ class _AddTaskState extends State<AddTask> {
     Future<void> UploadTask({required String? uid}) async {
       try {
         await taskService.AddTaskToDb(
+          // if task was created in workspace mode, the uid of task is uid of
+          // assignee and assigner now set to current uid
           ModelTask(
             title: widget.taskTitleController.text.trim(),
             description: widget.taskDescriptionController.text.trim(),
@@ -54,9 +59,24 @@ class _AddTaskState extends State<AddTask> {
                 ? FirebaseAuth.instance.currentUser!.uid
                 : null,
             workspaceID: widget.isWorkspace ? widget.workspaceID : null,
+            // if task was no due the state = inProgress
+            // if task has due, the state = pending (startTime > createAt)
+            //                            = inProgress (startTime < createAt)
+            state: widget.startTime == null
+                ? MyTaskState.inProgress.name
+                : (widget.startTime!.compareTo(Timestamp.now()) == 1
+                    ? MyTaskState.pending.name
+                    : MyTaskState.inProgress.name),
           ),
         );
         log("upload task is ok");
+
+        // create alarm for the task
+        // NotificationService.instance.scheduleBackgroundNotify(
+        //   DateTime.fromMillisecondsSinceEpoch(
+        //     widget.startTime!.millisecondsSinceEpoch,
+        //   ),
+        // );
 
         // close loading indicator
         if (context.mounted) {
@@ -74,28 +94,19 @@ class _AddTaskState extends State<AddTask> {
     }
 
     GetDates() async {
-      List<DateTime>? dateTimeList =
-          await showOmniDateTimeRangePicker(context: context);
-
-      if (dateTimeList != null) {
-        widget.startTime = Timestamp.fromMillisecondsSinceEpoch(
-            dateTimeList[0].millisecondsSinceEpoch);
-        widget.due = Timestamp.fromMillisecondsSinceEpoch(
-            dateTimeList[1].millisecondsSinceEpoch);
-      }
-
-      // if startTime > due => show error and reselect
-      if (DateTime.fromMillisecondsSinceEpoch(
-                  widget.startTime!.millisecondsSinceEpoch)
-              .compareTo(DateTime.fromMillisecondsSinceEpoch(
-                  widget.due!.millisecondsSinceEpoch)) ==
-          1) {
-        log("Start time must be equal or greater than end time");
-        if (context.mounted) {
-          MySnackBar(
-              context, "Start time must be equal or greater than end time");
+      try {
+        var result = await myDateTimeSelect(context);
+        widget.startTime = result[0];
+        widget.due = result[1];
+      } catch (e) {
+        log("message: $e");
+        log("myDateTimeException: ${myDateTimeException[0]}");
+        // if datetime was not set => switch back to screen
+        if (e.toString() == myDateTimeException[0].toString()) {
+          return;
+        } else {
+          await GetDates();
         }
-        return GetDates();
       }
       setState(() {});
     }
