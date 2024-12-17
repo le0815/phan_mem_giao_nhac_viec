@@ -4,7 +4,7 @@ import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 class ModelTask {
   late String title;
   late String description;
-  late int state;
+  late String state;
   String? assigner;
   String? workspaceID;
   Timestamp? due;

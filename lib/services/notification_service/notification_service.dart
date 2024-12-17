@@ -6,6 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:googleapis/servicecontrol/v1.dart' as service_control;
 import 'package:phan_mem_giao_nhac_viec/ultis/ultis.dart';
+import 'package:timezone/standalone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
   static final NotificationService instance = NotificationService._();
@@ -18,6 +21,10 @@ class NotificationService {
     await _firebaseMessaging.requestPermission(
       announcement: true,
     );
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()!
+        .requestExactAlarmsPermission();
   }
 
   @pragma('vm:entry-point')
@@ -48,6 +55,21 @@ class NotificationService {
       initializationSettings,
       onDidReceiveNotificationResponse: (details) {},
     );
+  }
+
+  scheduleBackgroundNotify(DateTime time) async {
+    log("start time utc: ${time.toUtc()}");
+    log("tz time: ${tz.TZDateTime.from(time.toUtc(), tz.getLocation("Asia/Ho_Chi_Minh"))}");
+    log("creating background notify");
+    flutterLocalNotificationsPlugin.zonedSchedule(
+        0,
+        "Task is start",
+        "test task",
+        tz.TZDateTime.from(time.toUtc(), tz.getLocation("Asia/Ho_Chi_Minh")),
+        notificationDetails(),
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        androidScheduleMode: AndroidScheduleMode.alarmClock);
   }
 
   notificationDetails() {

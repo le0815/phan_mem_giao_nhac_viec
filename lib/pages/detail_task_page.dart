@@ -148,7 +148,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
                 readOnly: !isEdit,
               ),
               AddVerticalSpace(10),
-              // task title
+              // task description
               const Text(
                 "Description",
                 style: TextStyle(
@@ -162,6 +162,18 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
                 readOnly: !isEdit,
               ),
               AddVerticalSpace(10),
+              // task state
+              Row(
+                children: [
+                  const Text(
+                    "State",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  AddHorizontalSpace(10),
+                  taskState(),
+                ],
+              ),
+              AddVerticalSpace(10),
               // created at
               Text(
                 "Created at: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.createAt.millisecondsSinceEpoch)}",
@@ -171,6 +183,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
                 ),
               ),
               // these field is for workspace only
+              // select member for workspace
               widget.isWorkspace
                   ? WorkspaceField(
                       key: workSpaceFiledGlobalKey,
@@ -190,10 +203,44 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
     );
   }
 
+  Widget taskState() {
+    return isEdit
+        ? // dropdown user in workspace
+        DropdownButton(
+            value: widget.modelTask.state,
+            items: List.generate(
+              MyTaskState.values.length,
+              (int index) => DropdownMenuItem(
+                value: MyTaskState.values[index].name,
+                child: Text(
+                  MyTaskState.values[index].name,
+                ),
+              ),
+            ),
+            onChanged: (value) {
+              setState(
+                () {
+                  // update task model state
+                  widget.modelTask.state = value.toString();
+                },
+              );
+            },
+          )
+        : Text(
+            widget.modelTask.state,
+            style: const TextStyle(
+              fontSize: 18,
+            ),
+          );
+  }
+
   GestureDetector DateTimePicker(Future<dynamic> GetDates()) {
     return GestureDetector(
       onTap: () async {
-        await GetDates();
+        // only edit mode can modify the time of the task
+        if (isEdit) {
+          await GetDates();
+        }
       },
       child: Row(
         mainAxisSize: MainAxisSize.max,
@@ -206,13 +253,18 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               AddHorizontalSpace(10),
-              // createAt
+              // startTime
+              // if time wasn't edited => show time of the task
               Text(startTime == null
-                  ? ""
+                  ? widget.modelTask.startTime == null
+                      ? ""
+                      : "Start: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.startTime!.millisecondsSinceEpoch).toLocal()}"
                   : "Start: ${DateTime.fromMillisecondsSinceEpoch(startTime!.millisecondsSinceEpoch).toLocal()}"),
               // due
               Text(due == null
-                  ? ""
+                  ? widget.modelTask.due == null
+                      ? ""
+                      : "Due: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.due!.millisecondsSinceEpoch).toLocal()}"
                   : "Due: ${DateTime.fromMillisecondsSinceEpoch(due!.millisecondsSinceEpoch).toLocal()}"),
             ],
           ),

@@ -165,6 +165,7 @@ class _BodyTaskState extends State<BodyTask> {
                   uid: result[index].data()['uid'],
                   createAt: result[index].data()['createAt'],
                   due: result[index].data()['due'],
+                  startTime: result[index].data()['startTime'],
                   state: result[index].data()['state']);
               return MyTaskTileOverview(
                 modelTask: modelTask,

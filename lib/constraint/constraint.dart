@@ -13,10 +13,10 @@ enum MyTaskState {
 }
 
 Map myTaskColor = {
-  MyTaskState.pending.index: Colors.yellow,
-  MyTaskState.inProgress.index: Colors.blue,
-  MyTaskState.completed.index: Colors.green,
-  MyTaskState.overDue.index: Colors.red,
+  MyTaskState.pending.name: Colors.yellow,
+  MyTaskState.inProgress.name: Colors.blue,
+  MyTaskState.completed.name: Colors.green,
+  MyTaskState.overDue.name: Colors.red,
 };
 Map myDateTimeException = {
   0: "date time was not set",

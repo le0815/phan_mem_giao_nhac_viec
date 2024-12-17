@@ -72,6 +72,17 @@ class BodyHome extends StatelessWidget {
               },
               child: Text("Background service"),
             ),
+            OutlinedButton(
+              onPressed: () async {
+                await NotificationService.instance.showNotify(
+                  id: 0,
+                  title: "message from background service",
+                  body:
+                      "I've been a rich man, I've been a poor man. And I choose rich every fucking time!",
+                );
+              },
+              child: Text("Send Notification"),
+            ),
             // MyDoughnutchart(),
           ],
         ),

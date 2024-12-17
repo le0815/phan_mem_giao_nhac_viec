@@ -12,6 +12,7 @@ import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
+import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 
@@ -62,13 +63,24 @@ class _AddTaskState extends State<AddTask> {
             // if task has due, the state = pending (startTime > createAt)
             //                            = inProgress (startTime < createAt)
             state: widget.startTime == null
-                ? MyTaskState.inProgress.index
+                ? MyTaskState.inProgress.name
                 : (widget.startTime!.compareTo(Timestamp.now()) == 1
-                    ? MyTaskState.pending.index
-                    : MyTaskState.inProgress.index),
+                    ? MyTaskState.pending.name
+                    : MyTaskState.inProgress.name),
           ),
         );
         log("upload task is ok");
+
+        log("start time: ${DateTime.fromMillisecondsSinceEpoch(
+          widget.startTime!.millisecondsSinceEpoch,
+        )}");
+
+        // create alarm for the task
+        // NotificationService.instance.scheduleBackgroundNotify(
+        //   DateTime.fromMillisecondsSinceEpoch(
+        //     widget.startTime!.millisecondsSinceEpoch,
+        //   ),
+        // );
 
         // close loading indicator
         if (context.mounted) {
