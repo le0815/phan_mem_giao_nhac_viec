@@ -32,8 +32,11 @@ class AuthService {
         // add new fcm token to database
         ModelUser modelUser = await DatabaseService().getUserByUID(_user!.uid);
         var newFcmToken = await FirebaseMessaging.instance.getToken();
-        modelUser.fcm.add(newFcmToken!);
-        updateUserInfoToDatabase(modelUser);
+        // if the fcm token already exist in the database -> return
+        if (!modelUser.fcm.contains(newFcmToken)) {
+          modelUser.fcm.add(newFcmToken!);
+          updateUserInfoToDatabase(modelUser);
+        }
       }
 
       return userCredential;
