@@ -11,6 +11,13 @@ class ModelChat {
     required this.timeUpdate,
   });
 
+  factory ModelChat.fromMap(Map<String, dynamic> object) {
+    return ModelChat(
+        chatName: object["chatName"],
+        members: object["members"],
+        timeUpdate: object["timeUpdate"]);
+  }
+
   Map<String, dynamic> toMap() {
     return {
       "chatName": chatName,

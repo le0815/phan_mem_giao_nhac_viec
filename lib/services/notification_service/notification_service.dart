@@ -147,42 +147,43 @@ class NotificationService {
   }
 
   Future sendNotification(
-      {required String receiverToken, String? title, String? body}) async {
+      {required List receiverToken, String? title, String? body}) async {
     const String fcmApiUrl =
         "https://fcm.googleapis.com/v1/projects/nckhflutter/messages:send";
 
     String accessToken = await getAccessToken();
-
-    final Map<String, dynamic> message = {
-      "message": {
-        "token": receiverToken,
-        "notification": {
-          "title": title,
-          "body": body,
-        }
-      },
-    };
-
     final Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $accessToken',
     };
+    // send notification request to each fcmToken in receiverToken
+    for (var element in receiverToken) {
+      final Map<String, dynamic> message = {
+        "message": {
+          "token": element,
+          "notification": {
+            "title": title,
+            "body": body,
+          }
+        },
+      };
 
-    try {
-      final http.Response response = await http.post(
-        Uri.parse(fcmApiUrl),
-        headers: headers,
-        body: jsonEncode(message),
-      );
+      try {
+        final http.Response response = await http.post(
+          Uri.parse(fcmApiUrl),
+          headers: headers,
+          body: jsonEncode(message),
+        );
 
-      if (response.statusCode == 200) {
-        print('Notification sent successfully');
-      } else {
-        print('Failed to send notification: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        if (response.statusCode == 200) {
+          print('Notification sent successfully');
+        } else {
+          print('Failed to send notification: ${response.statusCode}');
+          print('Response body: ${response.body}');
+        }
+      } catch (e) {
+        print('Error sending notification: $e');
       }
-    } catch (e) {
-      print('Error sending notification: $e');
     }
   }
 
