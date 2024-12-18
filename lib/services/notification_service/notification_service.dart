@@ -1,14 +1,19 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:googleapis/servicecontrol/v1.dart' as service_control;
+import 'package:phan_mem_giao_nhac_viec/services/auth/auth_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/ultis.dart';
 import 'package:timezone/standalone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+
+import '../../models/model_user.dart';
+import '../database/database_service.dart';
 
 class NotificationService {
   static final NotificationService instance = NotificationService._();
@@ -25,6 +30,16 @@ class NotificationService {
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()!
         .requestExactAlarmsPermission();
+
+    var notifyPermission = await _firebaseMessaging.getNotificationSettings();
+
+    // user must allow notification to use the app
+    if (notifyPermission.authorizationStatus !=
+        AuthorizationStatus.authorized) {
+      await requestPermission();
+    } else {
+      return;
+    }
   }
 
   @pragma('vm:entry-point')
@@ -169,6 +184,19 @@ class NotificationService {
     } catch (e) {
       print('Error sending notification: $e');
     }
+  }
+
+  Future removeFcmToken() async {
+    // get current user info
+    ModelUser modelUser = await DatabaseService()
+        .getUserByUID(FirebaseAuth.instance.currentUser!.uid);
+
+    // current fcm token
+    var fcmToken = await _firebaseMessaging.getToken();
+    // remove fcm token of device
+    modelUser.fcm.removeWhere((element) => element == fcmToken);
+
+    AuthService().updateUserInfoToDatabase(modelUser);
   }
 }
 

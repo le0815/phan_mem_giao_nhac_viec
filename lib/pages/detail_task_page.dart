@@ -76,6 +76,9 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
           }
         }
 
+        // update timeUpdate
+        widget.modelTask.timeUpdate = Timestamp.now();
+
         await taskService.UpdateTaskFromDb(widget.idTask, widget.modelTask);
         if (context.mounted) {
           MySnackBar(context, "Task Modified");

@@ -2,7 +2,10 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
+import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
+import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -25,6 +28,17 @@ class AuthService {
       log("signing");
       _user = userCredential.user;
 
+      if (_user?.uid != null) {
+        // add new fcm token to database
+        ModelUser modelUser = await DatabaseService().getUserByUID(_user!.uid);
+        var newFcmToken = await FirebaseMessaging.instance.getToken();
+        // if the fcm token already exist in the database -> return
+        if (!modelUser.fcm.contains(newFcmToken)) {
+          modelUser.fcm.add(newFcmToken!);
+          updateUserInfoToDatabase(modelUser);
+        }
+      }
+
       return userCredential;
     } on FirebaseAuthException catch (e) {
       log('error while signin: ${e.code}.');
@@ -35,6 +49,8 @@ class AuthService {
   // sign out
   Future<void> SignOut() async {
     try {
+      // remove fcmToken
+      await NotificationService.instance.removeFcmToken();
       await _firebaseAuth.signOut();
     } catch (e) {
       log("error while signing out");
@@ -47,6 +63,7 @@ class AuthService {
     String email,
     String password,
     String userName,
+    List<String> fcm,
   ) async {
     try {
       // register user
@@ -59,6 +76,7 @@ class AuthService {
       await SaveInfoToDatabase(
         userCredential,
         userName,
+        fcm,
       );
 
       return userCredential;
@@ -69,16 +87,31 @@ class AuthService {
   }
 
   // save usr info to database with id of the doc is uid
+  Future<void> updateUserInfoToDatabase(ModelUser modelUser) async {
+    try {
+      log("start uploading user info to database");
+      await _firebaseFirestore
+          .collection("User")
+          .doc(modelUser.uid)
+          .set(modelUser.ToMap());
+    } catch (e) {
+      log("err while uploading user info to database: $e");
+      throw Exception(e);
+    }
+  }
+
+  // save usr info to database with id of the doc is uid
   Future<void> SaveInfoToDatabase(
-      UserCredential userCredential, String userName) async {
+      UserCredential userCredential, String userName, List<String> fcm) async {
     try {
       log("start uploading user info to database");
       String uid = userCredential.user!.uid;
       await _firebaseFirestore.collection("User").doc(uid).set(ModelUser(
-              email: userCredential.user!.email.toString(),
-              userName: userName,
-              uid: uid)
-          .ToMap());
+            email: userCredential.user!.email.toString(),
+            userName: userName,
+            uid: uid,
+            fcm: fcm,
+          ).ToMap());
     } catch (e) {
       log("err while uploading user info to database: $e");
       throw Exception(e);
