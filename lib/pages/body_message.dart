@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_message_overview_tile.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_chat.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/chat_box_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/chat/chat_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
@@ -72,8 +73,12 @@ class BodyMessage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          ChatBoxPage(chatDocId: docs[index].id)),
+                    builder: (context) => ChatBoxPage(
+                      chatDocId: docs[index].id,
+                      modelChat: ModelChat.fromMap(
+                          (docs[index].data() as Map<String, dynamic>)),
+                    ),
+                  ),
                 );
               },
               child: MyMessageOverviewTile(

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,14 +7,19 @@ import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:intl/intl.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_message_tile.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_chat.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_message.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/services/chat/chat_service.dart';
+import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 
 class ChatBoxPage extends StatefulWidget {
   final String chatDocId;
-  const ChatBoxPage({super.key, required this.chatDocId});
+  final ModelChat modelChat;
+  const ChatBoxPage(
+      {super.key, required this.chatDocId, required this.modelChat});
 
   @override
   State<ChatBoxPage> createState() => _ChatBoxPageState();
@@ -20,6 +27,23 @@ class ChatBoxPage extends StatefulWidget {
 
 class _ChatBoxPageState extends State<ChatBoxPage> {
   final String currentUID = FirebaseAuth.instance.currentUser!.uid;
+  ModelUser? modelMember;
+  getModelMember() async {
+    var memberUID = widget.modelChat.members
+        .where(
+          (element) => element != currentUID,
+        )
+        .toString()
+        .replaceAll(RegExp(r'[()]'), '');
+
+    modelMember = await DatabaseService().getUserByUID(memberUID);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getModelMember();
+  }
 
   Future<void> sendMessage(String message) async {
     await ChatService.sendMessage(
@@ -35,6 +59,7 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
   @override
   Widget build(BuildContext context) {
     TextEditingController messageTextController = TextEditingController();
+    final ScrollController _scrollController = ScrollController();
     return Scaffold(
       appBar: AppBar(
         title: Text("Chat name"),
@@ -44,7 +69,27 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
         child: Column(
           children: [
             Expanded(
-              child: messageStream(),
+              child: Stack(
+                children: [
+                  messageStream(_scrollController),
+                  // scroll down button
+                  Positioned(
+                    bottom: 10,
+                    right: 10,
+                    child: IconButton(
+                      onPressed: () {
+                        // scroll down till the end of chat
+                        _scrollController.animateTo(
+                          _scrollController.position.maxScrollExtent,
+                          duration: const Duration(seconds: 2),
+                          curve: Curves.fastOutSlowIn,
+                        );
+                      },
+                      icon: Icon(Icons.arrow_circle_down_sharp),
+                    ),
+                  )
+                ],
+              ),
             ),
             AddVerticalSpace(8),
             bottomBar(messageTextController),
@@ -70,12 +115,11 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
               onPressed: () {
                 if (messageTextController.text.isNotEmpty) {
                   sendMessage(messageTextController.text);
-
+                  log("fcm member: ${modelMember!.fcm}");
                   // notify to user in chat box
                   NotificationService.instance.sendNotification(
-                    receiverToken:
-                        "fnT_YrfKT-6e5eOcmYWA1U:APA91bHVO1nHkrlC31qPJEydwpXhxhMEuK0YPYVQx7BXbYMM3WIhmPZ1z_LF4DLs89wgNabKfnNZuPrZRUsJ5takJERxnSYsuzCQrwvq9BKloKYX-GAgfZg",
-                    title: "You have new message!",
+                    receiverToken: modelMember!.fcm,
+                    title: "You have new message from ${modelMember!.userName}",
                     body: messageTextController.text,
                   );
 
@@ -88,7 +132,8 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
     );
   }
 
-  StreamBuilder<QuerySnapshot<Object?>> messageStream() {
+  StreamBuilder<QuerySnapshot<Object?>> messageStream(
+      ScrollController scrollController) {
     return StreamBuilder(
       stream: ChatService.messageStream(widget.chatDocId),
       builder: (context, snapshot) {
@@ -108,6 +153,7 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
         final docs = snapshot.data!.docs;
 
         return ListView.builder(
+          controller: scrollController,
           itemCount: docs.length,
           itemBuilder: (context, index) {
             Timestamp timeSend = (docs[index].data() as Map)["timeSend"];
