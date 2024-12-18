@@ -10,6 +10,15 @@ class ModelUser {
     required this.fcm,
   });
 
+  factory ModelUser.fromMap(Map<String, dynamic> object) {
+    return ModelUser(
+      email: object["email"],
+      userName: object["userName"],
+      uid: object["uid"],
+      fcm: object["fcm"],
+    );
+  }
+
   Map<String, dynamic> ToMap() {
     return {
       "email": email,
