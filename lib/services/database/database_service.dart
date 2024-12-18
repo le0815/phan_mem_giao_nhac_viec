@@ -72,8 +72,10 @@ class DatabaseService extends ChangeNotifier {
     var result =
         await _firebaseFirestore.collection(_userCollectionPath).doc(uid).get();
     return ModelUser(
-        email: result.data()!["email"],
-        userName: result.data()!["userName"],
-        uid: result.data()!["uid"]);
+      email: result.data()!["email"],
+      userName: result.data()!["userName"],
+      uid: result.data()!["uid"],
+      fcm: result.data()!["fcm"],
+    );
   }
 }

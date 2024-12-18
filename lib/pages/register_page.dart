@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
@@ -32,13 +33,14 @@ class RegisterPage extends StatelessWidget {
       // MyLoadingIndicator(context);
 
       final authService = AuthService();
-
+      var fcmToken = await FirebaseMessaging.instance.getToken();
       try {
         // create account
         await authService.RegisterWithEmailAndPassword(
           emailTextController.text,
           pwdTextController.text,
           userNameTextController.text,
+          [fcmToken!],
         );
       } catch (e) {
         // show error
