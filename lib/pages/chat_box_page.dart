@@ -116,6 +116,7 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
                 if (messageTextController.text.isNotEmpty) {
                   sendMessage(messageTextController.text);
                   log("fcm member: ${modelMember!.fcm}");
+
                   // notify to user in chat box
                   NotificationService.instance.sendNotification(
                     receiverToken: modelMember!.fcm,

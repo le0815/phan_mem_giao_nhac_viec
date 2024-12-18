@@ -71,13 +71,8 @@ class BodyWorkspace extends StatelessWidget {
                           builder: (context) => WorkspacePage(
                             key: workspaceDetailGlobalKey,
                             workspaceID: docs[index].id,
-                            modelWorkspace: ModelWorkspace(
-                                createAt:
-                                    (docs[index].data() as Map?)?["createAt"],
-                                workspaceName: (docs[index].data()
-                                    as Map?)?["workspaceName"],
-                                members:
-                                    (docs[index].data() as Map?)?["members"]),
+                            modelWorkspace: ModelWorkspace.fromMap(
+                                docs[index].data() as Map<String, dynamic>),
                           ),
                         ),
                       ).then(

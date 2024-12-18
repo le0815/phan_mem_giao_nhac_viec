@@ -14,6 +14,7 @@ import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
+import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
@@ -149,8 +150,8 @@ class WorkspacePageState extends State<WorkspacePage> {
             onSelected: (value) {
               // Handle selected value
               if (value == 0) {
-                addMemberDialog(
-                    context, widget.modelWorkspace.members, widget.workspaceID);
+                addMemberDialog(context, widget.modelWorkspace.members,
+                    widget.workspaceID, widget.modelWorkspace);
               }
               // delete workspace
               if (value == 1) {
@@ -348,8 +349,8 @@ class WorkspacePageState extends State<WorkspacePage> {
     );
   }
 
-  addMemberDialog(
-      BuildContext context, List currentMemberUID, String workspaceID) {
+  addMemberDialog(BuildContext context, List currentMemberUID,
+      String workspaceID, ModelWorkspace modelWorkspace) {
     TextEditingController searchPhaseController = TextEditingController();
     final _userTileGlobalKey = GlobalKey<MyUserTileOverviewState>();
     return showDialog(
@@ -423,6 +424,17 @@ class WorkspacePageState extends State<WorkspacePage> {
                   docID: workspaceID,
                   uid: currentMemberUID.last,
                 );
+                // get model user was recently added
+                final myModel =
+                    Provider.of<DatabaseService>(context, listen: false);
+                var userModel = ModelUser.fromMap(
+                    myModel.result[0].data() as Map<String, dynamic>);
+                // notify to user was recently added
+                NotificationService.instance.sendNotification(
+                  receiverToken: userModel.fcm,
+                  title: "You was added to ${modelWorkspace.workspaceName}",
+                );
+
                 setState(() {});
                 Navigator.pop(context);
               },
