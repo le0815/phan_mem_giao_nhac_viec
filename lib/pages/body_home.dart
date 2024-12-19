@@ -139,7 +139,7 @@ class OverView extends StatelessWidget {
                 context: context,
                 pickerType: DateTimePickerType.datetime,
               );
-              log("result: $result");
+              log("result: ${result}");
             },
             child: Text(
               "datetime picker",
