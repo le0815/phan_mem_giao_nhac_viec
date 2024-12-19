@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<DatabaseService>(
-            create: (context) => DatabaseService()),
+            create: (context) => DatabaseService.instance),
       ],
       child: CalendarControllerProvider(
         controller: EventController(),

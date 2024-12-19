@@ -2,10 +2,14 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 
 class DatabaseService extends ChangeNotifier {
+  static final DatabaseService instance = DatabaseService._();
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  DatabaseService._();
   final String _userCollectionPath = "User";
   final _result = {};
   get result => _result;
@@ -49,6 +53,45 @@ class DatabaseService extends ChangeNotifier {
     // delete task
     for (var element in tasksID.docs) {
       await _firebaseFirestore.collection("Task").doc(element.id).delete();
+    }
+  }
+
+  // get all task
+  Future<Map> GetAllTask({required String uid}) async {
+    var result = await _firebaseFirestore
+        .collection("Task")
+        .where("uid", isEqualTo: uid)
+        .get();
+    Map data = {};
+
+// classification state of task by group
+    for (var element in result.docs) {
+      var tempTask = ModelTask.fromMap(element.data());
+      if (data[tempTask.state] != null) {
+        data[tempTask.state].addAll({element.id: tempTask});
+      } else {
+        data[tempTask.state] = {element.id: tempTask};
+      }
+    }
+    return data;
+  }
+
+  taskClassification(ModelTask modelTask) {
+    // pending task
+    if (modelTask.state == MyTaskState.pending.name) {
+      return {modelTask.state: modelTask};
+    }
+    // inProgress task
+    if (modelTask.state == MyTaskState.inProgress.name) {
+      return {modelTask.state: modelTask};
+    }
+    // completed task
+    if (modelTask.state == MyTaskState.completed.name) {
+      return {modelTask.state: modelTask};
+    }
+    // overDue task
+    if (modelTask.state == MyTaskState.overDue.name) {
+      return {modelTask.state: modelTask};
     }
   }
 

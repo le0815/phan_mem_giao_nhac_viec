@@ -189,7 +189,7 @@ class NotificationService {
 
   Future removeFcmToken() async {
     // get current user info
-    ModelUser modelUser = await DatabaseService()
+    ModelUser modelUser = await DatabaseService.instance
         .getUserByUID(FirebaseAuth.instance.currentUser!.uid);
 
     // current fcm token

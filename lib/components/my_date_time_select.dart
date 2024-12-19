@@ -1,28 +1,29 @@
 import 'dart:developer';
 
+import 'package:board_datetime_picker/board_datetime_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_snackbar.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 
 Future<List<Timestamp?>> myDateTimeSelect(BuildContext context) async {
-  List<DateTime>? dateTimeList =
-      await showOmniDateTimeRangePicker(context: context);
+  final result = await showBoardDateTimeMultiPicker(
+    context: context,
+    pickerType: DateTimePickerType.datetime,
+  );
 
   Timestamp? startTime;
   Timestamp? due;
 
   // if datetime is not set
-  if (dateTimeList == null) {
+  if (result == null) {
     // throw exception
     throw (myDateTimeException[0].toString());
   }
 
-  startTime = Timestamp.fromMillisecondsSinceEpoch(
-      dateTimeList[0].millisecondsSinceEpoch);
-  due = Timestamp.fromMillisecondsSinceEpoch(
-      dateTimeList[1].millisecondsSinceEpoch);
+  startTime =
+      Timestamp.fromMillisecondsSinceEpoch(result.start.millisecondsSinceEpoch);
+  due = Timestamp.fromMillisecondsSinceEpoch(result.end.millisecondsSinceEpoch);
 
   // selected time must be greater than or equal to the current time
   if (DateTime.fromMillisecondsSinceEpoch(startTime.millisecondsSinceEpoch)

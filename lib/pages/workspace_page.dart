@@ -20,6 +20,8 @@ import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dar
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 import 'package:provider/provider.dart';
 
+import '../components/my_legend_chart.dart';
+
 class WorkspacePage extends StatefulWidget {
   final ModelWorkspace modelWorkspace;
   final String workspaceID;
@@ -45,7 +47,6 @@ class WorkspacePageState extends State<WorkspacePage> {
   //       DateTime.now().year, DateTime.now().month, DateTime.now().day, 22),
   // );
 
-  final databaseService = DatabaseService();
   final taskService = TaskService();
   List<CalendarEventData> events = [];
   List<ModelUser> membersOfWorkspace = [];
@@ -53,7 +54,7 @@ class WorkspacePageState extends State<WorkspacePage> {
   Future<List> getUsers() async {
     final List<ModelUser> userList = [];
     for (var element in widget.modelWorkspace.members) {
-      var result = await databaseService.getUserByUID(element);
+      var result = await DatabaseService.instance.getUserByUID(element);
       userList.add(result);
     }
     membersOfWorkspace = userList;
@@ -71,8 +72,8 @@ class WorkspacePageState extends State<WorkspacePage> {
   getAllTasks() async {
     clearTaskResult();
 
-    Map taskResult =
-        await databaseService.GetTasksFromWorkspace(widget.workspaceID);
+    Map taskResult = await DatabaseService.instance
+        .GetTasksFromWorkspace(widget.workspaceID);
     // get event form database
     taskResult.forEach(
       (key, value) {
@@ -129,7 +130,7 @@ class WorkspacePageState extends State<WorkspacePage> {
   }
 
   deleteWorkspace(String workspaceID) async {
-    await databaseService.deleteWorkspace(workspaceID);
+    await DatabaseService.instance.deleteWorkspace(workspaceID);
   }
 
   @override
@@ -254,9 +255,9 @@ class WorkspacePageState extends State<WorkspacePage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      annotationColor(
+                      myLegendChart(
                           annotation: "Pending", color: Colors.yellow),
-                      annotationColor(
+                      myLegendChart(
                           annotation: "In progress", color: Colors.blue),
                     ],
                   ),
@@ -264,10 +265,9 @@ class WorkspacePageState extends State<WorkspacePage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      annotationColor(
+                      myLegendChart(
                           annotation: "Completed", color: Colors.green),
-                      annotationColor(
-                          annotation: "Over due", color: Colors.red),
+                      myLegendChart(annotation: "Over due", color: Colors.red),
                     ],
                   ),
                 ],
@@ -326,26 +326,6 @@ class WorkspacePageState extends State<WorkspacePage> {
           ],
         ),
       ),
-    );
-  }
-
-  Row annotationColor({required String annotation, required Color color}) {
-    return Row(
-      children: [
-        Container(
-          width: 32,
-          height: 13,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        AddHorizontalSpace(5),
-        Text(
-          annotation,
-          style: const TextStyle(fontSize: 12),
-        )
-      ],
     );
   }
 
