@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:board_datetime_picker/board_datetime_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_pie_chart.dart';
@@ -9,6 +10,8 @@ import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../components/my_legend_chart.dart';
+import '../components/my_loading_indicator.dart';
+import '../services/database/database_service.dart';
 
 class BodyHome extends StatelessWidget {
   const BodyHome({super.key});
@@ -146,8 +149,24 @@ class OverView extends StatelessWidget {
             ),
           ),
           chatLegend(),
-          const Expanded(
-            child: MyPieChart(),
+          Expanded(
+            child: FutureBuilder(
+              future: DatabaseService.instance
+                  .GetAllTask(uid: FirebaseAuth.instance.currentUser!.uid),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const MyLoadingIndicator();
+                }
+                if (snapshot.data == null) {
+                  return const Center(
+                    child: Text("Nothing to show here"),
+                  );
+                }
+                return MyPieChart(
+                  taskData: snapshot.data!,
+                );
+              },
+            ),
           ),
         ],
       ),

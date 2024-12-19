@@ -47,7 +47,6 @@ class WorkspacePageState extends State<WorkspacePage> {
   //       DateTime.now().year, DateTime.now().month, DateTime.now().day, 22),
   // );
 
-  final databaseService = DatabaseService();
   final taskService = TaskService();
   List<CalendarEventData> events = [];
   List<ModelUser> membersOfWorkspace = [];
@@ -55,7 +54,7 @@ class WorkspacePageState extends State<WorkspacePage> {
   Future<List> getUsers() async {
     final List<ModelUser> userList = [];
     for (var element in widget.modelWorkspace.members) {
-      var result = await databaseService.getUserByUID(element);
+      var result = await DatabaseService.instance.getUserByUID(element);
       userList.add(result);
     }
     membersOfWorkspace = userList;
@@ -73,8 +72,8 @@ class WorkspacePageState extends State<WorkspacePage> {
   getAllTasks() async {
     clearTaskResult();
 
-    Map taskResult =
-        await databaseService.GetTasksFromWorkspace(widget.workspaceID);
+    Map taskResult = await DatabaseService.instance
+        .GetTasksFromWorkspace(widget.workspaceID);
     // get event form database
     taskResult.forEach(
       (key, value) {
@@ -131,7 +130,7 @@ class WorkspacePageState extends State<WorkspacePage> {
   }
 
   deleteWorkspace(String workspaceID) async {
-    await databaseService.deleteWorkspace(workspaceID);
+    await DatabaseService.instance.deleteWorkspace(workspaceID);
   }
 
   @override

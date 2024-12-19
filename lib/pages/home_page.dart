@@ -17,7 +17,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final DatabaseService databaseService = DatabaseService();
 
   List<Widget> bodyComponents = [
     const BodyHome(),
@@ -52,7 +51,7 @@ class _HomePageState extends State<HomePage> {
             child: GestureDetector(
               onTap: () async {
                 // get user info
-                var modelUser = await databaseService
+                var modelUser = await DatabaseService.instance
                     .getUserByUID(FirebaseAuth.instance.currentUser!.uid);
                 Navigator.push(
                   context,

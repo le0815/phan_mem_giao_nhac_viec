@@ -36,7 +36,7 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
         .toString()
         .replaceAll(RegExp(r'[()]'), '');
 
-    modelMember = await DatabaseService().getUserByUID(memberUID);
+    modelMember = await DatabaseService.instance.getUserByUID(memberUID);
   }
 
   @override
