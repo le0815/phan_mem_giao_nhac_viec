@@ -81,7 +81,7 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
                         // scroll down till the end of chat
                         _scrollController.animateTo(
                           _scrollController.position.maxScrollExtent,
-                          duration: const Duration(seconds: 2),
+                          duration: const Duration(seconds: 1),
                           curve: Curves.fastOutSlowIn,
                         );
                       },

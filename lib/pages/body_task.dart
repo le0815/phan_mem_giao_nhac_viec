@@ -159,15 +159,8 @@ class _BodyTaskState extends State<BodyTask> {
           return ListView.builder(
             itemCount: result.length,
             itemBuilder: (context, index) {
-              var modelTask = ModelTask(
-                  title: result[index].data()['title'],
-                  description: result[index].data()['description'],
-                  uid: result[index].data()['uid'],
-                  createAt: result[index].data()['createAt'],
-                  due: result[index].data()['due'],
-                  startTime: result[index].data()['startTime'],
-                  state: result[index].data()['state'],
-                  timeUpdate: result[index].data()['timeUpdate']);
+              var modelTask = ModelTask.fromMap(
+                  result[index].data() as Map<String, dynamic>);
               return MyTaskTileOverview(
                 modelTask: modelTask,
                 color: myTaskColor[modelTask.state],
