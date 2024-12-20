@@ -69,6 +69,8 @@ class WorkspacePageState extends State<WorkspacePage> {
     }
   }
 
+  checkCurrentUserPermission() {}
+
   getAllTasks() async {
     clearTaskResult();
 
@@ -175,6 +177,8 @@ class WorkspacePageState extends State<WorkspacePage> {
                 value: 0,
                 child: Text('Add member'),
               ),
+              // if user is owner => delete workspace
+              // if user is member => leave workspace
               const PopupMenuItem(
                 value: 1,
                 child: Text(

@@ -18,7 +18,7 @@ class WorkspaceService {
         .add(modelWorkspace.toMap());
     // add 'MembersDetail' subcollection after create main docs
     await mainCollection.collection("MembersDetail").doc(currentUID).set({
-      "role": MyWorkspaceRole.owner.index,
+      "role": MyWorkspaceRole.owner.name,
     });
   }
 
@@ -37,7 +37,7 @@ class WorkspaceService {
 
     // add 'MembersDetail' subcollection after create main docs
     await mainCollection.collection("MembersDetail").doc(uid).set({
-      "role": MyWorkspaceRole.member.index,
+      "role": MyWorkspaceRole.member.name,
     });
   }
 
