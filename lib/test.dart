@@ -1,24 +1,9 @@
-void main() async {
-  var temp = {
-    'AdSy10J3a4B6qSwJckva': {
-      'uid': 'iI98yciba5gGoPKyNA8znpS9gjC3',
-      'assigner': null,
-      'description': 'sddsf',
-      'state': 'pending',
-      'title': 'sdfsdf1221',
-      'workspaceID': null
-    },
-    'DLYsKzI5MODuhGmxNLxe': {
-      'uid': 'iI98yciba5gGoPKyNA8znpS9gjC3',
-      'due': null,
-      'assigner': null,
-      'description': null,
-      'startTime': null,
-      'state': 'inProgress',
-      'title': 'zfds',
-      'workspaceID': null
-    }
-  };
+class Test {
+  final String a;
+  Test({required this.a});
+}
 
-  print(temp["DLYsKzI5MODuhGmxNLxe"]!.length);
+void main() {
+  var b = Test(a: "asdf");
+  print(b.a);
 }

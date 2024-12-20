@@ -64,7 +64,20 @@ class DatabaseService extends ChangeNotifier {
         .get();
     Map data = {};
 
-// classification state of task by group
+    // classification state of task by group
+    // processed data will be like this
+    // {
+    //   taskState1: {
+    //     docIDTask1: modelTask1,
+    //     docIDTask2: modelTask2,
+    //     ....
+    //   }
+    //   taskState2: {
+    //     docIDTask3: modelTask3,
+    //     docIDTask4: modelTask4,
+    //     ....
+    //   }
+    // }
     for (var element in result.docs) {
       var tempTask = ModelTask.fromMap(element.data());
       if (data[tempTask.state] != null) {
