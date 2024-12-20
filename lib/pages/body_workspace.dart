@@ -9,6 +9,8 @@ import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/workspace_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
 
+final futureWorkspaceKey = GlobalKey<FutureWorkSpaceState>();
+
 class BodyWorkspace extends StatelessWidget {
   BodyWorkspace({super.key});
   final workspaceDetailGlobalKey = GlobalKey<WorkspacePageState>();
@@ -20,16 +22,114 @@ class BodyWorkspace extends StatelessWidget {
       padding: EdgeInsets.all(8),
       child: Stack(
         children: [
-          workspaceStream(currentUID),
+          FutureWorkSpace(
+              key: futureWorkspaceKey,
+              currentUID: currentUID,
+              workspaceDetailGlobalKey: workspaceDetailGlobalKey),
           addFloatingButton(context, currentUID),
         ],
       ),
     );
   }
 
-  StreamBuilder<QuerySnapshot<Object?>> workspaceStream(String currentUID) {
-    return StreamBuilder(
-      stream: WorkspaceService.workspaceStream(currentUID),
+  Positioned addFloatingButton(BuildContext context, String currentUID) {
+    return Positioned(
+      bottom: 10,
+      right: 10,
+      child: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              var workspaceNameController = TextEditingController();
+              return PopupDialog(
+                  workspaceNameController: workspaceNameController,
+                  context: context,
+                  currentUID: currentUID);
+            },
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+class PopupDialog extends StatelessWidget {
+  const PopupDialog({
+    super.key,
+    required this.workspaceNameController,
+    required this.context,
+    required this.currentUID,
+  });
+
+  final TextEditingController workspaceNameController;
+  final BuildContext context;
+  final String currentUID;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text(
+        "Create new workspace",
+        style: TextStyle(fontSize: 16),
+      ),
+      // workspace name text field
+      content: MyTextfield(
+        textController: workspaceNameController,
+        textFieldHint: "Enter workspace name",
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Cancel"),
+        ),
+        TextButton(
+          onPressed: () async {
+            await WorkspaceService.instance.createWorkspace(
+              currentUID: currentUID,
+              modelWorkspace: ModelWorkspace(
+                workspaceName: workspaceNameController.text,
+                createAt: Timestamp.now(),
+                members: [currentUID],
+              ),
+            );
+
+            Navigator.pop(context);
+            // refresh data of futureWorkspace
+            futureWorkspaceKey.currentState!.refreshData();
+          },
+          child: const Text("Add"),
+        ),
+      ],
+    );
+  }
+}
+
+class FutureWorkSpace extends StatefulWidget {
+  const FutureWorkSpace({
+    super.key,
+    required this.currentUID,
+    required this.workspaceDetailGlobalKey,
+  });
+
+  final String currentUID;
+  final GlobalKey<WorkspacePageState> workspaceDetailGlobalKey;
+
+  @override
+  State<FutureWorkSpace> createState() => FutureWorkSpaceState();
+}
+
+class FutureWorkSpaceState extends State<FutureWorkSpace> {
+  refreshData() {
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: WorkspaceService.instance
+          .workspaceFuture(currentUID: widget.currentUID),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // show loading indicator
@@ -48,104 +148,51 @@ class BodyWorkspace extends StatelessWidget {
             ),
           );
         }
-        final docs = snapshot.data!.docs;
+        final modelsWorkspaceData = snapshot.data!;
         return ListView.builder(
-          itemCount: docs.length,
+          itemCount: modelsWorkspaceData.length,
           itemBuilder: (context, index) {
-            return docs.isEmpty
-                ? const Center(
-                    child: Text(
-                      'No workspace here!',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.black54,
-                      ),
+            if (modelsWorkspaceData.isEmpty) {
+              const Center(
+                child: Text(
+                  'No workspace here!',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.black54,
+                  ),
+                ),
+              );
+            }
+
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => WorkspacePage(
+                      key: widget.workspaceDetailGlobalKey,
+                      workspaceID: modelsWorkspaceData.keys.elementAt(index),
+                      workspaceData:
+                          modelsWorkspaceData.values.elementAt(index),
                     ),
-                  )
-                // navigate to workspace detail page
-                : GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => WorkspacePage(
-                            key: workspaceDetailGlobalKey,
-                            workspaceID: docs[index].id,
-                            modelWorkspace: ModelWorkspace.fromMap(
-                                docs[index].data() as Map<String, dynamic>),
-                          ),
-                        ),
-                      ).then(
-                        (value) {
-                          // clear task overview after switch back
-                          workspaceDetailGlobalKey.currentState!
-                              .clearTaskResult();
-                        },
-                      );
-                    },
-                    child: MyWorkspaceOverviewTile(
-                      workspaceName:
-                          (docs[index].data() as Map?)?["workspaceName"],
-                    ),
-                  );
+                  ),
+                ).then(
+                  (value) {
+                    // clear task overview after switch back
+                    widget.workspaceDetailGlobalKey.currentState!
+                        .clearTaskResult();
+                  },
+                );
+              },
+              child: MyWorkspaceOverviewTile(
+                workspaceName: modelsWorkspaceData.values
+                    .elementAt(index)['modelWorkspace']
+                    .workspaceName,
+              ),
+            );
           },
         );
       },
-    );
-  }
-
-  Positioned addFloatingButton(BuildContext context, String currentUID) {
-    return Positioned(
-      bottom: 10,
-      right: 10,
-      child: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) {
-              var workspaceNameController = TextEditingController();
-              return popUpDialog(workspaceNameController, context, currentUID);
-            },
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  AlertDialog popUpDialog(TextEditingController workspaceNameController,
-      BuildContext context, String currentUID) {
-    return AlertDialog(
-      title: const Text(
-        "Create new workspace",
-        style: TextStyle(fontSize: 16),
-      ),
-      // workspace name text field
-      content: MyTextfield(
-        textController: workspaceNameController,
-        textFieldHint: "Enter workspace name",
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Cancel"),
-        ),
-        TextButton(
-          onPressed: () async {
-            WorkspaceService.createWorkspace(
-              currentUID: currentUID,
-              modelWorkspace: ModelWorkspace(
-                workspaceName: workspaceNameController.text,
-                createAt: Timestamp.now(),
-                members: [currentUID],
-              ),
-            );
-
-            Navigator.pop(context);
-          },
-          child: const Text("Add"),
-        ),
-      ],
     );
   }
 }

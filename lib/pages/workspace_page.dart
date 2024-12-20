@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:calendar_view/calendar_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
@@ -23,12 +24,12 @@ import 'package:provider/provider.dart';
 import '../components/my_legend_chart.dart';
 
 class WorkspacePage extends StatefulWidget {
-  final ModelWorkspace modelWorkspace;
+  final Map workspaceData;
   final String workspaceID;
 
   const WorkspacePage({
     super.key,
-    required this.modelWorkspace,
+    required this.workspaceData,
     required this.workspaceID,
   });
 
@@ -46,14 +47,16 @@ class WorkspacePageState extends State<WorkspacePage> {
   //   endTime: DateTime(
   //       DateTime.now().year, DateTime.now().month, DateTime.now().day, 22),
   // );
-
+  ModelWorkspace? modelWorkspace;
+  Map? membersDetail;
   final taskService = TaskService();
+  var currentUserRole;
   List<CalendarEventData> events = [];
   List<ModelUser> membersOfWorkspace = [];
   var calendarController;
   Future<List> getUsers() async {
     final List<ModelUser> userList = [];
-    for (var element in widget.modelWorkspace.members) {
+    for (var element in modelWorkspace!.members) {
       var result = await DatabaseService.instance.getUserByUID(element);
       userList.add(result);
     }
@@ -69,7 +72,11 @@ class WorkspacePageState extends State<WorkspacePage> {
     }
   }
 
-  checkCurrentUserPermission() {}
+  checkCurrentUserRole() async {
+    var currentUID = FirebaseAuth.instance.currentUser!.uid;
+
+    currentUserRole = membersDetail![currentUID]["role"];
+  }
 
   getAllTasks() async {
     clearTaskResult();
@@ -137,8 +144,11 @@ class WorkspacePageState extends State<WorkspacePage> {
 
   @override
   void didChangeDependencies() {
+    modelWorkspace = widget.workspaceData.entries.first.value;
+    membersDetail = widget.workspaceData.entries.last.value;
     calendarController = CalendarControllerProvider.of(context).controller;
     getAllTasks();
+    checkCurrentUserRole();
     super.didChangeDependencies();
   }
 
@@ -146,15 +156,15 @@ class WorkspacePageState extends State<WorkspacePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.modelWorkspace.workspaceName),
+        title: Text(modelWorkspace!.workspaceName),
         actions: [
           PopupMenuButton(
             icon: const Icon(Icons.menu), // Icon for the button
             onSelected: (value) {
               // Handle selected value
               if (value == 0) {
-                addMemberDialog(context, widget.modelWorkspace.members,
-                    widget.workspaceID, widget.modelWorkspace);
+                addMemberDialog(context, modelWorkspace!.members,
+                    widget.workspaceID, modelWorkspace!);
               }
               // delete workspace
               if (value == 1) {
@@ -179,11 +189,13 @@ class WorkspacePageState extends State<WorkspacePage> {
               ),
               // if user is owner => delete workspace
               // if user is member => leave workspace
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 1,
                 child: Text(
-                  'Delete workspace',
-                  style: TextStyle(
+                  MyWorkspaceRole.values.first.name == currentUserRole
+                      ? 'Delete workspace'
+                      : "Leave Workspace",
+                  style: const TextStyle(
                     color: Colors.red,
                   ),
                 ),
@@ -224,7 +236,7 @@ class WorkspacePageState extends State<WorkspacePage> {
                             (event.event as Map)["modelTask"]),
                         idTask: (event.event as Map)["id"],
                         isWorkspace: true,
-                        workspaceName: widget.modelWorkspace.workspaceName,
+                        workspaceName: modelWorkspace!.workspaceName,
                         memberList: membersOfWorkspace,
                       ),
                     ),
@@ -403,7 +415,7 @@ class WorkspacePageState extends State<WorkspacePage> {
             ),
             TextButton(
               onPressed: () {
-                WorkspaceService.addUser(
+                WorkspaceService.instance.addUser(
                   newMemberList: currentMemberUID,
                   docID: workspaceID,
                   uid: currentMemberUID.last,
