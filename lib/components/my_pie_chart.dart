@@ -61,7 +61,7 @@ class _MyPieChartState extends State<MyPieChart> {
           // generate data sections from task fetched from firebase
           /// IMPORTANCE
           /// you must modify PieChartSectionData class by
-          /// - add 'Map<String, dynamic>? data' attribute
+          /// - add 'final Map<String, dynamic>? data' attribute
           /// - add 'this.data' in the constructor
           /// - 'Map<String, dynamic>? data' and 'data: data' in the copyWith func
           sections: List.generate(
