@@ -4,6 +4,7 @@ import 'package:calendar_view/calendar_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
@@ -205,8 +206,8 @@ class WorkspacePageState extends State<WorkspacePage> {
                   MyAlertDialog(
                     context,
                     msg: "Are you sure want to leave this workspace?",
-                    onOkay: () {
-                      leaveWorkspace(workspaceID: widget.workspaceID);
+                    onOkay: () async {
+                      await leaveWorkspace(workspaceID: widget.workspaceID);
                       // close alert dialog
                       Navigator.pop(context);
                       // close workspace page
@@ -383,6 +384,7 @@ class WorkspacePageState extends State<WorkspacePage> {
       String workspaceID, ModelWorkspace modelWorkspace) {
     TextEditingController searchPhaseController = TextEditingController();
     final _userTileGlobalKey = GlobalKey<MyUserTileOverviewState>();
+
     return showDialog(
       context: context,
       builder: (context) {
@@ -416,11 +418,27 @@ class WorkspacePageState extends State<WorkspacePage> {
                           : ListView.builder(
                               itemCount: value.result.length,
                               itemBuilder: (context, index) {
+                                ModelUser searchedUser = ModelUser.fromMap(
+                                    value.result[index].data());
+                                // if member already exist-> show error
+                                if (currentMemberUID
+                                    .contains(searchedUser.uid)) {
+                                  SchedulerBinding.instance
+                                      .addPostFrameCallback((_) {
+                                    MyAlertDialog(
+                                      context,
+                                      msg: "User was existed in the workspace",
+                                      onOkay: () => Navigator.pop(context),
+                                    );
+                                  });
+                                  return const Text(
+                                      "User was existed in the workspace");
+                                }
                                 return GestureDetector(
                                   onTap: () {
-                                    // change color of user tile when tapped
-                                    final userTile =
+                                    var userTile =
                                         _userTileGlobalKey.currentState!;
+                                    // change color of user tile when tapped
                                     userTile.changeState();
                                     // add uid to members of chat
                                     currentMemberUID
@@ -449,24 +467,35 @@ class WorkspacePageState extends State<WorkspacePage> {
             ),
             TextButton(
               onPressed: () {
-                WorkspaceService.instance.addUser(
-                  newMemberList: currentMemberUID,
-                  docID: workspaceID,
-                  uid: currentMemberUID.last,
-                );
-                // get model user was recently added
-                final myModel =
-                    Provider.of<DatabaseService>(context, listen: false);
-                var userModel = ModelUser.fromMap(
-                    myModel.result[0].data() as Map<String, dynamic>);
-                // notify to user was recently added
-                NotificationService.instance.sendNotification(
-                  receiverToken: userModel.fcm,
-                  title: "You was added to ${modelWorkspace.workspaceName}",
-                );
+                var userTile = _userTileGlobalKey.currentState;
 
-                setState(() {});
-                Navigator.pop(context);
+                /// if user was not selected -> show alert
+                if (userTile == null || userTile.widget.isSelected == false) {
+                  MyAlertDialog(
+                    context,
+                    msg: "User must be selected",
+                    onOkay: () => Navigator.pop(context),
+                  );
+                } else {
+                  WorkspaceService.instance.addUser(
+                    newMemberList: currentMemberUID,
+                    docID: workspaceID,
+                    uid: currentMemberUID.last,
+                  );
+                  // get model user was recently added
+                  final myModel =
+                      Provider.of<DatabaseService>(context, listen: false);
+                  var userModel = ModelUser.fromMap(
+                      myModel.result[0].data() as Map<String, dynamic>);
+                  // notify to user was recently added
+                  NotificationService.instance.sendNotification(
+                    receiverToken: userModel.fcm,
+                    title: "You was added to ${modelWorkspace.workspaceName}",
+                  );
+                  // reload to get latest data
+                  setState(() {});
+                  Navigator.pop(context);
+                }
               },
               child: const Text("Add"),
             ),

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 MyAlertDialog(BuildContext context,
-    {required String msg, required Function()? onOkay}) {
-  ;
-  showDialog(
+    {required String msg, required Function()? onOkay}) async {
+  await showDialog(
     context: context,
     builder: (context) {
       return AlertDialog(

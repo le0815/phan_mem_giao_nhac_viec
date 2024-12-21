@@ -13,6 +13,8 @@ import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart'
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 import 'package:provider/provider.dart';
 
+import '../components/my_alert_dialog.dart';
+
 class BodyMessage extends StatelessWidget {
   const BodyMessage({super.key});
 
@@ -171,13 +173,24 @@ class BodyMessage extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                // add chat to database
-                ChatService.createNewChat(
-                  chatName: chatNameController.text.trim(),
-                  members: iudMember,
-                  timeUpdate: Timestamp.now(),
-                );
-                Navigator.pop(context);
+                var userTile = _userTileGlobalKey.currentState;
+
+                /// if user was not selected -> show alert
+                if (userTile == null || userTile.widget.isSelected == false) {
+                  MyAlertDialog(
+                    context,
+                    msg: "User must be selected",
+                    onOkay: () => Navigator.pop(context),
+                  );
+                } else {
+                  // add chat to database
+                  ChatService.createNewChat(
+                    chatName: chatNameController.text.trim(),
+                    members: iudMember,
+                    timeUpdate: Timestamp.now(),
+                  );
+                  Navigator.pop(context);
+                }
               },
               child: const Text("Add"),
             ),
