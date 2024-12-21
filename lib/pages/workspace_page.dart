@@ -138,11 +138,11 @@ class WorkspacePageState extends State<WorkspacePage> {
     }
   }
 
-  leaveWorkspace({required String workspaceID}) async {
+  leaveWorkspace({required String workspaceID, required String uid}) async {
     try {
       await WorkspaceService.instance.leaveWorkspace(
         workspaceID: workspaceID,
-        uid: currentUID,
+        uid: uid,
         modelWorkspace: modelWorkspace!,
         membersDetail: membersDetail!,
         membersOfWorkspace: membersOfWorkspace,
@@ -160,6 +160,8 @@ class WorkspacePageState extends State<WorkspacePage> {
   deleteWorkspace(String workspaceID) async {
     await WorkspaceService.instance.deleteWorkspace(workspaceID);
   }
+
+  removeUser({required String workspaceID, required String uid}) {}
 
   @override
   void didChangeDependencies() {
@@ -207,7 +209,8 @@ class WorkspacePageState extends State<WorkspacePage> {
                     context,
                     msg: "Are you sure want to leave this workspace?",
                     onOkay: () async {
-                      await leaveWorkspace(workspaceID: widget.workspaceID);
+                      await leaveWorkspace(
+                          workspaceID: widget.workspaceID, uid: currentUID);
                       // close alert dialog
                       Navigator.pop(context);
                       // close workspace page
@@ -362,9 +365,20 @@ class WorkspacePageState extends State<WorkspacePage> {
                         return ListView.builder(
                           itemCount: result!.length,
                           itemBuilder: (context, index) {
+                            ModelUser modelUser = result[index];
                             return MyUserTileOverview(
-                              userName: result[index].userName,
-                              msg: result[index].email,
+                              userName: modelUser.userName,
+                              msg: modelUser.email,
+                              onRemove: () async {
+                                // remove user has the same logic as leaveWorkspace
+                                await leaveWorkspace(
+                                    workspaceID: widget.workspaceID,
+                                    uid: modelUser.uid);
+
+                                // reload data
+                                setState(() {});
+                                getAllTasks();
+                              },
                             );
                           },
                         );
@@ -449,6 +463,7 @@ class WorkspacePageState extends State<WorkspacePage> {
                                     userName:
                                         value.result[index].data()["userName"],
                                     msg: "sample",
+                                    onRemove: () {},
                                   ),
                                 );
                               },

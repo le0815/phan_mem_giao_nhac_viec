@@ -157,7 +157,7 @@ class OverView extends StatelessWidget {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const MyLoadingIndicator();
                 }
-                if (snapshot.data == null) {
+                if (snapshot.data == null || snapshot.data!.isEmpty) {
                   return const Center(
                     child: Text("Nothing to show here"),
                   );

@@ -155,6 +155,7 @@ class BodyMessage extends StatelessWidget {
                                     userName:
                                         value.result[index].data()["userName"],
                                     msg: "sample",
+                                    onRemove: () {},
                                   ),
                                 );
                               },
