@@ -50,6 +50,7 @@ class WorkspacePageState extends State<WorkspacePage> {
   ModelWorkspace? modelWorkspace;
   Map? membersDetail;
   final taskService = TaskService();
+  var currentUID = FirebaseAuth.instance.currentUser!.uid;
   var currentUserRole;
   List<CalendarEventData> events = [];
   List<ModelUser> membersOfWorkspace = [];
@@ -73,8 +74,6 @@ class WorkspacePageState extends State<WorkspacePage> {
   }
 
   checkCurrentUserRole() async {
-    var currentUID = FirebaseAuth.instance.currentUser!.uid;
-
     currentUserRole = membersDetail![currentUID]["role"];
   }
 
@@ -138,8 +137,27 @@ class WorkspacePageState extends State<WorkspacePage> {
     }
   }
 
+  leaveWorkspace({required String workspaceID}) async {
+    try {
+      await WorkspaceService.instance.leaveWorkspace(
+        workspaceID: workspaceID,
+        uid: currentUID,
+        modelWorkspace: modelWorkspace!,
+        membersDetail: membersDetail!,
+        membersOfWorkspace: membersOfWorkspace,
+      );
+    } catch (e) {
+      // show err dialog
+      MyAlertDialog(
+        context,
+        msg: e.toString(),
+        onOkay: () => Navigator.pop(context),
+      );
+    }
+  }
+
   deleteWorkspace(String workspaceID) async {
-    await DatabaseService.instance.deleteWorkspace(workspaceID);
+    await WorkspaceService.instance.deleteWorkspace(workspaceID);
   }
 
   @override
@@ -169,17 +187,33 @@ class WorkspacePageState extends State<WorkspacePage> {
               // delete workspace
               if (value == 1) {
                 // show alert
-                MyAlertDialog(
-                  context,
-                  msg: "Are you sure want to delete this workspace?",
-                  onOkay: () {
-                    deleteWorkspace(widget.workspaceID);
-                    // close alert dialog
-                    Navigator.pop(context);
-                    // close workspace page
-                    Navigator.pop(context);
-                  },
-                );
+                // if current use is owner -> delete workspace
+                // else leave
+                if (MyWorkspaceRole.values.first.name == currentUserRole) {
+                  MyAlertDialog(
+                    context,
+                    msg: "Are you sure want to delete this workspace?",
+                    onOkay: () {
+                      deleteWorkspace(widget.workspaceID);
+                      // close alert dialog
+                      Navigator.pop(context);
+                      // close workspace page
+                      Navigator.pop(context);
+                    },
+                  );
+                } else {
+                  MyAlertDialog(
+                    context,
+                    msg: "Are you sure want to leave this workspace?",
+                    onOkay: () {
+                      leaveWorkspace(workspaceID: widget.workspaceID);
+                      // close alert dialog
+                      Navigator.pop(context);
+                      // close workspace page
+                      Navigator.pop(context);
+                    },
+                  );
+                }
               }
             },
             itemBuilder: (context) => [

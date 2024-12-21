@@ -165,8 +165,8 @@ class FutureWorkSpaceState extends State<FutureWorkSpace> {
             }
 
             return GestureDetector(
-              onTap: () {
-                Navigator.push(
+              onTap: () async {
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => WorkspacePage(
@@ -183,6 +183,8 @@ class FutureWorkSpaceState extends State<FutureWorkSpace> {
                         .clearTaskResult();
                   },
                 );
+                // refresh data of futureWorkspace
+                setState(() {});
               },
               child: MyWorkspaceOverviewTile(
                 workspaceName: modelsWorkspaceData.values
