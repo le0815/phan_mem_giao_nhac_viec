@@ -30,32 +30,6 @@ class DatabaseService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> deleteWorkspace(String workspaceID) async {
-    // get workspace doc
-    var workspaceDoc =
-        _firebaseFirestore.collection("Workspace").doc(workspaceID);
-    var subCollection = await workspaceDoc.collection("MembersDetail").get();
-
-    // delete sub collection first
-    for (var element in subCollection.docs) {
-      await workspaceDoc.collection("MembersDetail").doc(element.id).delete();
-    }
-    // delete workspace
-    await workspaceDoc.delete();
-
-    // delete tasks of workspace
-    // get all taskID of workspace task
-    var tasksID = await _firebaseFirestore
-        .collection("Task")
-        .where("workspaceID", isEqualTo: workspaceID)
-        .get();
-
-    // delete task
-    for (var element in tasksID.docs) {
-      await _firebaseFirestore.collection("Task").doc(element.id).delete();
-    }
-  }
-
   // get all task
   Future<Map> GetAllTask({required String uid}) async {
     var result = await _firebaseFirestore
