@@ -159,20 +159,20 @@ class _BodyTaskState extends State<BodyTask> {
           return ListView.builder(
             itemCount: result.length,
             itemBuilder: (context, index) {
-              var modelTask = ModelTask.fromMap(
-                  result[index].data() as Map<String, dynamic>);
+              var modelTask = result.values.elementAt(index);
+              var idTask = result.keys.elementAt(index);
               return MyTaskTileOverview(
                 modelTask: modelTask,
                 color: myTaskColor[modelTask.state],
                 onRemove: () async {
-                  await RemoveTaskFromDb(result[index].id);
+                  await RemoveTaskFromDb(idTask);
                   // reload task
                   setState(() {});
                 },
                 onTap: () async {
                   await OpenTaskDetail(
                     modelTask,
-                    result[index].id,
+                    idTask,
                   );
                   // reload task overview
                   setState(() {});

@@ -28,8 +28,11 @@ class TaskService extends ChangeNotifier {
 
     var result = {};
     for (var element in data.docs) {
-      result[result.length] = element;
-      log("data: $element");
+      result.addAll(
+        {
+          element.id: element.data(),
+        },
+      );
     }
     return result;
   }
@@ -63,21 +66,36 @@ class TaskService extends ChangeNotifier {
     // get latest update task from db
     var result = await GetTaskFromDb();
     var resultByDate = {};
+    var dateOnlyCurrentTime = ConvertToDateOnly(time);
 
-    // loop for get task with createAt itself match to the current time
-    for (var element in result.values) {
-      // element
-      Timestamp timeCreateOfTask = element.data()["createAt"];
-      // convert to date only
-      var dateOnlyTimeCreateOfTask = ConvertToDateOnly(
-          DateTime.fromMillisecondsSinceEpoch(
-              timeCreateOfTask.millisecondsSinceEpoch));
-      var dateOnlyCurrentTime = ConvertToDateOnly(time);
+    // loop to get task with due time is bigger or equal to the current time
+    result.forEach(
+      (key, value) {
+        ModelTask modelTask = ModelTask.fromMap(value);
 
-      if (dateOnlyCurrentTime.compareTo(dateOnlyTimeCreateOfTask) == 0) {
-        resultByDate[resultByDate.length] = element;
-      }
-    }
+        // if the task was not provide due time -> add
+        if (modelTask.due == null) {
+          resultByDate.addAll(
+            {
+              key: modelTask,
+            },
+          );
+        } else {
+          // convert due time to date only
+          var dateOnlyDueTimeOfTask = ConvertToDateOnly(
+              DateTime.fromMillisecondsSinceEpoch(
+                  modelTask.due!.millisecondsSinceEpoch));
+          // if due time is greater or equal than current day
+          if (dateOnlyCurrentTime.compareTo(dateOnlyDueTimeOfTask) != 1) {
+            resultByDate.addAll(
+              {
+                key: modelTask,
+              },
+            );
+          }
+        }
+      },
+    );
     return resultByDate;
     // notifyListeners();
   }
