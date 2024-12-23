@@ -55,8 +55,12 @@ dependencies:
   workmanager: ^0.5.2
   timezone: ^0.10.0
   board_datetime_picker: ^2.2.0
+  hive:
+  hive_flutter:
 
 dev_dependencies:
+  hive_generator:
+  build_runner:
   flutter_test:
     sdk: flutter
 

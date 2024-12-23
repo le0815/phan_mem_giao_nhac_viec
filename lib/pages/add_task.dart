@@ -38,11 +38,11 @@ class _AddTaskState extends State<AddTask> {
 
   @override
   Widget build(BuildContext context) {
-    final TaskService taskService = TaskService();
+    // final TaskService taskService = TaskService();
 
     Future<void> UploadTask({required String? uid}) async {
       try {
-        await taskService.AddTaskToDb(
+        await TaskService.instance.AddTaskToDb(
           // if task was created in workspace mode, the uid of task is uid of
           // assignee and assigner now set to current uid
           ModelTask(

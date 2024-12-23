@@ -136,19 +136,7 @@ class OverView extends StatelessWidget {
             thickness: 1,
             color: Colors.black,
           ),
-          OutlinedButton(
-            onPressed: () async {
-              final result = await showBoardDateTimeMultiPicker(
-                context: context,
-                pickerType: DateTimePickerType.datetime,
-              );
-              log("result: ${result}");
-            },
-            child: Text(
-              "datetime picker",
-            ),
-          ),
-          chatLegend(),
+          const chatLegend(),
           Expanded(
             child: FutureBuilder(
               future: DatabaseService.instance

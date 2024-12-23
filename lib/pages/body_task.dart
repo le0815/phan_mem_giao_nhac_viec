@@ -20,7 +20,7 @@ class BodyTask extends StatefulWidget {
 }
 
 class _BodyTaskState extends State<BodyTask> {
-  final taskService = TaskService();
+  // final taskService = TaskService();
   // use list object to changeable value after pass to function
   DateTime currentDate = DateTime.now();
   // @override
@@ -34,7 +34,7 @@ class _BodyTaskState extends State<BodyTask> {
 
   RemoveTaskFromDb(String taskId) async {
     try {
-      await taskService.RemoveTaskFromDb(taskId);
+      await TaskService.instance.RemoveTaskFromDb(taskId);
     } catch (e) {
       if (context.mounted) {
         // show err dialog
@@ -144,7 +144,7 @@ class _BodyTaskState extends State<BodyTask> {
   Expanded TaskTileOverView() {
     return Expanded(
       child: FutureBuilder<Map>(
-        future: taskService.GetTaskByDay(currentDate),
+        future: TaskService.instance.GetTaskByDay(currentDate),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const MyLoadingIndicator();

@@ -7,7 +7,8 @@ import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 
 class TaskService extends ChangeNotifier {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
-
+  static final TaskService instance = TaskService._();
+  TaskService._();
   // add task
   Future<void> AddTaskToDb(ModelTask task) async {
     try {

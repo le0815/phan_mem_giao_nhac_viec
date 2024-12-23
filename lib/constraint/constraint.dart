@@ -12,6 +12,10 @@ enum MyTaskState {
   overDue,
 }
 
+enum BackgroundTask {
+  syncData,
+}
+
 Map myTaskColor = {
   MyTaskState.pending.name: Colors.yellow,
   MyTaskState.inProgress.name: Colors.blue,

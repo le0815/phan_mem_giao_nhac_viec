@@ -50,7 +50,7 @@ class WorkspacePageState extends State<WorkspacePage> {
   // );
   ModelWorkspace? modelWorkspace;
   Map? membersDetail;
-  final taskService = TaskService();
+  // final taskService = TaskService();
   var currentUID = FirebaseAuth.instance.currentUser!.uid;
   var currentUserRole;
   List<CalendarEventData> events = [];
@@ -125,7 +125,7 @@ class WorkspacePageState extends State<WorkspacePage> {
 
   RemoveTaskFromDb(String taskId) async {
     try {
-      await taskService.RemoveTaskFromDb(taskId);
+      await TaskService.instance.RemoveTaskFromDb(taskId);
     } catch (e) {
       if (context.mounted) {
         // show err dialog

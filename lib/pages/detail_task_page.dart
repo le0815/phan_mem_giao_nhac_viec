@@ -37,7 +37,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
   final TextEditingController textTitleController = TextEditingController();
   final TextEditingController textDescriptionController =
       TextEditingController();
-  final TaskService taskService = TaskService();
+  // final TaskService taskService = TaskService();
   Timestamp? startTime;
   Timestamp? due;
   final workSpaceFiledGlobalKey = GlobalKey<WorkspaceFieldState>();
@@ -78,7 +78,8 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
         // update timeUpdate
         widget.modelTask.timeUpdate = Timestamp.now();
 
-        await taskService.UpdateTaskFromDb(widget.idTask, widget.modelTask);
+        await TaskService.instance
+            .UpdateTaskFromDb(widget.idTask, widget.modelTask);
         if (context.mounted) {
           MySnackBar(context, "Task Modified");
         }

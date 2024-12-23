@@ -1,4 +1,5 @@
 import 'package:calendar_view/calendar_view.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/firebase_options.dart';
 import 'package:phan_mem_giao_nhac_viec/services/auth/auth_gate.dart';
@@ -24,7 +25,7 @@ testBackgroundTask() async {
   // await NotificationService.instance.initNotify();
   await NotificationService.instance.showNotify(
     id: 0,
-    title: "message from background service",
+    title: FirebaseAuth.instance.currentUser!.uid,
     body:
         "I've been a rich man, I've been a poor man. And I choose rich every fucking time!",
   );
