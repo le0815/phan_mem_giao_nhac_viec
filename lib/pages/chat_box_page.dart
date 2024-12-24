@@ -46,13 +46,13 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
   }
 
   Future<void> sendMessage(String message) async {
-    await ChatService.sendMessage(
+    await ChatService.instance.sendMessage(
+      chatDocID: widget.chatDocId,
       modelMessage: ModelMessage(
-          message: message,
-          chatCollectionID: widget.chatDocId,
-          messageCollection: "Message",
-          timeSend: Timestamp.now(),
-          senderUID: currentUID),
+        message: message,
+        timeSend: Timestamp.now(),
+        senderUID: currentUID,
+      ),
     );
   }
 
@@ -136,7 +136,7 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
   StreamBuilder<QuerySnapshot<Object?>> messageStream(
       ScrollController scrollController) {
     return StreamBuilder(
-      stream: ChatService.messageStream(widget.chatDocId),
+      stream: ChatService.instance.messageStream(widget.chatDocId),
       builder: (context, snapshot) {
         // show loading indicator
         if (snapshot.connectionState == ConnectionState.waiting) {

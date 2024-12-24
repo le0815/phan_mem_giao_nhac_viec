@@ -31,7 +31,7 @@ class TaskService extends ChangeNotifier {
     for (var element in data.docs) {
       result.addAll(
         {
-          element.id: element.data(),
+          element.id: ModelTask.fromMap(element.data()),
         },
       );
     }
@@ -72,25 +72,23 @@ class TaskService extends ChangeNotifier {
     // loop to get task with due time is bigger or equal to the current time
     result.forEach(
       (key, value) {
-        ModelTask modelTask = ModelTask.fromMap(value);
-
         // if the task was not provide due time -> add
-        if (modelTask.due == null) {
+        if (value.due == null) {
           resultByDate.addAll(
             {
-              key: modelTask,
+              key: value,
             },
           );
         } else {
           // convert due time to date only
           var dateOnlyDueTimeOfTask = ConvertToDateOnly(
               DateTime.fromMillisecondsSinceEpoch(
-                  modelTask.due!.millisecondsSinceEpoch));
+                  value.due!.millisecondsSinceEpoch));
           // if due time is greater or equal than current day
           if (dateOnlyCurrentTime.compareTo(dateOnlyDueTimeOfTask) != 1) {
             resultByDate.addAll(
               {
-                key: modelTask,
+                key: value,
               },
             );
           }

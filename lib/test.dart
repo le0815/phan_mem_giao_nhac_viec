@@ -9,10 +9,12 @@ class Test {
 }
 
 void main() {
-  var a = {
-    1: "sdf",
-    2: 'dsfdsf',
-  };
+  var map = {};
+  // map.addAll({1: "345"});
+  // map.addAll({1: "456"});
+  map[1] = "343";
+  map[1] = "2w34";
+  print(map);
 
   // print(a.values.);
 }

@@ -1,7 +1,11 @@
 import 'package:calendar_view/calendar_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/firebase_options.dart';
+import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_chat.dart';
 import 'package:phan_mem_giao_nhac_viec/services/auth/auth_gate.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_home.dart';
@@ -42,11 +46,22 @@ void callbackDispatcher() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // hive
+  await Hive.initFlutter();
+  HiveBoxes.instance.registerAllAdapters();
+
+  await HiveBoxes.instance.openAllBoxes();
+  HiveBoxes.instance.taskHiveBox.clear();
+
+  // notification
   await NotificationService.instance.initNotify();
 
+  // background service
   await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
   tz.initializeTimeZones();
 

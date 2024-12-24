@@ -1,15 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive/hive.dart';
 
+part "model_task.g.dart";
+
+@HiveType(typeId: 3)
 class ModelTask {
+  @HiveField(0)
   String title;
+  @HiveField(1)
   String description;
+  @HiveField(2)
   String state;
+  @HiveField(3)
   String? assigner;
+  @HiveField(4)
   String? workspaceID;
+  @HiveField(5)
   Timestamp? due;
+  @HiveField(6)
   Timestamp? startTime;
+  @HiveField(7)
   Timestamp createAt;
+  @HiveField(8)
   String uid;
+  @HiveField(9)
   Timestamp timeUpdate;
   // final String? idTask;
 

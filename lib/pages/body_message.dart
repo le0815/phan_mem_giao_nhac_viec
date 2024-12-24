@@ -3,9 +3,12 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_message_overview_tile.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_chat.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/chat_box_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/chat/chat_service.dart';
@@ -44,7 +47,7 @@ class BodyMessage extends StatelessWidget {
   StreamBuilder<QuerySnapshot<Object?>> getChatGroupStream() {
     final currentUID = FirebaseAuth.instance.currentUser!.uid;
     return StreamBuilder(
-      stream: ChatService.groupChatStream(currentUID),
+      stream: ChatService.instance.groupChatStream(currentUID),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           log("loading chat group from database: - ${DateTime.now()}");
@@ -69,6 +72,13 @@ class BodyMessage extends StatelessWidget {
         return ListView.builder(
           itemCount: docs.length,
           itemBuilder: (context, index) {
+            ModelChat modelChat =
+                ModelChat.fromMap((docs[index].data() as Map<String, dynamic>));
+            var idChat = docs[index].id;
+            // save data to hive
+            // HiveBoxes.instance.modelChat.put(idChat, modelChat);
+
+            // log("box data: ${HiveBoxes.instance.modelChat.toMap()}");
             return GestureDetector(
               // open chat page
               onTap: () {
@@ -77,14 +87,13 @@ class BodyMessage extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => ChatBoxPage(
                       chatDocId: docs[index].id,
-                      modelChat: ModelChat.fromMap(
-                          (docs[index].data() as Map<String, dynamic>)),
+                      modelChat: modelChat,
                     ),
                   ),
                 );
               },
               child: MyMessageOverviewTile(
-                chatName: (docs[index].data() as Map?)?["chatName"],
+                chatName: modelChat.chatName,
                 // (docs[index].data() as Map?)?["msg"]
                 msg: "Test",
               ),
@@ -185,7 +194,7 @@ class BodyMessage extends StatelessWidget {
                   );
                 } else {
                   // add chat to database
-                  ChatService.createNewChat(
+                  ChatService.instance.createNewChat(
                     chatName: chatNameController.text.trim(),
                     members: iudMember,
                     timeUpdate: Timestamp.now(),

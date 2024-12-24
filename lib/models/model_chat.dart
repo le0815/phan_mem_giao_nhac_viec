@@ -1,8 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive/hive.dart';
 
-class ModelChat {
+part "model_chat.g.dart";
+
+@HiveType(typeId: 1)
+class ModelChat extends HiveObject {
+  @HiveField(0)
   final String chatName;
+  @HiveField(1)
   final List members;
+  @HiveField(2)
   final Timestamp timeUpdate;
 
   ModelChat({

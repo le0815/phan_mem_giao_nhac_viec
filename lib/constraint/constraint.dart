@@ -16,6 +16,15 @@ enum BackgroundTask {
   syncData,
 }
 
+class HiveBoxName {
+  static const String chatHiveBox = "chatHiveBox";
+  static const String messageHiveBox = "messageHiveBox";
+  static const String taskHiveBox = "taskHiveBox";
+  static const String userHiveBox = "userHiveBox";
+  static const String workspaceHiveBox = "workspaceHiveBox";
+  static const String memberDetailHiveBox = "memberDetailHiveBox";
+}
+
 Map myTaskColor = {
   MyTaskState.pending.name: Colors.yellow,
   MyTaskState.inProgress.name: Colors.blue,

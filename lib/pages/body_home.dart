@@ -3,8 +3,11 @@ import 'dart:developer';
 import 'package:board_datetime_picker/board_datetime_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_pie_chart.dart';
+import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 import 'package:workmanager/workmanager.dart';
@@ -137,25 +140,41 @@ class OverView extends StatelessWidget {
             color: Colors.black,
           ),
           const chatLegend(),
-          Expanded(
-            child: FutureBuilder(
-              future: DatabaseService.instance
-                  .GetAllTask(uid: FirebaseAuth.instance.currentUser!.uid),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const MyLoadingIndicator();
-                }
-                if (snapshot.data == null || snapshot.data!.isEmpty) {
-                  return const Center(
-                    child: Text("Nothing to show here"),
-                  );
-                }
-                return MyPieChart(
-                  taskData: snapshot.data!,
+          ValueListenableBuilder(
+            valueListenable: HiveBoxes.instance.taskHiveBox.listenable(),
+            builder: (context, box, child) {
+              log("task data: ${HiveBoxes.instance.taskHiveBox.toMap()}");
+              if (box.isEmpty) {
+                return const Center(
+                  child: Text("Nothing to show here"),
                 );
-              },
-            ),
+              }
+
+              return MyPieChart(
+                taskData: DatabaseService.instance.taskClassification(
+                    data: (box.toMap() as Map<String, ModelTask>)),
+              );
+            },
           ),
+          // Expanded(
+          //   child: FutureBuilder(
+          //     future: DatabaseService.instance
+          //         .GetAllTask(uid: FirebaseAuth.instance.currentUser!.uid),
+          //     builder: (context, snapshot) {
+          //       if (snapshot.connectionState == ConnectionState.waiting) {
+          //         return const MyLoadingIndicator();
+          //       }
+          //       if (snapshot.data == null || snapshot.data!.isEmpty) {
+          //         return const Center(
+          //           child: Text("Nothing to show here"),
+          //         );
+          //       }
+          //       return MyPieChart(
+          //         taskData: snapshot.data!,
+          //       );
+          //     },
+          //   ),
+          // ),
         ],
       ),
     );
