@@ -12,3 +12,6 @@
 
 ## Ứng dụng tham khảo:  
 ClickUp (https://play.google.com/store/apps/details?id=co.mangotechnologies.clickup&pli=1) 
+
+## Contributor
+Special thanks to wonderful tester: NBC (https://web.facebook.com/coldbrew1206)
