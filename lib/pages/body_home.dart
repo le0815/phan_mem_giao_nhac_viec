@@ -140,41 +140,39 @@ class OverView extends StatelessWidget {
             color: Colors.black,
           ),
           const chatLegend(),
-          ValueListenableBuilder(
-            valueListenable: HiveBoxes.instance.taskHiveBox.listenable(),
-            builder: (context, box, child) {
-              log("task data: ${HiveBoxes.instance.taskHiveBox.toMap()}");
-              if (box.isEmpty) {
-                return const Center(
-                  child: Text("Nothing to show here"),
+          OutlinedButton(
+            onPressed: () async {
+              try {
+                // clear old data
+                await HiveBoxes.instance.clearAllData();
+                HiveBoxes.instance.syncData(
+                  await DatabaseService.instance.getAllDataFromUID(),
                 );
+              } catch (e) {
+                log("error while sync data: $e");
               }
-
-              return MyPieChart(
-                taskData: DatabaseService.instance.taskClassification(
-                    data: (box.toMap() as Map<String, ModelTask>)),
-              );
+              log("sync data: ${HiveBoxes.instance.taskHiveBox.toMap()}");
             },
+            child: Text("sync data"),
           ),
-          // Expanded(
-          //   child: FutureBuilder(
-          //     future: DatabaseService.instance
-          //         .GetAllTask(uid: FirebaseAuth.instance.currentUser!.uid),
-          //     builder: (context, snapshot) {
-          //       if (snapshot.connectionState == ConnectionState.waiting) {
-          //         return const MyLoadingIndicator();
-          //       }
-          //       if (snapshot.data == null || snapshot.data!.isEmpty) {
-          //         return const Center(
-          //           child: Text("Nothing to show here"),
-          //         );
-          //       }
-          //       return MyPieChart(
-          //         taskData: snapshot.data!,
-          //       );
-          //     },
-          //   ),
-          // ),
+          Expanded(
+            child: ValueListenableBuilder(
+              valueListenable: HiveBoxes.instance.taskHiveBox.listenable(),
+              builder: (context, box, child) {
+                if (box.isEmpty) {
+                  return const Center(
+                    child: Text("Nothing to show here!"),
+                  );
+                }
+                var classifiedTask = DatabaseService.instance
+                    .taskClassification(
+                        data: box.toMap().cast<String, ModelTask>());
+                return MyPieChart(
+                  taskData: classifiedTask,
+                );
+              },
+            ),
+          ),
         ],
       ),
     );

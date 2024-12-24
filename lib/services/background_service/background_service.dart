@@ -10,6 +10,6 @@ class BackgroundService {
 
   syncData() async {
     // get task data from firebase
-    var tasksData = await TaskService.instance.GetTaskByDay(DateTime.now());
+    // var tasksData = await TaskService.instance.GetTaskByDay(DateTime.now());
   }
 }

@@ -63,14 +63,13 @@ class TaskService extends ChangeNotifier {
     }
   }
 
-  Future<Map> GetTaskByDay(DateTime time) async {
-    // get latest update task from db
-    var result = await GetTaskFromDb();
+  getTaskByDay(
+      {required DateTime time, required Map<String, ModelTask> taskData}) {
     var resultByDate = {};
     var dateOnlyCurrentTime = ConvertToDateOnly(time);
 
     // loop to get task with due time is bigger or equal to the current time
-    result.forEach(
+    taskData.forEach(
       (key, value) {
         // if the task was not provide due time -> add
         if (value.due == null) {
@@ -84,8 +83,13 @@ class TaskService extends ChangeNotifier {
           var dateOnlyDueTimeOfTask = ConvertToDateOnly(
               DateTime.fromMillisecondsSinceEpoch(
                   value.due!.millisecondsSinceEpoch));
-          // if due time is greater or equal than current day
-          if (dateOnlyCurrentTime.compareTo(dateOnlyDueTimeOfTask) != 1) {
+          // convert due time to date only
+          var dateOnlyCreateTimeOfTask = ConvertToDateOnly(
+              DateTime.fromMillisecondsSinceEpoch(
+                  value.startTime!.millisecondsSinceEpoch));
+          // if due, create time is greater or equal than current day
+          if (dateOnlyCurrentTime.compareTo(dateOnlyDueTimeOfTask) != 1 &&
+              dateOnlyCurrentTime.compareTo(dateOnlyCreateTimeOfTask) != -1) {
             resultByDate.addAll(
               {
                 key: value,

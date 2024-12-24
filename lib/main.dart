@@ -56,7 +56,6 @@ void main() async {
   HiveBoxes.instance.registerAllAdapters();
 
   await HiveBoxes.instance.openAllBoxes();
-  HiveBoxes.instance.taskHiveBox.clear();
 
   // notification
   await NotificationService.instance.initNotify();

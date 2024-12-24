@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:horizontal_week_calendar/horizontal_week_calendar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
@@ -11,6 +12,8 @@ import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_task_tile_overview.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
+
+import '../local_database/hive_boxes.dart';
 
 class BodyTask extends StatefulWidget {
   const BodyTask({super.key});
@@ -143,24 +146,22 @@ class _BodyTaskState extends State<BodyTask> {
 
   Expanded TaskTileOverView() {
     return Expanded(
-      child: FutureBuilder<Map>(
-        future: TaskService.instance.GetTaskByDay(currentDate),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const MyLoadingIndicator();
-          }
-
-          if (!snapshot.hasData) {
+      child: ValueListenableBuilder(
+        valueListenable: HiveBoxes.instance.taskHiveBox.listenable(),
+        builder: (context, value, child) {
+          if (value.isEmpty) {
             return const Center(
               child: Text("Nothing to show here!"),
             );
           }
-          var result = snapshot.data!;
+          var taskData = TaskService.instance.getTaskByDay(
+              time: currentDate,
+              taskData: value.toMap().cast<String, ModelTask>());
           return ListView.builder(
-            itemCount: result.length,
+            itemCount: taskData.length,
             itemBuilder: (context, index) {
-              var modelTask = result.values.elementAt(index);
-              var idTask = result.keys.elementAt(index);
+              var modelTask = taskData.values.elementAt(index);
+              var idTask = taskData.keys.elementAt(index);
               return MyTaskTileOverview(
                 modelTask: modelTask,
                 color: myTaskColor[modelTask.state],

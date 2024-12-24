@@ -41,10 +41,11 @@ class AuthService {
           updateUserInfoToDatabase(modelUser);
         }
 
+        // clear old data
+        // HiveBoxes.instance.taskHiveBox.clear();
         // sync all data to hive boxes
-
-        HiveBoxes.instance
-            .syncData(await DatabaseService.instance.getAllDataFromUID());
+        // HiveBoxes.instance
+        //     .syncData(await DatabaseService.instance.getAllDataFromUID());
       }
 
       return userCredential;
