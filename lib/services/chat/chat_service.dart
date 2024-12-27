@@ -39,16 +39,18 @@ class ChatService {
     // get data of chat
     var mainCollectionDataDoc = await mainCollection.get();
     for (var mainDoc in mainCollectionDataDoc.docs) {
-      var modelChat = ModelChat.fromMap(mainDoc.data());
+      var modelChat = mainDoc.data();
       var chatID = mainDoc.id;
 
       // message is sub collection of chat collection
-      var messagesDataDoc =
-          await mainDoc.reference.collection(_messageCollection).get();
+      var messagesDataDoc = await mainDoc.reference
+          .collection(_messageCollection)
+          .orderBy("timeSend", descending: false)
+          .get();
       var messagesData = {};
       for (var subDoc in messagesDataDoc.docs) {
         var messageId = subDoc.id;
-        var modelMessage = ModelMessage.fromMap(subDoc.data());
+        var modelMessage = subDoc.data();
 
         messagesData[messageId] = modelMessage;
       }
@@ -69,7 +71,7 @@ class ChatService {
   Future<void> createNewChat({
     required String chatName,
     required List members,
-    required Timestamp timeUpdate,
+    required int timeUpdate,
   }) async {
     _firebaseFirestore.collection(_collectionName).add(ModelChat(
           chatName: chatName,

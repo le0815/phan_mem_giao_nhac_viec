@@ -8,7 +8,7 @@ class ModelWorkspace {
   @HiveField(0)
   final String workspaceName;
   @HiveField(1)
-  final Timestamp createAt;
+  final int createAt;
   @HiveField(2)
   final List members;
 

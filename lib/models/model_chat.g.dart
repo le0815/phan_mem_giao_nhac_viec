@@ -19,7 +19,7 @@ class ModelChatAdapter extends TypeAdapter<ModelChat> {
     return ModelChat(
       chatName: fields[0] as String,
       members: (fields[1] as List).cast<dynamic>(),
-      timeUpdate: fields[2] as Timestamp,
+      timeUpdate: fields[2] as int,
     );
   }
 

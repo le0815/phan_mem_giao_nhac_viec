@@ -1,19 +1,23 @@
+import 'dart:async';
 import 'dart:developer';
+import 'dart:isolate';
+import 'dart:ui';
 
-import 'package:board_datetime_picker/board_datetime_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:googleapis/streetviewpublish/v1.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_pie_chart.dart';
-import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
-import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
+import 'package:uuid/uuid.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../components/my_legend_chart.dart';
+
 import '../components/my_loading_indicator.dart';
+import '../local_database/hive_boxes.dart';
 import '../services/database/database_service.dart';
 
 class BodyHome extends StatelessWidget {
@@ -37,7 +41,7 @@ class BodyHome extends StatelessWidget {
                     var uniqueID = DateTime.now().second;
                     await Workmanager().registerOneOffTask(
                       uniqueID.toString(),
-                      "test background task",
+                      BackgroundTaskName.syncTask,
                       initialDelay: Duration(seconds: 10),
                     );
                   },
@@ -118,11 +122,16 @@ class BodyHome extends StatelessWidget {
   }
 }
 
-class OverView extends StatelessWidget {
-  const OverView({
+class OverView extends StatefulWidget {
+  OverView({
     super.key,
   });
 
+  @override
+  State<OverView> createState() => _OverViewState();
+}
+
+class _OverViewState extends State<OverView> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -143,15 +152,10 @@ class OverView extends StatelessWidget {
           OutlinedButton(
             onPressed: () async {
               try {
-                // clear old data
-                await HiveBoxes.instance.clearAllData();
-                HiveBoxes.instance.syncData(
-                  await DatabaseService.instance.getAllDataFromUID(),
-                );
+                HiveBoxes.instance.syncAllData();
               } catch (e) {
                 log("error while sync data: $e");
               }
-              log("sync data: ${HiveBoxes.instance.taskHiveBox.toMap()}");
             },
             child: Text("sync data"),
           ),
@@ -164,9 +168,9 @@ class OverView extends StatelessWidget {
                     child: Text("Nothing to show here!"),
                   );
                 }
+
                 var classifiedTask = DatabaseService.instance
-                    .taskClassification(
-                        data: box.toMap().cast<String, ModelTask>());
+                    .taskClassification(data: box.toMap());
                 return MyPieChart(
                   taskData: classifiedTask,
                 );

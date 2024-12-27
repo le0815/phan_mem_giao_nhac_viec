@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_message_overview_tile.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
@@ -27,7 +28,7 @@ class BodyMessage extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       child: Stack(
         children: [
-          getChatGroupStream(),
+          const GetChatGroup(),
           // float add new chat button
           Positioned(
             bottom: 10,
@@ -41,66 +42,6 @@ class BodyMessage extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  StreamBuilder<QuerySnapshot<Object?>> getChatGroupStream() {
-    final currentUID = FirebaseAuth.instance.currentUser!.uid;
-    return StreamBuilder(
-      stream: ChatService.instance.groupChatStream(currentUID),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          log("loading chat group from database: - ${DateTime.now()}");
-          // show loading indicator
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        if (!snapshot.hasData) {
-          return const Center(
-            child: Text(
-              'No message here',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.black54,
-              ),
-            ),
-          );
-        }
-        final docs = snapshot.data!.docs;
-        // list message
-        return ListView.builder(
-          itemCount: docs.length,
-          itemBuilder: (context, index) {
-            ModelChat modelChat =
-                ModelChat.fromMap((docs[index].data() as Map<String, dynamic>));
-            var idChat = docs[index].id;
-            // save data to hive
-            // HiveBoxes.instance.modelChat.put(idChat, modelChat);
-
-            // log("box data: ${HiveBoxes.instance.modelChat.toMap()}");
-            return GestureDetector(
-              // open chat page
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatBoxPage(
-                      chatDocId: docs[index].id,
-                      modelChat: modelChat,
-                    ),
-                  ),
-                );
-              },
-              child: MyMessageOverviewTile(
-                chatName: modelChat.chatName,
-                // (docs[index].data() as Map?)?["msg"]
-                msg: "Test",
-              ),
-            );
-          },
-        );
-      },
     );
   }
 
@@ -197,14 +138,76 @@ class BodyMessage extends StatelessWidget {
                   ChatService.instance.createNewChat(
                     chatName: chatNameController.text.trim(),
                     members: iudMember,
-                    timeUpdate: Timestamp.now(),
+                    timeUpdate: Timestamp.now().millisecondsSinceEpoch,
                   );
                   Navigator.pop(context);
+                  // sync chat data
+                  log("sync chat data from add new chat");
+                  HiveBoxes.instance.syncData(syncType: SyncTypes.syncMessage);
                 }
               },
               child: const Text("Add"),
             ),
           ],
+        );
+      },
+    );
+  }
+}
+
+class GetChatGroup extends StatefulWidget {
+  const GetChatGroup({super.key});
+
+  @override
+  State<GetChatGroup> createState() => _GetChatGroupState();
+}
+
+class _GetChatGroupState extends State<GetChatGroup> {
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: HiveBoxes.instance.chatHiveBox.listenable(),
+      builder: (context, value, child) {
+        if (value.isEmpty) {
+          return const Center(
+            child: Text(
+              'No message here',
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.black54,
+              ),
+            ),
+          );
+        }
+        var chatData = value.toMap();
+        // list message
+        return ListView.builder(
+          itemCount: chatData.length,
+          itemBuilder: (context, index) {
+            ModelChat modelChat = ModelChat.fromMap(
+                chatData.values.elementAt(index)["modelChat"]);
+            var idChat = chatData.keys.elementAt(index);
+
+            return GestureDetector(
+              // open chat page
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatBoxPage(
+                      chatDocId: idChat,
+                      modelChat: modelChat,
+                    ),
+                  ),
+                );
+              },
+              child: MyMessageOverviewTile(
+                chatName: modelChat.chatName,
+                // (docs[index].data() as Map?)?["msg"]
+                msg: "Test",
+              ),
+            );
+          },
         );
       },
     );

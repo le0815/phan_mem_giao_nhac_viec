@@ -17,16 +17,16 @@ class ModelTaskAdapter extends TypeAdapter<ModelTask> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return ModelTask(
-      createAt: fields[7] as Timestamp,
+      createAt: fields[7] as int,
       title: fields[0] as String,
       description: fields[1] as String,
       uid: fields[8] as String,
       state: fields[2] as String,
-      timeUpdate: fields[9] as Timestamp,
-      due: fields[5] as Timestamp?,
+      timeUpdate: fields[9] as int,
+      due: fields[5] as int?,
       assigner: fields[3] as String?,
       workspaceID: fields[4] as String?,
-      startTime: fields[6] as Timestamp?,
+      startTime: fields[6] as int?,
     );
   }
 

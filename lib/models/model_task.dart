@@ -16,15 +16,15 @@ class ModelTask {
   @HiveField(4)
   String? workspaceID;
   @HiveField(5)
-  Timestamp? due;
+  int? due;
   @HiveField(6)
-  Timestamp? startTime;
+  int? startTime;
   @HiveField(7)
-  Timestamp createAt;
+  int createAt;
   @HiveField(8)
   String uid;
   @HiveField(9)
-  Timestamp timeUpdate;
+  int timeUpdate;
   // final String? idTask;
 
   ModelTask({
@@ -41,7 +41,7 @@ class ModelTask {
     // this.idTask,
   });
 
-  factory ModelTask.fromMap(Map<String, dynamic> object) {
+  factory ModelTask.fromMap(Map<dynamic, dynamic> object) {
     return ModelTask(
       title: object["title"],
       description: object["description"],

@@ -12,8 +12,15 @@ enum MyTaskState {
   overDue,
 }
 
-enum BackgroundTask {
-  syncData,
+class BackgroundTaskName {
+  static const String syncTask = "syncTask";
+  static const String sendDataFromIsolate = "sendDataFromIsolate";
+}
+
+class SyncTypes {
+  static const String syncTask = "syncTask";
+  static const String syncMessage = "syncMessage";
+  static const String syncWorkSpace = "syncWorkSpace";
 }
 
 class HiveBoxName {

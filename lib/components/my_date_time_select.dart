@@ -6,14 +6,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_snackbar.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 
-Future<List<Timestamp?>> myDateTimeSelect(BuildContext context) async {
+Future<List<int?>> myDateTimeSelect(BuildContext context) async {
   final result = await showBoardDateTimeMultiPicker(
     context: context,
     pickerType: DateTimePickerType.datetime,
   );
 
-  Timestamp? startTime;
-  Timestamp? due;
+  int? startTime;
+  int? due;
 
   // if datetime is not set
   if (result == null) {
@@ -21,16 +21,14 @@ Future<List<Timestamp?>> myDateTimeSelect(BuildContext context) async {
     throw (myDateTimeException[0].toString());
   }
 
-  startTime =
-      Timestamp.fromMillisecondsSinceEpoch(result.start.millisecondsSinceEpoch);
-  due = Timestamp.fromMillisecondsSinceEpoch(result.end.millisecondsSinceEpoch);
+  startTime = result.start.millisecondsSinceEpoch;
+  due = result.end.millisecondsSinceEpoch;
 
   // selected time must be greater than or equal to the current time
-  if (DateTime.fromMillisecondsSinceEpoch(startTime.millisecondsSinceEpoch)
+  if (DateTime.fromMillisecondsSinceEpoch(startTime)
               .compareTo(DateTime.now()) ==
           -1 ||
-      DateTime.fromMillisecondsSinceEpoch(due.millisecondsSinceEpoch)
-              .compareTo(DateTime.now()) ==
+      DateTime.fromMillisecondsSinceEpoch(due).compareTo(DateTime.now()) ==
           -1) {
     log("Selected time must be equal or greater than current time");
     if (context.mounted) {
@@ -41,9 +39,8 @@ Future<List<Timestamp?>> myDateTimeSelect(BuildContext context) async {
   }
 
   // if startTime > due => show error and reselect
-  if (DateTime.fromMillisecondsSinceEpoch(startTime.millisecondsSinceEpoch)
-          .compareTo(DateTime.fromMillisecondsSinceEpoch(
-              due.millisecondsSinceEpoch)) ==
+  if (DateTime.fromMillisecondsSinceEpoch(startTime)
+          .compareTo(DateTime.fromMillisecondsSinceEpoch(due)) ==
       1) {
     log("Start time must be equal or greater than end time");
     if (context.mounted) {

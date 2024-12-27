@@ -10,7 +10,7 @@ class ModelChat extends HiveObject {
   @HiveField(1)
   final List members;
   @HiveField(2)
-  final Timestamp timeUpdate;
+  final int timeUpdate;
 
   ModelChat({
     required this.chatName,
@@ -18,7 +18,7 @@ class ModelChat extends HiveObject {
     required this.timeUpdate,
   });
 
-  factory ModelChat.fromMap(Map<String, dynamic> object) {
+  factory ModelChat.fromMap(Map<dynamic, dynamic> object) {
     return ModelChat(
         chatName: object["chatName"],
         members: object["members"],

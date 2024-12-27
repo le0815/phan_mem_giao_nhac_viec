@@ -8,7 +8,7 @@ class ModelMessage {
   @HiveField(1)
   final String message;
   @HiveField(2)
-  final Timestamp timeSend;
+  final int timeSend;
   // @HiveField(3)
   // final String chatCollectionID;
   // @HiveField(4)

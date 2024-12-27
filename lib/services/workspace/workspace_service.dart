@@ -228,7 +228,7 @@ class WorkspaceService {
     var result = await mainCollection.get();
     var totalResult = {};
     for (var element in result.docs) {
-      var modelWorkspace = ModelWorkspace.fromMap(element.data());
+      var modelWorkspace = element.data();
 
       /// get MembersDetail collection inside the main collection
       var subCollection =
@@ -237,7 +237,7 @@ class WorkspaceService {
       for (var subElement in subCollection.docs) {
         membersDetail.addAll(
           {
-            subElement.id: ModelMemberDetail.fromMap(subElement.data()),
+            subElement.id: subElement.data(),
           },
         );
       }

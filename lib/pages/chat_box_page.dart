@@ -4,9 +4,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_message_tile.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_chat.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_message.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
@@ -27,6 +30,7 @@ class ChatBoxPage extends StatefulWidget {
 
 class _ChatBoxPageState extends State<ChatBoxPage> {
   final String currentUID = FirebaseAuth.instance.currentUser!.uid;
+  final ScrollController _scrollController = ScrollController();
   ModelUser? modelMember;
   getModelMember() async {
     var memberUID = widget.modelChat.members
@@ -50,16 +54,24 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
       chatDocID: widget.chatDocId,
       modelMessage: ModelMessage(
         message: message,
-        timeSend: Timestamp.now(),
+        timeSend: DateTime.now().millisecondsSinceEpoch,
         senderUID: currentUID,
       ),
+    );
+  }
+
+  scrollDown() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(seconds: 1),
+      curve: Curves.fastOutSlowIn,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     TextEditingController messageTextController = TextEditingController();
-    final ScrollController _scrollController = ScrollController();
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Chat name"),
@@ -71,7 +83,11 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
             Expanded(
               child: Stack(
                 children: [
-                  messageStream(_scrollController),
+                  MessageHiveStream(
+                    scrollController: _scrollController,
+                    chatDocId: widget.chatDocId,
+                    currentUID: currentUID,
+                  ),
                   // scroll down button
                   Positioned(
                     bottom: 10,
@@ -79,13 +95,9 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
                     child: IconButton(
                       onPressed: () {
                         // scroll down till the end of chat
-                        _scrollController.animateTo(
-                          _scrollController.position.maxScrollExtent,
-                          duration: const Duration(seconds: 1),
-                          curve: Curves.fastOutSlowIn,
-                        );
+                        scrollDown();
                       },
-                      icon: Icon(Icons.arrow_circle_down_sharp),
+                      icon: const Icon(Icons.arrow_circle_down_sharp),
                     ),
                   )
                 ],
@@ -111,6 +123,7 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
               textFieldHint: "Enter message here",
             ),
           ),
+          // send message button
           IconButton(
               onPressed: () {
                 if (messageTextController.text.isNotEmpty) {
@@ -124,7 +137,14 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
                     body: messageTextController.text,
                   );
 
+                  // sync message into hive
+                  log("sync new message sent");
+                  HiveBoxes.instance.syncData(syncType: SyncTypes.syncMessage);
+
                   messageTextController.clear();
+
+                  // scroll down
+                  scrollDown();
                 }
               },
               icon: Icon(Icons.send_outlined))
@@ -132,44 +152,51 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
       ),
     );
   }
+}
 
-  StreamBuilder<QuerySnapshot<Object?>> messageStream(
-      ScrollController scrollController) {
-    return StreamBuilder(
-      stream: ChatService.instance.messageStream(widget.chatDocId),
-      builder: (context, snapshot) {
-        // show loading indicator
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        // if have no data
-        if (!snapshot.hasData) {
+class MessageHiveStream extends StatelessWidget {
+  final ScrollController scrollController;
+  final String chatDocId;
+  final String currentUID;
+  const MessageHiveStream(
+      {super.key,
+      required this.scrollController,
+      required this.chatDocId,
+      required this.currentUID});
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: HiveBoxes.instance.chatHiveBox.listenable(),
+      builder: (context, value, child) {
+        Map messageData = value.toMap()[chatDocId]["modelMessages"];
+        if (messageData.isEmpty) {
           return const Center(
             child: Text("Empty message!"),
           );
         }
 
-        final docs = snapshot.data!.docs;
-
         return ListView.builder(
           controller: scrollController,
-          itemCount: docs.length,
+          itemCount: messageData.length,
           itemBuilder: (context, index) {
-            Timestamp timeSend = (docs[index].data() as Map)["timeSend"];
+            ModelMessage modelMessage =
+                ModelMessage.fromMap(messageData.values.elementAt(index));
+
             // convert to datetime format
-            DateTime convertedTime = timeSend.toDate();
+            DateTime convertedTime =
+                DateTime.fromMillisecondsSinceEpoch(modelMessage.timeSend);
             // convert to HH:mm format
             String formattedTime = DateFormat("HH:mm").format(convertedTime);
             return MyMessageTile(
-                text: (docs[index].data() as Map)["message"],
-                timeSend: formattedTime,
-                bubbleType:
-                    // if senderUID of message is equal to current message => set to send bubble type
-                    (docs[index].data() as Map)["senderUID"] == currentUID
-                        ? BubbleType.sendBubble
-                        : BubbleType.receiverBubble);
+              text: modelMessage.message,
+              timeSend: formattedTime,
+              bubbleType:
+                  // if senderUID of message is equal to current message => set to send bubble type
+                  (modelMessage.senderUID == currentUID
+                      ? BubbleType.sendBubble
+                      : BubbleType.receiverBubble),
+            );
           },
         );
       },

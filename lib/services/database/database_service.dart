@@ -57,7 +57,7 @@ class DatabaseService extends ChangeNotifier {
   }
 
   // get all task
-  taskClassification({required Map<String, ModelTask> data}) {
+  taskClassification({required Map<dynamic, dynamic> data}) {
     Map result = {};
     // classification state of task by group
     // processed data will be like this
@@ -75,10 +75,11 @@ class DatabaseService extends ChangeNotifier {
     // }
     data.forEach(
       (key, value) {
-        if (data[value.state] != null) {
-          result[value.state].addAll({key: value});
+        var modelTask = ModelTask.fromMap(value);
+        if (result[modelTask.state] != null) {
+          result[modelTask.state].addAll({key: modelTask});
         } else {
-          result[value.state] = {key: value};
+          result[modelTask.state] = {key: modelTask};
         }
       },
     );

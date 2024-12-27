@@ -17,7 +17,7 @@ class ModelWorkspaceAdapter extends TypeAdapter<ModelWorkspace> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return ModelWorkspace(
-      createAt: fields[1] as Timestamp,
+      createAt: fields[1] as int,
       workspaceName: fields[0] as String,
       members: (fields[2] as List).cast<dynamic>(),
     );

@@ -18,7 +18,7 @@ class ModelMessageAdapter extends TypeAdapter<ModelMessage> {
     };
     return ModelMessage(
       message: fields[1] as String,
-      timeSend: fields[2] as Timestamp,
+      timeSend: fields[2] as int,
       senderUID: fields[5] as String,
     );
   }

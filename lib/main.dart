@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:ui';
+
 import 'package:calendar_view/calendar_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,22 +8,22 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/firebase_options.dart';
 import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
-import 'package:phan_mem_giao_nhac_viec/models/model_chat.dart';
 import 'package:phan_mem_giao_nhac_viec/services/auth/auth_gate.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_home.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_message.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:phan_mem_giao_nhac_viec/services/background_service/background_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
+final bodyTaskGlobalKey = GlobalKey<BodyTaskState>();
 final navigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
-const taskName = "testTask";
 
 testBackgroundTask() async {
   await Firebase.initializeApp(
@@ -35,11 +38,39 @@ testBackgroundTask() async {
   );
 }
 
+@pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask(
     (taskName, inputData) async {
-      await testBackgroundTask();
-      return Future.value(true);
+      try {
+        log("Initializing Hive in background task");
+        await Hive.initFlutter();
+        log("Hive initialized");
+        HiveBoxes.instance.registerAllAdapters();
+        log("Adapters registered");
+        await HiveBoxes.instance.openAllBoxes();
+        log("Hive boxes opened");
+        log("hive box task data: ${HiveBoxes.instance.taskHiveBox}");
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        log("Firebase initialized");
+
+        if (BackgroundTaskName.syncTask == taskName) {
+          await BackgroundService.instance.syncData(taskName);
+        }
+        // if (BackgroundTaskName.sendDataFromIsolate == taskName) {
+        //   BackgroundService.sendDataToMainIsolate(inputData!["portName"]);
+        //   // sendDataToMainIsolate(inputData!["portName"]);
+        // }
+
+        log("Background task completed");
+
+        return Future.value(true);
+      } catch (e) {
+        log("Error in background task: $e");
+        return Future.value(false);
+      }
     },
   );
 }
@@ -54,7 +85,6 @@ void main() async {
   // hive
   await Hive.initFlutter();
   HiveBoxes.instance.registerAllAdapters();
-
   await HiveBoxes.instance.openAllBoxes();
 
   // notification

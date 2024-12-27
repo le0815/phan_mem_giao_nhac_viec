@@ -90,7 +90,7 @@ class PopupDialog extends StatelessWidget {
               currentUID: currentUID,
               modelWorkspace: ModelWorkspace(
                 workspaceName: workspaceNameController.text,
-                createAt: Timestamp.now(),
+                createAt: DateTime.now().millisecondsSinceEpoch,
                 members: [currentUID],
               ),
             );

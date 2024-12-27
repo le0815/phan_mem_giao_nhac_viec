@@ -31,7 +31,7 @@ class TaskService extends ChangeNotifier {
     for (var element in data.docs) {
       result.addAll(
         {
-          element.id: ModelTask.fromMap(element.data()),
+          element.id: element.data(),
         },
       );
     }
@@ -63,36 +63,35 @@ class TaskService extends ChangeNotifier {
     }
   }
 
-  getTaskByDay(
-      {required DateTime time, required Map<String, ModelTask> taskData}) {
-    var resultByDate = {};
+  Map<String, ModelTask> getTaskByDay(
+      {required DateTime time, required Map<dynamic, dynamic> taskData}) {
+    var resultByDate = <String, ModelTask>{};
     var dateOnlyCurrentTime = ConvertToDateOnly(time);
 
     // loop to get task with due time is bigger or equal to the current time
     taskData.forEach(
       (key, value) {
+        ModelTask modelTask = ModelTask.fromMap(value);
         // if the task was not provide due time -> add
-        if (value.due == null) {
+        if (modelTask.due == null) {
           resultByDate.addAll(
             {
-              key: value,
+              key: modelTask,
             },
           );
         } else {
           // convert due time to date only
           var dateOnlyDueTimeOfTask = ConvertToDateOnly(
-              DateTime.fromMillisecondsSinceEpoch(
-                  value.due!.millisecondsSinceEpoch));
+              DateTime.fromMillisecondsSinceEpoch(modelTask.due!));
           // convert due time to date only
           var dateOnlyCreateTimeOfTask = ConvertToDateOnly(
-              DateTime.fromMillisecondsSinceEpoch(
-                  value.startTime!.millisecondsSinceEpoch));
+              DateTime.fromMillisecondsSinceEpoch(modelTask.startTime!));
           // if due, create time is greater or equal than current day
           if (dateOnlyCurrentTime.compareTo(dateOnlyDueTimeOfTask) != 1 &&
               dateOnlyCurrentTime.compareTo(dateOnlyCreateTimeOfTask) != -1) {
             resultByDate.addAll(
               {
-                key: value,
+                key: modelTask,
               },
             );
           }
