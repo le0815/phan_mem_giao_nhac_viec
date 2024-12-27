@@ -515,6 +515,7 @@ class WorkspacePageState extends State<WorkspacePage> {
                   NotificationService.instance.sendNotification(
                     receiverToken: userModel.fcm,
                     title: "You was added to ${modelWorkspace.workspaceName}",
+                    payload: {"type": NotificationPayloadType.workspace.name},
                   );
                   Navigator.pop(context);
                   // sync workspace data

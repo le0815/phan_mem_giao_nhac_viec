@@ -110,7 +110,8 @@ class NotificationService {
       log("foreground notify title: ${remoteMessage.notification?.title}");
       log("foreground notify body: ${remoteMessage.notification?.body}");
       log("foreground notify payload: ${remoteMessage.data}");
-
+      Map payload = remoteMessage.data;
+      if (payload.isNotEmpty) {}
       // Show the notification
       await showNotify(
         id: remoteMessage
@@ -147,7 +148,10 @@ class NotificationService {
   }
 
   Future sendNotification(
-      {required List receiverToken, String? title, String? body}) async {
+      {required List receiverToken,
+      String? title,
+      String? body,
+      Map? payload}) async {
     const String fcmApiUrl =
         "https://fcm.googleapis.com/v1/projects/nckhflutter/messages:send";
 
@@ -164,7 +168,8 @@ class NotificationService {
           "notification": {
             "title": title,
             "body": body,
-          }
+          },
+          "data": payload,
         },
       };
 

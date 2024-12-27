@@ -13,6 +13,9 @@ import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 
+import '../services/database/database_service.dart';
+import '../services/notification_service/notification_service.dart';
+
 class DetailTaskPage extends StatefulWidget {
   final ModelTask modelTask;
   final String idTask;
@@ -81,8 +84,20 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
 
         await TaskService.instance
             .UpdateTaskFromDb(widget.idTask, widget.modelTask);
-        // sync task data
-        await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
+
+        if (widget.isWorkspace) {
+          // send to assignees
+          ModelUser modelMember =
+              await DatabaseService.instance.getUserByUID(widget.modelTask.uid);
+          NotificationService.instance.sendNotification(
+              receiverToken: modelMember.fcm,
+              title: "Your ${widget.modelTask.title} was edited!",
+              payload: {"type": NotificationPayloadType.workspace.name});
+          await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
+        } else {
+          await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
+        }
+
         if (context.mounted) {
           MySnackBar(context, "Task Modified");
         }

@@ -20,7 +20,10 @@ import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
+import 'pages/home_page.dart';
+
 final bodyTaskGlobalKey = GlobalKey<BodyTaskState>();
+final homePageGlobalKey = GlobalKey<HomePageState>();
 final navigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();

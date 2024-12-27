@@ -76,8 +76,10 @@ class _AddTaskState extends State<AddTask> {
         if (widget.isWorkspace) {
           ModelUser modelMember =
               await DatabaseService.instance.getUserByUID(uid!);
-          NotificationService.instance
-              .sendNotification(receiverToken: modelMember.fcm);
+          NotificationService.instance.sendNotification(
+              receiverToken: modelMember.fcm,
+              title: "You have a new task in your workspace!",
+              payload: {"type": NotificationPayloadType.workspace.name});
           await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
         } else {
           await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);

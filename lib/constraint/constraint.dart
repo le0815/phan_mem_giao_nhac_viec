@@ -32,6 +32,12 @@ class HiveBoxName {
   static const String memberDetailHiveBox = "memberDetailHiveBox";
 }
 
+enum NotificationPayloadType {
+  task,
+  chat,
+  workspace,
+}
+
 Map myTaskColor = {
   MyTaskState.pending.name: Colors.yellow,
   MyTaskState.inProgress.name: Colors.blue,

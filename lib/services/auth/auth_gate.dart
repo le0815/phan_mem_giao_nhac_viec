@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/home_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/auth/login_or_register.dart';
 
+import '../../main.dart';
+
 class AuthPage extends StatelessWidget {
   const AuthPage({super.key});
 
@@ -23,7 +25,9 @@ class AuthPage extends StatelessWidget {
         }
         if (snapshot.hasData) {
           log("redirect to home page: - ${DateTime.now()}");
-          return const HomePage();
+          return HomePage(
+            key: homePageGlobalKey,
+          );
         } else {
           return const LoginOrRegisterPage();
         }

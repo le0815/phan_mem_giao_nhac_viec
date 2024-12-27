@@ -1,22 +1,17 @@
-import 'dart:async';
 import 'dart:developer';
-import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:googleapis/streetviewpublish/v1.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_pie_chart.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
-import 'package:uuid/uuid.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../components/my_legend_chart.dart';
 
-import '../components/my_loading_indicator.dart';
 import '../local_database/hive_boxes.dart';
 import '../services/database/database_service.dart';
 
@@ -158,6 +153,16 @@ class _OverViewState extends State<OverView> {
               }
             },
             child: Text("sync data"),
+          ),
+          OutlinedButton(
+            onPressed: () {
+              NotificationService.instance.sendNotification(payload: {
+                1: "sdf"
+              }, receiverToken: [
+                "fF-lPvymRxa65KxyQNqmln:APA91bEGP9ANoIA8JEoPYW-5uR4H3SZCr8akHD1cnE_rJGuk-n7VGr30VMjOaE3JhTWd_ivvK6r2FXA2NeRxFNh-JcwfbOimOHWemhup3AAMOiylhcym4KI"
+              ]);
+            },
+            child: Text("test notify"),
           ),
           Expanded(
             child: ValueListenableBuilder(
