@@ -18,7 +18,7 @@ class ModelWorkspace {
     required this.members,
   });
 
-  factory ModelWorkspace.fromMap(Map<String, dynamic> object) {
+  factory ModelWorkspace.fromMap(Map<dynamic, dynamic> object) {
     return ModelWorkspace(
       createAt: object["createAt"],
       workspaceName: object["workspaceName"],

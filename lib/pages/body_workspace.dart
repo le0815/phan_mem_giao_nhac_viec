@@ -3,13 +3,16 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_workspace_overview_tile.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/workspace_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
 
-final futureWorkspaceKey = GlobalKey<FutureWorkSpaceState>();
+final hiveWorkspaceStreamKey = GlobalKey<HiveWorkspaceStreamState>();
 
 class BodyWorkspace extends StatelessWidget {
   BodyWorkspace({super.key});
@@ -22,8 +25,8 @@ class BodyWorkspace extends StatelessWidget {
       padding: EdgeInsets.all(8),
       child: Stack(
         children: [
-          FutureWorkSpace(
-              key: futureWorkspaceKey,
+          HiveWorkspaceStream(
+              key: hiveWorkspaceStreamKey,
               currentUID: currentUID,
               workspaceDetailGlobalKey: workspaceDetailGlobalKey),
           addFloatingButton(context, currentUID),
@@ -86,6 +89,7 @@ class PopupDialog extends StatelessWidget {
         ),
         TextButton(
           onPressed: () async {
+            // create new workspace
             await WorkspaceService.instance.createWorkspace(
               currentUID: currentUID,
               modelWorkspace: ModelWorkspace(
@@ -96,8 +100,8 @@ class PopupDialog extends StatelessWidget {
             );
 
             Navigator.pop(context);
-            // refresh data of futureWorkspace
-            futureWorkspaceKey.currentState!.refreshData();
+            // sync workspace data
+            HiveBoxes.instance.syncData(syncType: SyncTypes.syncWorkSpace);
           },
           child: const Text("Add"),
         ),
@@ -106,8 +110,8 @@ class PopupDialog extends StatelessWidget {
   }
 }
 
-class FutureWorkSpace extends StatefulWidget {
-  const FutureWorkSpace({
+class HiveWorkspaceStream extends StatefulWidget {
+  const HiveWorkspaceStream({
     super.key,
     required this.currentUID,
     required this.workspaceDetailGlobalKey,
@@ -117,27 +121,16 @@ class FutureWorkSpace extends StatefulWidget {
   final GlobalKey<WorkspacePageState> workspaceDetailGlobalKey;
 
   @override
-  State<FutureWorkSpace> createState() => FutureWorkSpaceState();
+  State<HiveWorkspaceStream> createState() => HiveWorkspaceStreamState();
 }
 
-class FutureWorkSpaceState extends State<FutureWorkSpace> {
-  refreshData() {
-    setState(() {});
-  }
-
+class HiveWorkspaceStreamState extends State<HiveWorkspaceStream> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: WorkspaceService.instance
-          .workspaceFuture(currentUID: widget.currentUID),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          // show loading indicator
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        if (!snapshot.hasData) {
+    return ValueListenableBuilder(
+      valueListenable: HiveBoxes.instance.workspaceHiveBox.listenable(),
+      builder: (context, value, child) {
+        if (value.isEmpty) {
           return const Center(
             child: Text(
               'No workspace here!',
@@ -148,22 +141,12 @@ class FutureWorkSpaceState extends State<FutureWorkSpace> {
             ),
           );
         }
-        final modelsWorkspaceData = snapshot.data!;
+        final modelsWorkspaceData = value.toMap();
         return ListView.builder(
           itemCount: modelsWorkspaceData.length,
           itemBuilder: (context, index) {
-            if (modelsWorkspaceData.isEmpty) {
-              const Center(
-                child: Text(
-                  'No workspace here!',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.black54,
-                  ),
-                ),
-              );
-            }
-
+            ModelWorkspace modelWorkspace = ModelWorkspace.fromMap(
+                modelsWorkspaceData.values.elementAt(index)['modelWorkspace']);
             return GestureDetector(
               onTap: () async {
                 await Navigator.push(
@@ -187,9 +170,7 @@ class FutureWorkSpaceState extends State<FutureWorkSpace> {
                 setState(() {});
               },
               child: MyWorkspaceOverviewTile(
-                workspaceName: modelsWorkspaceData.values
-                    .elementAt(index)['modelWorkspace']
-                    .workspaceName,
+                workspaceName: modelWorkspace.workspaceName,
               ),
             );
           },

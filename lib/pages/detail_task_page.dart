@@ -81,6 +81,8 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
 
         await TaskService.instance
             .UpdateTaskFromDb(widget.idTask, widget.modelTask);
+        // sync task data
+        await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
         if (context.mounted) {
           MySnackBar(context, "Task Modified");
         }
@@ -126,8 +128,8 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
             icon: isEdit ? const Icon(Icons.check) : const Icon(Icons.edit),
           ),
           IconButton(
-            onPressed: () {
-              widget.onRemove();
+            onPressed: () async {
+              await widget.onRemove();
             },
             icon: const Icon(Icons.delete_outline),
           )

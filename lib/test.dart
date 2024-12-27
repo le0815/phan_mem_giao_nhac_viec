@@ -15,15 +15,17 @@ class Test {
 }
 
 void main() async {
-  var b = Test(b: 10);
-  var c = Test(b: 34);
-  if (b == c) {
-    print("okay");
-    b.log();
-    c.log();
-  } else {
-    print("not okay");
-    b.log();
-    c.log();
-  }
+  Map a = {
+    1: "swerew",
+    2: "sefwer",
+    3: "ertert",
+  };
+  a.forEach(
+    (key, value) {
+      if (key == 1) {
+        return;
+      }
+      print(key);
+    },
+  );
 }

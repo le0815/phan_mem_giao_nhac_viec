@@ -125,9 +125,9 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
           ),
           // send message button
           IconButton(
-              onPressed: () {
+              onPressed: () async {
                 if (messageTextController.text.isNotEmpty) {
-                  sendMessage(messageTextController.text);
+                  await sendMessage(messageTextController.text);
                   log("fcm member: ${modelMember!.fcm}");
 
                   // notify to user in chat box
@@ -139,7 +139,8 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
 
                   // sync message into hive
                   log("sync new message sent");
-                  HiveBoxes.instance.syncData(syncType: SyncTypes.syncMessage);
+                  await HiveBoxes.instance
+                      .syncData(syncType: SyncTypes.syncMessage);
 
                   messageTextController.clear();
 

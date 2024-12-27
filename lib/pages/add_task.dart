@@ -78,8 +78,9 @@ class _AddTaskState extends State<AddTask> {
               await DatabaseService.instance.getUserByUID(uid!);
           NotificationService.instance
               .sendNotification(receiverToken: modelMember.fcm);
+          await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
         } else {
-          HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
+          await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
         }
         // create alarm for the task
         // NotificationService.instance.scheduleBackgroundNotify(
