@@ -12,6 +12,7 @@ import 'package:timezone/standalone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../main.dart';
 import '../../models/model_user.dart';
 import '../database/database_service.dart';
 
@@ -45,10 +46,10 @@ class NotificationService {
   @pragma('vm:entry-point')
   Future<void> initNotify() async {
     await requestPermission();
-
     final token = await _firebaseMessaging.getToken();
 
     log("FCM token: $token");
+
     FirebaseMessaging.onBackgroundMessage(handleBackgroundNotify);
 
     await initLocalNotify();
@@ -209,8 +210,15 @@ class NotificationService {
 @pragma('vm:entry-point')
 Future<void> handleBackgroundNotify(RemoteMessage remoteMessage) async {
   if (remoteMessage.notification != null) {
-    log("notify title: ${remoteMessage.notification?.title}");
-    log("notify body: ${remoteMessage.notification?.body}");
-    log("notify payload: ${remoteMessage.data}");
+    String? title = remoteMessage.notification?.title;
+    String? body = remoteMessage.notification?.body;
+    log("notify title: $title");
+    log("notify body: $body");
+    // log("notify payload: ${remoteMessage.data}");
+    await NotificationService.instance.showNotify(
+      id: remoteMessage.hashCode,
+      title: title,
+      body: body,
+    );
   }
 }

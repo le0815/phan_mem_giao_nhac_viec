@@ -42,10 +42,9 @@ class AuthService {
         }
 
         // clear old data
-        // HiveBoxes.instance.taskHiveBox.clear();
-        // sync all data to hive boxes
-        // HiveBoxes.instance
-        //     .syncData(await DatabaseService.instance.getAllDataFromUID());
+        await HiveBoxes.instance.clearAllData();
+        // sync new data from firebase
+        HiveBoxes.instance.syncAllData();
       }
 
       return userCredential;

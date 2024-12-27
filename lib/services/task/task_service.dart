@@ -22,13 +22,27 @@ class TaskService extends ChangeNotifier {
   // get task
   Future<Map> GetTaskFromDb() async {
     // get task of current user by uid
-    var data = await _firebaseFirestore
-        .collection('Task')
-        .where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-        .get();
+    // var data = await _firebaseFirestore
+    //     .collection('Task')
+    //     .where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+    //     .get();
 
+    var currentUID = FirebaseAuth.instance.currentUser!.uid;
+
+    var data = _firebaseFirestore.collection('Task');
+    // query1 to get task of current user
+    // query 2 to get task was assigned by current user
+    var query1 = await data.where("uid", isEqualTo: currentUID).get();
+    var query2 = await data.where("assigner", isEqualTo: currentUID).get();
     var result = {};
-    for (var element in data.docs) {
+    for (var element in query1.docs) {
+      result.addAll(
+        {
+          element.id: element.data(),
+        },
+      );
+    }
+    for (var element in query2.docs) {
       result.addAll(
         {
           element.id: element.data(),
