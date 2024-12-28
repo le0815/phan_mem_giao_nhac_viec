@@ -6,12 +6,16 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:googleapis/servicecontrol/v1.dart' as service_control;
+import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
 import 'package:phan_mem_giao_nhac_viec/services/auth/auth_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/ultis.dart';
 import 'package:timezone/standalone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:uuid/uuid.dart';
+import 'package:workmanager/workmanager.dart';
 
+import '../../constraint/constraint.dart';
 import '../../main.dart';
 import '../../models/model_user.dart';
 import '../database/database_service.dart';
@@ -58,6 +62,8 @@ class NotificationService {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       return await handleForegroundNotify(message);
     });
+
+    // flutterLocalNotificationsPlugin.
   }
 
   Future initLocalNotify() async {
@@ -69,16 +75,28 @@ class NotificationService {
     );
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onDidReceiveNotificationResponse: (details) {},
+      onDidReceiveNotificationResponse: onForegroundLocal,
+      onDidReceiveBackgroundNotificationResponse: onBackgroundLocal,
     );
   }
 
-  scheduleBackgroundNotify(DateTime time) async {
+  static onForegroundLocal(NotificationResponse notificationRespone) {
+    log("foreground");
+    log(notificationRespone.toString());
+  }
+
+  @pragma('vm:entry-point')
+  static onBackgroundLocal(NotificationResponse notificationRespone) {
+    log("Background");
+    log(notificationRespone.toString());
+  }
+
+  scheduleBackgroundNotify({required DateTime time, required int id}) async {
     log("start time utc: ${time.toUtc()}");
     log("tz time: ${tz.TZDateTime.from(time.toUtc(), tz.getLocation("Asia/Ho_Chi_Minh"))}");
     log("creating background notify");
     flutterLocalNotificationsPlugin.zonedSchedule(
-        0,
+        id,
         "Task is start",
         "test task",
         tz.TZDateTime.from(time.toUtc(), tz.getLocation("Asia/Ho_Chi_Minh")),
@@ -86,6 +104,9 @@ class NotificationService {
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         androidScheduleMode: AndroidScheduleMode.alarmClock);
+    var temp =
+        await flutterLocalNotificationsPlugin.pendingNotificationRequests();
+    log("active alarm: $temp");
   }
 
   notificationDetails() {
@@ -112,7 +133,27 @@ class NotificationService {
       log("foreground notify body: ${remoteMessage.notification?.body}");
       log("foreground notify payload: ${remoteMessage.data}");
       Map payload = remoteMessage.data;
+
+      /// payload structure
+      /// {
+      ///   syncType: [sync1, sync2]
+      /// }
+      // sync hive data
       if (payload.isNotEmpty) {}
+      try {
+        log("start sync ${payload["syncType"]} in foreground mode");
+        // loop for sync task
+        (payload["syncType"] as List).forEach(
+          (element) {
+            HiveBoxes.instance.syncData(syncType: element);
+          },
+        );
+
+        log("sync hive data in foreground mode is okay");
+      } catch (e) {
+        log("error while sync hive data in foreground mode: $e");
+      }
+
       // Show the notification
       await showNotify(
         id: remoteMessage
@@ -212,13 +253,23 @@ Future<void> handleBackgroundNotify(RemoteMessage remoteMessage) async {
   if (remoteMessage.notification != null) {
     String? title = remoteMessage.notification?.title;
     String? body = remoteMessage.notification?.body;
+    Map? payload = remoteMessage.data;
     log("notify title: $title");
     log("notify body: $body");
-    // log("notify payload: ${remoteMessage.data}");
-    await NotificationService.instance.showNotify(
-      id: remoteMessage.hashCode,
-      title: title,
-      body: body,
-    );
+    log("notify payload: ${remoteMessage.data}");
+
+    // sync hive data
+    if (payload.isNotEmpty) {
+      /// payload structure
+      /// {
+      ///   syncType: [sync1, sync2]
+      /// }
+      // sync hive data
+      await Workmanager().registerOneOffTask(
+        const Uuid().v1(),
+        BackgroundTaskName.syncHiveData,
+        inputData: payload.cast<String, dynamic>(),
+      );
+    }
   }
 }

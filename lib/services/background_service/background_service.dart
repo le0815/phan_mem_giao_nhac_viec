@@ -16,24 +16,10 @@ class BackgroundService {
 
   BackgroundService._();
 
-  syncData(String type) async {
-    switch (type) {
-      // sync task
-      case BackgroundTaskName.syncTask:
-        log("fetching data from firebase");
-        var syncData = await DatabaseService.instance.getAllDataFromUID();
-        var taskData = syncData["task"];
-        log("data fetched from firebase: $taskData");
-        // clear old data
-        await HiveBoxes.instance.taskHiveBox!.clear();
-        // update new data
-        log("loading task data into Hive");
-        await HiveBoxes.instance.taskHiveBox!.putAll(taskData);
-        log("task data after update: ${HiveBoxes.instance.taskHiveBox!.toMap()}");
-
-        break;
-      default:
-    }
+  syncData(String type) {
+    log("sync $type data in background");
+    HiveBoxes.instance.syncData(syncType: type);
+    log("sync $type data finished");
   }
 
   // static sendDataToMainIsolate(String portName) {

@@ -36,7 +36,7 @@ class BodyHome extends StatelessWidget {
                     var uniqueID = DateTime.now().second;
                     await Workmanager().registerOneOffTask(
                       uniqueID.toString(),
-                      BackgroundTaskName.syncTask,
+                      BackgroundTaskName.syncHiveData,
                       initialDelay: Duration(seconds: 10),
                     );
                   },
@@ -156,13 +156,13 @@ class _OverViewState extends State<OverView> {
           ),
           OutlinedButton(
             onPressed: () {
-              NotificationService.instance.sendNotification(payload: {
-                1: "sdf"
-              }, receiverToken: [
-                "fF-lPvymRxa65KxyQNqmln:APA91bEGP9ANoIA8JEoPYW-5uR4H3SZCr8akHD1cnE_rJGuk-n7VGr30VMjOaE3JhTWd_ivvK6r2FXA2NeRxFNh-JcwfbOimOHWemhup3AAMOiylhcym4KI"
-              ]);
+              NotificationService.instance.scheduleBackgroundNotify(
+                id: 42323,
+                time: DateTime.now().add(const Duration(seconds: 10)),
+              );
+              log("created alarm for task");
             },
-            child: Text("test notify"),
+            child: Text("test alarm"),
           ),
           Expanded(
             child: ValueListenableBuilder(

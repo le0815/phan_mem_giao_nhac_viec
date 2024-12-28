@@ -59,8 +59,12 @@ void callbackDispatcher() {
         );
         log("Firebase initialized");
 
-        if (BackgroundTaskName.syncTask == taskName) {
-          await BackgroundService.instance.syncData(taskName);
+        if (BackgroundTaskName.syncHiveData == taskName) {
+          (inputData!["syncType"] as List).forEach(
+            (element) {
+              BackgroundService.instance.syncData(element);
+            },
+          );
         }
         // if (BackgroundTaskName.sendDataFromIsolate == taskName) {
         //   BackgroundService.sendDataToMainIsolate(inputData!["portName"]);
@@ -89,7 +93,8 @@ void main() async {
   await Hive.initFlutter();
   HiveBoxes.instance.registerAllAdapters();
   await HiveBoxes.instance.openAllBoxes();
-
+  // sync hive data
+  HiveBoxes.instance.syncAllData();
   // notification
   await NotificationService.instance.initNotify();
 

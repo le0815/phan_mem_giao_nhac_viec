@@ -79,7 +79,9 @@ class _AddTaskState extends State<AddTask> {
           NotificationService.instance.sendNotification(
               receiverToken: modelMember.fcm,
               title: "You have a new task in your workspace!",
-              payload: {"type": NotificationPayloadType.workspace.name});
+              payload: {
+                "syncType": [SyncTypes.syncTask]
+              });
           await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
         } else {
           await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);

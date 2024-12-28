@@ -322,10 +322,22 @@ class WorkspacePageState extends State<WorkspacePage> {
                               userName: modelUser.userName,
                               msg: modelUser.email,
                               onRemove: () async {
-                                // remove user has the same logic as leaveWorkspace
+                                // remove user have the same logic as leaveWorkspace
                                 await leaveWorkspace(
                                     workspaceID: widget.workspaceID,
                                     uid: modelUser.uid);
+
+                                // send notification to user
+                                NotificationService.instance.sendNotification(
+                                    receiverToken: modelUser.fcm,
+                                    title:
+                                        "You was removed from ${modelWorkspace!.workspaceName} workspace!",
+                                    payload: {
+                                      "syncType": [
+                                        SyncTypes.syncWorkSpace,
+                                        SyncTypes.syncTask
+                                      ],
+                                    });
 
                                 // reload data
                                 setState(() {});
@@ -514,8 +526,11 @@ class WorkspacePageState extends State<WorkspacePage> {
                   // notify to user was recently added
                   NotificationService.instance.sendNotification(
                     receiverToken: userModel.fcm,
-                    title: "You was added to ${modelWorkspace.workspaceName}",
-                    payload: {"type": NotificationPayloadType.workspace.name},
+                    title:
+                        "You was added to ${modelWorkspace.workspaceName} workspace",
+                    payload: {
+                      "syncType": [SyncTypes.syncWorkSpace]
+                    },
                   );
                   Navigator.pop(context);
                   // sync workspace data

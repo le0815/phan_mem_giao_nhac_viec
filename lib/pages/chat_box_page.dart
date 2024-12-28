@@ -132,10 +132,13 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
 
                   // notify to user in chat box
                   NotificationService.instance.sendNotification(
-                    receiverToken: modelMember!.fcm,
-                    title: "You have new message from ${modelMember!.userName}",
-                    body: messageTextController.text,
-                  );
+                      receiverToken: modelMember!.fcm,
+                      title:
+                          "You have new message from ${modelMember!.userName}",
+                      body: messageTextController.text,
+                      payload: {
+                        "syncType": [SyncTypes.syncMessage],
+                      });
 
                   // sync message into hive
                   log("sync new message sent");

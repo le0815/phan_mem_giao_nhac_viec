@@ -11,6 +11,7 @@ import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_chat.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/chat_box_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/chat/chat_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
@@ -18,6 +19,7 @@ import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 import 'package:provider/provider.dart';
 
 import '../components/my_alert_dialog.dart';
+import '../services/notification_service/notification_service.dart';
 
 class BodyMessage extends StatelessWidget {
   const BodyMessage({super.key});
@@ -50,7 +52,7 @@ class BodyMessage extends StatelessWidget {
     TextEditingController chatNameController = TextEditingController();
     final _userTileGlobalKey = GlobalKey<MyUserTileOverviewState>();
     var iudMember = [FirebaseAuth.instance.currentUser!.uid];
-
+    ModelUser? modelUserMemberChat;
     return showDialog(
       context: context,
       builder: (context) {
@@ -90,6 +92,8 @@ class BodyMessage extends StatelessWidget {
                           : ListView.builder(
                               itemCount: value.result.length,
                               itemBuilder: (context, index) {
+                                modelUserMemberChat = ModelUser.fromMap(
+                                    value.result[index].data());
                                 return GestureDetector(
                                   onTap: () {
                                     // change color of user tile when tapped
@@ -102,8 +106,7 @@ class BodyMessage extends StatelessWidget {
                                   },
                                   child: MyUserTileOverview(
                                     key: _userTileGlobalKey,
-                                    userName:
-                                        value.result[index].data()["userName"],
+                                    userName: modelUserMemberChat!.userName,
                                     msg: "sample",
                                     onRemove: () {},
                                   ),
@@ -123,7 +126,7 @@ class BodyMessage extends StatelessWidget {
               child: const Text("Cancel"),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 var userTile = _userTileGlobalKey.currentState;
 
                 /// if user was not selected -> show alert
@@ -135,7 +138,7 @@ class BodyMessage extends StatelessWidget {
                   );
                 } else {
                   // add chat to database
-                  ChatService.instance.createNewChat(
+                  await ChatService.instance.createNewChat(
                     chatName: chatNameController.text.trim(),
                     members: iudMember,
                     timeUpdate: Timestamp.now().millisecondsSinceEpoch,
@@ -144,6 +147,13 @@ class BodyMessage extends StatelessWidget {
                   // sync chat data
                   log("sync chat data from add new chat");
                   HiveBoxes.instance.syncData(syncType: SyncTypes.syncMessage);
+                  NotificationService.instance.sendNotification(
+                      receiverToken: modelUserMemberChat!.fcm,
+                      title:
+                          "You have a new chat with ${modelUserMemberChat!.userName}!",
+                      payload: {
+                        "syncType": [SyncTypes.syncMessage]
+                      });
                 }
               },
               child: const Text("Add"),

@@ -13,7 +13,7 @@ enum MyTaskState {
 }
 
 class BackgroundTaskName {
-  static const String syncTask = "syncTask";
+  static const String syncHiveData = "syncHiveData";
   static const String sendDataFromIsolate = "sendDataFromIsolate";
 }
 

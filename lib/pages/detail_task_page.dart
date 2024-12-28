@@ -91,8 +91,11 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
               await DatabaseService.instance.getUserByUID(widget.modelTask.uid);
           NotificationService.instance.sendNotification(
               receiverToken: modelMember.fcm,
-              title: "Your ${widget.modelTask.title} was edited!",
-              payload: {"type": NotificationPayloadType.workspace.name});
+              title:
+                  "Your ${widget.modelTask.title} workspace task was edited!",
+              payload: {
+                "syncType": [SyncTypes.syncTask]
+              });
           await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
         } else {
           await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);

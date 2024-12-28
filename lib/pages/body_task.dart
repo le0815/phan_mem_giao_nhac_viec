@@ -65,12 +65,12 @@ class BodyTaskState extends State<BodyTask> {
               context,
               msg: "Are you sure want to delete this task?",
               onOkay: () {
-                RemoveTaskFromDb(idTask);
                 // close alert dialog
                 Navigator.pop(context);
                 // switch back to right before screen
                 Navigator.pop(context);
                 // sync task in hive
+                HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
               },
             );
           },
