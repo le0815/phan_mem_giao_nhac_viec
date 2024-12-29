@@ -14,18 +14,4 @@ class Test {
   }
 }
 
-void main() async {
-  Map a = {
-    1: "swerew",
-    2: "sefwer",
-    3: "ertert",
-  };
-  a.forEach(
-    (key, value) {
-      if (key == 1) {
-        return;
-      }
-      print(key);
-    },
-  );
-}
+void main() async {}

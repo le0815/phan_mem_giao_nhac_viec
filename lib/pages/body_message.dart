@@ -152,7 +152,7 @@ class BodyMessage extends StatelessWidget {
                       title:
                           "You have a new chat with ${modelUserMemberChat!.userName}!",
                       payload: {
-                        "syncType": [SyncTypes.syncMessage]
+                        0: SyncTypes.syncMessage,
                       });
                 }
               },

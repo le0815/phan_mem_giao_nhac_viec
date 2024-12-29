@@ -1,8 +1,13 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:math' as math;
+import 'dart:ui';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
+import 'package:awesome_notifications_fcm/awesome_notifications_fcm_platform_interface.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:googleapis/servicecontrol/v1.dart' as service_control;
@@ -20,148 +25,97 @@ import '../../main.dart';
 import '../../models/model_user.dart';
 import '../database/database_service.dart';
 
+@pragma("vm:entry-point")
 class NotificationService {
   static final NotificationService instance = NotificationService._();
-  final _firebaseMessaging = FirebaseMessaging.instance;
-  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
+  final AwesomeNotifications _awesomeNotifications = AwesomeNotifications();
+  final AwesomeNotificationsFcm _awesomeNotificationsFcm =
+      AwesomeNotificationsFcm();
   NotificationService._();
 
-  Future requestPermission() async {
-    await _firebaseMessaging.requestPermission(
-      announcement: true,
+  requestPermission() async {
+    await _awesomeNotifications.isNotificationAllowed().then(
+      (isAllowed) async {
+        if (!isAllowed) {
+          await _awesomeNotifications.requestPermissionToSendNotifications();
+        }
+      },
     );
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()!
-        .requestExactAlarmsPermission();
-
-    var notifyPermission = await _firebaseMessaging.getNotificationSettings();
-
-    // user must allow notification to use the app
-    if (notifyPermission.authorizationStatus !=
-        AuthorizationStatus.authorized) {
-      await requestPermission();
-    } else {
-      return;
-    }
   }
 
-  @pragma('vm:entry-point')
-  Future<void> initNotify() async {
+  notificationEvents() async {
+    await _awesomeNotifications.setListeners(
+        onActionReceivedMethod: onActionReceivedMethod,
+        onNotificationDisplayedMethod: onNotificationDisplayedMethod);
+  }
+
+  initialize() async {
+    await localNotificationInit();
     await requestPermission();
-    final token = await _firebaseMessaging.getToken();
 
-    log("FCM token: $token");
+    // _awesomeNotificationsFcm.initialize(
+    //   onFcmTokenHandle: myFcmTokenHandle,
+    //   onFcmSilentDataHandle: mySilentDataHandle,
+    // );
+    await notificationEvents();
 
-    FirebaseMessaging.onBackgroundMessage(handleBackgroundNotify);
-
-    await initLocalNotify();
-
-    // Listen for messages in the foreground
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      return await handleForegroundNotify(message);
-    });
-
-    // flutterLocalNotificationsPlugin.
+    log("fcm token: ${await FirebaseMessaging.instance.getToken()}");
   }
 
-  Future initLocalNotify() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('ic_launcher');
-    const InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: onForegroundLocal,
-      onDidReceiveBackgroundNotificationResponse: onBackgroundLocal,
-    );
-  }
-
-  static onForegroundLocal(NotificationResponse notificationRespone) {
-    log("foreground");
-    log(notificationRespone.toString());
-  }
-
-  @pragma('vm:entry-point')
-  static onBackgroundLocal(NotificationResponse notificationRespone) {
-    log("Background");
-    log(notificationRespone.toString());
-  }
-
-  scheduleBackgroundNotify({required DateTime time, required int id}) async {
-    log("start time utc: ${time.toUtc()}");
-    log("tz time: ${tz.TZDateTime.from(time.toUtc(), tz.getLocation("Asia/Ho_Chi_Minh"))}");
-    log("creating background notify");
-    flutterLocalNotificationsPlugin.zonedSchedule(
-        id,
-        "Task is start",
-        "test task",
-        tz.TZDateTime.from(time.toUtc(), tz.getLocation("Asia/Ho_Chi_Minh")),
-        notificationDetails(),
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        androidScheduleMode: AndroidScheduleMode.alarmClock);
-    var temp =
-        await flutterLocalNotificationsPlugin.pendingNotificationRequests();
-    log("active alarm: $temp");
-  }
-
-  notificationDetails() {
-    return const NotificationDetails(
-      android: AndroidNotificationDetails(
-        "channelId", "channelName",
-        importance: Importance.max,
-        priority: Priority.high, // Ensure priority is set to high
-        playSound: true,
-      ),
+  Future<void> localNotificationInit() async {
+    await _awesomeNotifications.initialize(
+      // set the icon to null if you want to use the default app icon
+      'resource://drawable/ic_launcher',
+      [
+        NotificationChannel(
+          channelGroupKey: 'basic_channel_group',
+          channelKey: 'basic_channel',
+          channelName: 'Basic notifications',
+          channelDescription: 'Notification channel for basic tests',
+          defaultColor: Color(0xFF9D50DD),
+          ledColor: Colors.white,
+          importance: NotificationImportance.Max,
+          channelShowBadge: true,
+          onlyAlertOnce: true,
+          playSound: true,
+          enableLights: true,
+          enableVibration: true,
+        )
+      ],
+      // Channel groups are only visual and are not required
+      channelGroups: [
+        NotificationChannelGroup(
+            channelGroupKey: 'basic_channel_group',
+            channelGroupName: 'Basic group')
+      ],
+      debug: true,
     );
   }
 
-  Future<void> showNotify(
-      {required int id, String? title, String? body}) async {
-    return await flutterLocalNotificationsPlugin.show(
-        id, title, body, notificationDetails());
-  }
+  @pragma("vm:entry-point")
+  static Future<void> mySilentDataHandle(FcmSilentData silentData) async {
+    log('"SilentData": ${silentData.toString()}');
 
-  Future<void> handleForegroundNotify(RemoteMessage remoteMessage) async {
-    if (remoteMessage.notification != null) {
-      log("foreground notify at: ${DateTime.now()}");
-      log("foreground notify title: ${remoteMessage.notification?.title}");
-      log("foreground notify body: ${remoteMessage.notification?.body}");
-      log("foreground notify payload: ${remoteMessage.data}");
-      Map payload = remoteMessage.data;
-
-      /// payload structure
-      /// {
-      ///   syncType: [sync1, sync2]
-      /// }
-      // sync hive data
-      if (payload.isNotEmpty) {}
-      try {
-        log("start sync ${payload["syncType"]} in foreground mode");
-        // loop for sync task
-        (payload["syncType"] as List).forEach(
-          (element) {
-            HiveBoxes.instance.syncData(syncType: element);
-          },
-        );
-
-        log("sync hive data in foreground mode is okay");
-      } catch (e) {
-        log("error while sync hive data in foreground mode: $e");
-      }
-
-      // Show the notification
-      await showNotify(
-        id: remoteMessage
-            .hashCode, // You can use a unique ID for each notification
-        title: remoteMessage.notification!.title,
-        body: remoteMessage.notification!.body,
-      );
+    if (silentData.createdLifeCycle != NotificationLifeCycle.Foreground) {
+      log("BACKGROUND");
+    } else {
+      log("FOREGROUND");
     }
+  }
+
+  createNotification(
+      {required String title,
+      required String body,
+      required Map<String, String> payload}) async {
+    await _awesomeNotifications.createNotification(
+        content: NotificationContent(
+      id: math.Random().nextInt(999),
+      channelKey: 'basic_channel',
+      actionType: ActionType.Default,
+      title: title,
+      body: body,
+      payload: payload,
+    ));
   }
 
   Future getAccessToken() async {
@@ -223,13 +177,13 @@ class NotificationService {
         );
 
         if (response.statusCode == 200) {
-          print('Notification sent successfully');
+          log('Notification sent successfully');
         } else {
-          print('Failed to send notification: ${response.statusCode}');
-          print('Response body: ${response.body}');
+          log('Failed to send notification: ${response.statusCode}');
+          log('Response body: ${response.body}');
         }
       } catch (e) {
-        print('Error sending notification: $e');
+        log('Error sending notification: $e');
       }
     }
   }
@@ -240,36 +194,65 @@ class NotificationService {
         .getUserByUID(FirebaseAuth.instance.currentUser!.uid);
 
     // current fcm token
-    var fcmToken = await _firebaseMessaging.getToken();
+    var fcmToken = await FirebaseMessaging.instance.getToken();
     // remove fcm token of device
     modelUser.fcm.removeWhere((element) => element == fcmToken);
 
     AuthService().updateUserInfoToDatabase(modelUser);
   }
-}
 
-@pragma('vm:entry-point')
-Future<void> handleBackgroundNotify(RemoteMessage remoteMessage) async {
-  if (remoteMessage.notification != null) {
-    String? title = remoteMessage.notification?.title;
-    String? body = remoteMessage.notification?.body;
-    Map? payload = remoteMessage.data;
-    log("notify title: $title");
-    log("notify body: $body");
-    log("notify payload: ${remoteMessage.data}");
-
-    // sync hive data
-    if (payload.isNotEmpty) {
-      /// payload structure
-      /// {
-      ///   syncType: [sync1, sync2]
-      /// }
-      // sync hive data
-      await Workmanager().registerOneOffTask(
-        const Uuid().v1(),
-        BackgroundTaskName.syncHiveData,
-        inputData: payload.cast<String, dynamic>(),
+  static foregroundNotificationHandle(Map<String, dynamic> notificationData) {
+    log("handling notification data in foreground mode");
+    Map? payload = notificationData["payload"];
+    if (payload != null && payload.isNotEmpty) {
+      // sync data
+      payload.forEach(
+        (key, value) {
+          HiveBoxes.instance.syncData(syncType: value);
+        },
       );
     }
+  }
+
+  @pragma("vm:entry-point")
+  static backgroundNotificationHandle(Map<String, dynamic> notificationData) {
+    log("handling notification data in background mode");
+    Map? payload = notificationData["payload"];
+    if (payload != null && payload.isNotEmpty) {
+      // sync data
+      payload.forEach(
+        (key, value) {
+          HiveBoxes.instance.syncData(syncType: value);
+        },
+      );
+    }
+  }
+
+  @pragma("vm:entry-point")
+  static Future<void> onNotificationDisplayedMethod(
+      ReceivedNotification receivedNotification) async {
+    Map<String, dynamic> notificationData = {
+      "appStatus": receivedNotification.displayedLifeCycle!.name,
+      "title": receivedNotification.title,
+      "body": receivedNotification.body,
+      "payload": receivedNotification.payload,
+    };
+    // depends on app status (back or foreground) to handle the notification
+    if (receivedNotification.displayedLifeCycle ==
+        NotificationLifeCycle.Foreground) {
+      foregroundNotificationHandle(notificationData);
+    } else {
+      backgroundNotificationHandle(notificationData);
+    }
+
+    log("notification received: $notificationData");
+  }
+
+  @pragma("vm:entry-point")
+  static Future<void> onActionReceivedMethod(
+      ReceivedAction receivedAction) async {
+    log("onActionReceivedMethod: ${receivedAction.title}");
+    log("onActionReceivedMethod: ${receivedAction.body}");
+    log("onActionReceivedMethod: ${receivedAction.payload}");
   }
 }

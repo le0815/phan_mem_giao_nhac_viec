@@ -94,7 +94,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
               title:
                   "Your ${widget.modelTask.title} workspace task was edited!",
               payload: {
-                "syncType": [SyncTypes.syncTask]
+                0: SyncTypes.syncTask,
               });
           await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
         } else {

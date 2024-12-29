@@ -44,12 +44,18 @@ class BodyHome extends StatelessWidget {
                 ),
                 OutlinedButton(
                   onPressed: () async {
-                    await NotificationService.instance.showNotify(
-                      id: 0,
-                      title: "message from background service",
-                      body:
-                          "I've been a rich man, I've been a poor man. And I choose rich every fucking time!",
-                    );
+                    // await NotificationService.instance.showNotify(
+                    //   id: 0,
+                    //   title: "message from background service",
+                    //   body:
+                    //       "I've been a rich man, I've been a poor man. And I choose rich every fucking time!",
+                    // );
+                    await NotificationService.instance.createNotification(
+                        title: "title",
+                        body: "body",
+                        payload: {
+                          "syncType": "fasdf",
+                        });
                   },
                   child: Text("Send Notification"),
                 ),
@@ -156,10 +162,10 @@ class _OverViewState extends State<OverView> {
           ),
           OutlinedButton(
             onPressed: () {
-              NotificationService.instance.scheduleBackgroundNotify(
-                id: 42323,
-                time: DateTime.now().add(const Duration(seconds: 10)),
-              );
+              // NotificationService.instance.scheduleBackgroundNotify(
+              //   id: 42323,
+              //   time: DateTime.now().add(const Duration(seconds: 10)),
+              // );
               log("created alarm for task");
             },
             child: Text("test alarm"),

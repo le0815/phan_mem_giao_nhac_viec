@@ -28,19 +28,6 @@ final navigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 
-testBackgroundTask() async {
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  // await NotificationService.instance.initNotify();
-  await NotificationService.instance.showNotify(
-    id: 0,
-    title: FirebaseAuth.instance.currentUser!.uid,
-    body:
-        "I've been a rich man, I've been a poor man. And I choose rich every fucking time!",
-  );
-}
-
 @pragma('vm:entry-point')
 void callbackDispatcher() {
   Workmanager().executeTask(
@@ -95,8 +82,9 @@ void main() async {
   await HiveBoxes.instance.openAllBoxes();
   // sync hive data
   HiveBoxes.instance.syncAllData();
+
   // notification
-  await NotificationService.instance.initNotify();
+  await NotificationService.instance.initialize();
 
   // background service
   await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
