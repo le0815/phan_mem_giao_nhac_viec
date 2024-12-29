@@ -47,9 +47,9 @@ void callbackDispatcher() {
         log("Firebase initialized");
 
         if (BackgroundTaskName.syncHiveData == taskName) {
-          (inputData!["syncType"] as List).forEach(
-            (element) {
-              BackgroundService.instance.syncData(element);
+          (inputData!["syncType"] as Map).forEach(
+            (key, value) {
+              BackgroundService.instance.syncData(value);
             },
           );
         }
@@ -80,8 +80,10 @@ void main() async {
   await Hive.initFlutter();
   HiveBoxes.instance.registerAllAdapters();
   await HiveBoxes.instance.openAllBoxes();
-  // sync hive data
-  HiveBoxes.instance.syncAllData();
+  // sync hive data if user logged in
+  if (FirebaseAuth.instance.currentUser != null) {
+    HiveBoxes.instance.syncAllData();
+  }
 
   // notification
   await NotificationService.instance.initialize();

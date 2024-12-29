@@ -4,33 +4,26 @@ import 'dart:math' as math;
 import 'dart:ui';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
-import 'package:awesome_notifications_fcm/awesome_notifications_fcm_platform_interface.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:googleapis_auth/auth_io.dart' as auth;
-import 'package:googleapis/servicecontrol/v1.dart' as service_control;
 import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
 import 'package:phan_mem_giao_nhac_viec/services/auth/auth_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/ultis.dart';
-import 'package:timezone/standalone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 import 'package:uuid/uuid.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../../constraint/constraint.dart';
-import '../../main.dart';
 import '../../models/model_user.dart';
 import '../database/database_service.dart';
 
-@pragma("vm:entry-point")
 class NotificationService {
   static final NotificationService instance = NotificationService._();
   final AwesomeNotifications _awesomeNotifications = AwesomeNotifications();
-  final AwesomeNotificationsFcm _awesomeNotificationsFcm =
-      AwesomeNotificationsFcm();
+  final _randomIDNotification = math.Random();
+  final _localTimeZone = "Asia/Ho_Chi_Minh";
   NotificationService._();
 
   requestPermission() async {
@@ -52,7 +45,6 @@ class NotificationService {
   initialize() async {
     await localNotificationInit();
     await requestPermission();
-
     // _awesomeNotificationsFcm.initialize(
     //   onFcmTokenHandle: myFcmTokenHandle,
     //   onFcmSilentDataHandle: mySilentDataHandle,
@@ -109,13 +101,49 @@ class NotificationService {
       required Map<String, String> payload}) async {
     await _awesomeNotifications.createNotification(
         content: NotificationContent(
-      id: math.Random().nextInt(999),
+      id: _randomIDNotification.nextInt(999),
       channelKey: 'basic_channel',
       actionType: ActionType.Default,
       title: title,
       body: body,
       payload: payload,
     ));
+  }
+
+  createScheduleNotification(
+      {required String title,
+      String? body,
+      required Map<String, String> payload,
+      required DateTime time}) async {
+    log("creating schedule alarm for task in: $time");
+    await _awesomeNotifications.createNotification(
+      content: NotificationContent(
+        id: _randomIDNotification.nextInt(999),
+        channelKey: 'basic_channel',
+        title: title,
+        body: body,
+        payload: payload,
+      ),
+      schedule: NotificationCalendar(
+        second: 0,
+        minute: time.minute,
+        hour: time.hour,
+        day: time.day,
+        month: time.month,
+        year: time.year,
+        timeZone: _localTimeZone,
+        repeats: false,
+        allowWhileIdle: true,
+      ),
+    );
+  }
+
+  Future<List<NotificationModel>> getScheduleNotification() async {
+    return await _awesomeNotifications.listScheduledNotifications();
+  }
+
+  clearAllScheduleAlarm() async {
+    await _awesomeNotifications.cancelAllSchedules();
   }
 
   Future getAccessToken() async {
@@ -201,8 +229,8 @@ class NotificationService {
     AuthService().updateUserInfoToDatabase(modelUser);
   }
 
-  static foregroundNotificationHandle(Map<String, dynamic> notificationData) {
-    log("handling notification data in foreground mode");
+  static appAliveNotificationHandle(Map<String, dynamic> notificationData) {
+    log("handling notification data in alive mode");
     Map? payload = notificationData["payload"];
     if (payload != null && payload.isNotEmpty) {
       // sync data
@@ -215,15 +243,15 @@ class NotificationService {
   }
 
   @pragma("vm:entry-point")
-  static backgroundNotificationHandle(Map<String, dynamic> notificationData) {
-    log("handling notification data in background mode");
+  static terminatedNotificationHandle(Map<String, dynamic> notificationData) {
+    log("handling notification data in terminated mode");
     Map? payload = notificationData["payload"];
     if (payload != null && payload.isNotEmpty) {
-      // sync data
-      payload.forEach(
-        (key, value) {
-          HiveBoxes.instance.syncData(syncType: value);
-        },
+      // use workmanager to sync data
+      Workmanager().registerOneOffTask(
+        const Uuid().v1().toString(),
+        BackgroundTaskName.syncHiveData,
+        inputData: {"syncType": payload},
       );
     }
   }
@@ -239,10 +267,10 @@ class NotificationService {
     };
     // depends on app status (back or foreground) to handle the notification
     if (receivedNotification.displayedLifeCycle ==
-        NotificationLifeCycle.Foreground) {
-      foregroundNotificationHandle(notificationData);
+        NotificationLifeCycle.Terminated) {
+      terminatedNotificationHandle(notificationData);
     } else {
-      backgroundNotificationHandle(notificationData);
+      appAliveNotificationHandle(notificationData);
     }
 
     log("notification received: $notificationData");

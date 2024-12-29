@@ -12,6 +12,7 @@ enum MyTaskState {
   overDue,
 }
 
+@pragma("vm:entry-point")
 class BackgroundTaskName {
   static const String syncHiveData = "syncHiveData";
   static const String sendDataFromIsolate = "sendDataFromIsolate";

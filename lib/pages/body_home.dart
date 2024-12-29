@@ -6,6 +6,7 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_pie_chart.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/services/background_service/background_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 import 'package:workmanager/workmanager.dart';
@@ -162,11 +163,7 @@ class _OverViewState extends State<OverView> {
           ),
           OutlinedButton(
             onPressed: () {
-              // NotificationService.instance.scheduleBackgroundNotify(
-              //   id: 42323,
-              //   time: DateTime.now().add(const Duration(seconds: 10)),
-              // );
-              log("created alarm for task");
+              BackgroundService.instance.setScheduleAlarm();
             },
             child: Text("test alarm"),
           ),
