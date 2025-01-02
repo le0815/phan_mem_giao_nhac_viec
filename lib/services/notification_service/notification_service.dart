@@ -248,17 +248,9 @@ class NotificationService {
         BackgroundService.instance.setScheduleAlarm();
       }
 
-      // if notification is schedule alarm
+      // if notification is schedule alarm -> update task state
       if (payload["notificationType"] != null) {
-        // decode string to map cause payload["modelTask"] is String datatype
-        var decodedModelTask = json.decode(payload["modelTask"]);
-        ModelTask modelTask = ModelTask.fromMap(decodedModelTask);
-        // update task state
-        var idTask = payload["idTask"];
-        modelTask.state = payload["taskState"];
-        HiveBoxes.instance.taskHiveBox.put(idTask, modelTask.ToMap());
-        // update task to database
-        TaskService.instance.UpdateTaskToDb(idTask, modelTask);
+        BackgroundService.instance.updateTaskState(payload);
       }
     }
   }
@@ -269,11 +261,18 @@ class NotificationService {
     Map? payload = notificationData["payload"];
     if (payload != null && payload.isNotEmpty) {
       // use workmanager to sync data
-      Workmanager().registerOneOffTask(
-        const Uuid().v1().toString(),
-        BackgroundTaskName.syncHiveData,
-        inputData: {"syncType": payload},
-      );
+      if (payload["syncType"] != null) {
+        Workmanager().registerOneOffTask(
+          const Uuid().v1().toString(),
+          BackgroundTaskName.syncHiveData,
+          inputData: {"syncType": payload},
+        );
+      }
+
+      // if notification is schedule alarm -> update task state
+      if (payload["notificationType"] != null) {
+        BackgroundService.instance.updateTaskState(payload);
+      }
     }
   }
 

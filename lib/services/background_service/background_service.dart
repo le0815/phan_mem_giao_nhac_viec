@@ -20,9 +20,9 @@ class BackgroundService {
 
   BackgroundService._();
   @pragma("vm:entry-point")
-  syncData(String type) {
+  Future<void> syncData(String type) async {
     log("sync $type data in background");
-    HiveBoxes.instance.syncData(syncType: type);
+    await HiveBoxes.instance.syncData(syncType: type);
     log("sync $type data finished");
   }
 
@@ -36,7 +36,10 @@ class BackgroundService {
     taskHiveBox.forEach(
       (key, value) {
         ModelTask modelTask = ModelTask.fromMap(value);
-
+        // pass if state of the task is completed
+        if (modelTask.state == MyTaskState.completed.name) {
+          return;
+        }
         if (modelTask.startTime != null) {
           // set alarm for start state
           notificationService.createScheduleNotification(
@@ -64,5 +67,17 @@ class BackgroundService {
         }
       },
     );
+  }
+
+  updateTaskState(Map payload) async {
+    // decode string to map cause payload["modelTask"] is String datatype
+    var decodedModelTask = json.decode(payload["modelTask"]);
+    ModelTask modelTask = ModelTask.fromMap(decodedModelTask);
+    // update task state
+    var idTask = payload["idTask"];
+    modelTask.state = payload["taskState"];
+    HiveBoxes.instance.taskHiveBox.put(idTask, modelTask.ToMap());
+    // update task to database
+    TaskService.instance.UpdateTaskToDb(idTask, modelTask);
   }
 }

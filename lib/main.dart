@@ -47,9 +47,15 @@ void callbackDispatcher() {
         log("Firebase initialized");
 
         if (BackgroundTaskName.syncHiveData == taskName) {
-          (inputData!["syncType"] as Map).forEach(
-            (key, value) {
-              BackgroundService.instance.syncData(value);
+          Map inputDataMap = inputData!["syncType"] as Map;
+
+          inputDataMap.forEach(
+            (key, value) async {
+              await BackgroundService.instance.syncData(value);
+              // if sync task -> update notification
+              if (value == SyncTypes.syncTask) {
+                BackgroundService.instance.setScheduleAlarm();
+              }
             },
           );
         }
