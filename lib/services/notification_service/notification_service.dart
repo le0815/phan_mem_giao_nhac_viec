@@ -10,7 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/services/auth/auth_service.dart';
+import 'package:phan_mem_giao_nhac_viec/services/background_service/background_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/ultis.dart';
 import 'package:uuid/uuid.dart';
 import 'package:workmanager/workmanager.dart';
@@ -18,6 +20,7 @@ import 'package:workmanager/workmanager.dart';
 import '../../constraint/constraint.dart';
 import '../../models/model_user.dart';
 import '../database/database_service.dart';
+import '../task/task_service.dart';
 
 class NotificationService {
   static final NotificationService instance = NotificationService._();
@@ -123,6 +126,7 @@ class NotificationService {
         title: title,
         body: body,
         payload: payload,
+        category: NotificationCategory.Alarm,
       ),
       schedule: NotificationCalendar(
         second: 0,
@@ -234,11 +238,28 @@ class NotificationService {
     Map? payload = notificationData["payload"];
     if (payload != null && payload.isNotEmpty) {
       // sync data
-      payload.forEach(
-        (key, value) {
-          HiveBoxes.instance.syncData(syncType: value);
-        },
-      );
+      if (payload["syncType"] != null) {
+        payload.forEach(
+          (key, value) {
+            HiveBoxes.instance.syncData(syncType: value);
+          },
+        );
+        // set schedule alarm for task
+        BackgroundService.instance.setScheduleAlarm();
+      }
+
+      // if notification is schedule alarm
+      if (payload["notificationType"] != null) {
+        // decode string to map cause payload["modelTask"] is String datatype
+        var decodedModelTask = json.decode(payload["modelTask"]);
+        ModelTask modelTask = ModelTask.fromMap(decodedModelTask);
+        // update task state
+        var idTask = payload["idTask"];
+        modelTask.state = payload["taskState"];
+        HiveBoxes.instance.taskHiveBox.put(idTask, modelTask.ToMap());
+        // update task to database
+        TaskService.instance.UpdateTaskToDb(idTask, modelTask);
+      }
     }
   }
 

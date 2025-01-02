@@ -63,7 +63,7 @@ class TaskService extends ChangeNotifier {
   }
 
   // delete task
-  Future<void> UpdateTaskFromDb(String taskId, ModelTask modelTask) async {
+  Future<void> UpdateTaskToDb(String taskId, ModelTask modelTask) async {
     try {
       await _firebaseFirestore
           .collection("Task")

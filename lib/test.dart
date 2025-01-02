@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math' as math;
 
 Future func1() => Future.delayed(Duration(seconds: 5), () => print("func1"));
@@ -17,10 +18,7 @@ class Test {
 }
 
 void main() async {
-  final randomIDNotification = math.Random();
-  int a = 0;
-  while (a <= 10) {
-    print(randomIDNotification.nextInt(999));
-    a++;
-  }
+  String a =
+      "{uid: nlVmz66WNDfhzOyMdTxLJOvoziq1, due: 1735889402285, timeUpdate: 1735803008477, assigner: null, description: , startTime: 1735803120000, state: pending, title: sreer, createAt: 1735803008477, workspaceID: null}";
+  print(jsonDecode(a));
 }

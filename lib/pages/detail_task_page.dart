@@ -83,7 +83,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
         widget.modelTask.timeUpdate = DateTime.now().millisecondsSinceEpoch;
 
         await TaskService.instance
-            .UpdateTaskFromDb(widget.idTask, widget.modelTask);
+            .UpdateTaskToDb(widget.idTask, widget.modelTask);
 
         if (widget.isWorkspace) {
           // send to assignees
