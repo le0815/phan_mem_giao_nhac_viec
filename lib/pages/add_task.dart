@@ -9,8 +9,10 @@ import 'package:phan_mem_giao_nhac_viec/components/my_elevated_button_long.dart'
 import 'package:phan_mem_giao_nhac_viec/components/my_snackbar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
+import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
@@ -25,8 +27,8 @@ class AddTask extends StatefulWidget {
     this.workspaceID,
     this.isWorkspace = false,
   });
-  Timestamp? startTime;
-  Timestamp? due;
+  int? startTime;
+  int? due;
   var taskTitleController = TextEditingController();
   var taskDescriptionController = TextEditingController();
   @override
@@ -38,11 +40,11 @@ class _AddTaskState extends State<AddTask> {
 
   @override
   Widget build(BuildContext context) {
-    final TaskService taskService = TaskService();
+    // final TaskService taskService = TaskService();
 
     Future<void> UploadTask({required String? uid}) async {
       try {
-        await taskService.AddTaskToDb(
+        await TaskService.instance.AddTaskToDb(
           // if task was created in workspace mode, the uid of task is uid of
           // assignee and assigner now set to current uid
           ModelTask(
@@ -51,7 +53,7 @@ class _AddTaskState extends State<AddTask> {
             uid: widget.isWorkspace
                 ? uid!
                 : FirebaseAuth.instance.currentUser!.uid,
-            createAt: Timestamp.now(),
+            createAt: DateTime.now().millisecondsSinceEpoch,
             due: widget.due,
             startTime: widget.startTime,
             assigner: widget.isWorkspace
@@ -63,14 +65,27 @@ class _AddTaskState extends State<AddTask> {
             //                            = inProgress (startTime < createAt)
             state: widget.startTime == null
                 ? MyTaskState.inProgress.name
-                : (widget.startTime!.compareTo(Timestamp.now()) == 1
-                    ? MyTaskState.pending.name
-                    : MyTaskState.inProgress.name),
-            timeUpdate: Timestamp.now(),
+                : MyTaskState.pending.name,
+            timeUpdate: DateTime.now().millisecondsSinceEpoch,
           ),
         );
         log("upload task is ok");
 
+        // if is workspace mode -> send notifi to trigger update task on member device
+        // else update task
+        if (widget.isWorkspace) {
+          ModelUser modelMember =
+              await DatabaseService.instance.getUserByUID(uid!);
+          NotificationService.instance.sendNotification(
+              receiverToken: modelMember.fcm,
+              title: "You have a new task in your workspace!",
+              payload: {
+                0: SyncTypes.syncTask,
+              });
+          await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
+        } else {
+          await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
+        }
         // create alarm for the task
         // NotificationService.instance.scheduleBackgroundNotify(
         //   DateTime.fromMillisecondsSinceEpoch(
@@ -207,11 +222,11 @@ class _AddTaskState extends State<AddTask> {
               // createAt
               Text(widget.startTime == null
                   ? ""
-                  : "Start: ${DateTime.fromMillisecondsSinceEpoch(widget.startTime!.millisecondsSinceEpoch).toLocal()}"),
+                  : "Start: ${DateTime.fromMillisecondsSinceEpoch(widget.startTime!).toLocal()}"),
               // due
               Text(widget.due == null
                   ? ""
-                  : "Due: ${DateTime.fromMillisecondsSinceEpoch(widget.due!.millisecondsSinceEpoch).toLocal()}"),
+                  : "Due: ${DateTime.fromMillisecondsSinceEpoch(widget.due!).toLocal()}"),
             ],
           ),
         ],

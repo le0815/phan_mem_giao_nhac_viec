@@ -60,7 +60,7 @@ class MyTaskTileOverview extends StatelessWidget {
                       Text(
                         modelTask.due == null
                             ? ""
-                            : "\nDue: ${DateFormat("HH:mm").format(modelTask.due!.toDate())}",
+                            : "\nDue: ${DateFormat("HH:mm").format(DateTime.fromMillisecondsSinceEpoch(modelTask.due!))}",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),

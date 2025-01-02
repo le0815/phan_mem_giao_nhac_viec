@@ -1,8 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive/hive.dart';
 
+part "model_workspace.g.dart";
+
+@HiveType(typeId: 0)
 class ModelWorkspace {
+  @HiveField(0)
   final String workspaceName;
-  final Timestamp createAt;
+  @HiveField(1)
+  final int createAt;
+  @HiveField(2)
   final List members;
 
   ModelWorkspace({
@@ -11,7 +18,7 @@ class ModelWorkspace {
     required this.members,
   });
 
-  factory ModelWorkspace.fromMap(Map<String, dynamic> object) {
+  factory ModelWorkspace.fromMap(Map<dynamic, dynamic> object) {
     return ModelWorkspace(
       createAt: object["createAt"],
       workspaceName: object["workspaceName"],

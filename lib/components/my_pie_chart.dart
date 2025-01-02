@@ -74,7 +74,8 @@ class _MyPieChartState extends State<MyPieChart> {
                 color: myTaskColor[widget.taskData.keys.elementAt(index)],
                 radius: _touchSection == index ? 70 : 50,
                 title: "",
-                data: widget.taskData[currentTaskStateKey],
+                data: (widget.taskData[currentTaskStateKey] as Map)
+                    .cast<String, dynamic>(),
                 // color: Colors.yellow,
               );
             },

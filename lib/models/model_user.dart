@@ -1,8 +1,18 @@
+import 'package:hive/hive.dart';
+
+part "model_user.g.dart";
+
+@HiveType(typeId: 4)
 class ModelUser {
+  @HiveField(0)
   final String email;
+  @HiveField(1)
   final String userName;
+  @HiveField(2)
   final String uid;
+  @HiveField(3)
   final List<dynamic> fcm;
+
   ModelUser({
     required this.email,
     required this.userName,

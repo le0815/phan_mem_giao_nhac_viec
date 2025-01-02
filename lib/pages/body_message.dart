@@ -3,10 +3,15 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_message_overview_tile.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_chat.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/chat_box_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/chat/chat_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
@@ -14,6 +19,7 @@ import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 import 'package:provider/provider.dart';
 
 import '../components/my_alert_dialog.dart';
+import '../services/notification_service/notification_service.dart';
 
 class BodyMessage extends StatelessWidget {
   const BodyMessage({super.key});
@@ -24,7 +30,7 @@ class BodyMessage extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       child: Stack(
         children: [
-          getChatGroupStream(),
+          const GetChatGroup(),
           // float add new chat button
           Positioned(
             bottom: 10,
@@ -41,66 +47,12 @@ class BodyMessage extends StatelessWidget {
     );
   }
 
-  StreamBuilder<QuerySnapshot<Object?>> getChatGroupStream() {
-    final currentUID = FirebaseAuth.instance.currentUser!.uid;
-    return StreamBuilder(
-      stream: ChatService.groupChatStream(currentUID),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          log("loading chat group from database: - ${DateTime.now()}");
-          // show loading indicator
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        if (!snapshot.hasData) {
-          return const Center(
-            child: Text(
-              'No message here',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.black54,
-              ),
-            ),
-          );
-        }
-        final docs = snapshot.data!.docs;
-        // list message
-        return ListView.builder(
-          itemCount: docs.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              // open chat page
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatBoxPage(
-                      chatDocId: docs[index].id,
-                      modelChat: ModelChat.fromMap(
-                          (docs[index].data() as Map<String, dynamic>)),
-                    ),
-                  ),
-                );
-              },
-              child: MyMessageOverviewTile(
-                chatName: (docs[index].data() as Map?)?["chatName"],
-                // (docs[index].data() as Map?)?["msg"]
-                msg: "Test",
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
   Future<dynamic> AddNewChatDialog(BuildContext context) {
     TextEditingController searchPhaseController = TextEditingController();
     TextEditingController chatNameController = TextEditingController();
     final _userTileGlobalKey = GlobalKey<MyUserTileOverviewState>();
     var iudMember = [FirebaseAuth.instance.currentUser!.uid];
-
+    ModelUser? modelUserMemberChat;
     return showDialog(
       context: context,
       builder: (context) {
@@ -140,6 +92,8 @@ class BodyMessage extends StatelessWidget {
                           : ListView.builder(
                               itemCount: value.result.length,
                               itemBuilder: (context, index) {
+                                modelUserMemberChat = ModelUser.fromMap(
+                                    value.result[index].data());
                                 return GestureDetector(
                                   onTap: () {
                                     // change color of user tile when tapped
@@ -152,8 +106,7 @@ class BodyMessage extends StatelessWidget {
                                   },
                                   child: MyUserTileOverview(
                                     key: _userTileGlobalKey,
-                                    userName:
-                                        value.result[index].data()["userName"],
+                                    userName: modelUserMemberChat!.userName,
                                     msg: "sample",
                                     onRemove: () {},
                                   ),
@@ -173,7 +126,7 @@ class BodyMessage extends StatelessWidget {
               child: const Text("Cancel"),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 var userTile = _userTileGlobalKey.currentState;
 
                 /// if user was not selected -> show alert
@@ -185,17 +138,86 @@ class BodyMessage extends StatelessWidget {
                   );
                 } else {
                   // add chat to database
-                  ChatService.createNewChat(
+                  await ChatService.instance.createNewChat(
                     chatName: chatNameController.text.trim(),
                     members: iudMember,
-                    timeUpdate: Timestamp.now(),
+                    timeUpdate: Timestamp.now().millisecondsSinceEpoch,
                   );
                   Navigator.pop(context);
+                  // sync chat data
+                  log("sync chat data from add new chat");
+                  HiveBoxes.instance.syncData(syncType: SyncTypes.syncMessage);
+                  NotificationService.instance.sendNotification(
+                      receiverToken: modelUserMemberChat!.fcm,
+                      title:
+                          "You have a new chat with ${modelUserMemberChat!.userName}!",
+                      payload: {
+                        0: SyncTypes.syncMessage,
+                      });
                 }
               },
               child: const Text("Add"),
             ),
           ],
+        );
+      },
+    );
+  }
+}
+
+class GetChatGroup extends StatefulWidget {
+  const GetChatGroup({super.key});
+
+  @override
+  State<GetChatGroup> createState() => _GetChatGroupState();
+}
+
+class _GetChatGroupState extends State<GetChatGroup> {
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: HiveBoxes.instance.chatHiveBox.listenable(),
+      builder: (context, value, child) {
+        if (value.isEmpty) {
+          return const Center(
+            child: Text(
+              'No message here',
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.black54,
+              ),
+            ),
+          );
+        }
+        var chatData = value.toMap();
+        // list message
+        return ListView.builder(
+          itemCount: chatData.length,
+          itemBuilder: (context, index) {
+            ModelChat modelChat = ModelChat.fromMap(
+                chatData.values.elementAt(index)["modelChat"]);
+            var idChat = chatData.keys.elementAt(index);
+
+            return GestureDetector(
+              // open chat page
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatBoxPage(
+                      chatDocId: idChat,
+                      modelChat: modelChat,
+                    ),
+                  ),
+                );
+              },
+              child: MyMessageOverviewTile(
+                chatName: modelChat.chatName,
+                // (docs[index].data() as Map?)?["msg"]
+                msg: "Test",
+              ),
+            );
+          },
         );
       },
     );

@@ -1,16 +1,19 @@
 import 'dart:developer';
+import 'dart:ui';
 
-import 'package:board_datetime_picker/board_datetime_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_pie_chart.dart';
+import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/services/background_service/background_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../components/my_legend_chart.dart';
-import '../components/my_loading_indicator.dart';
+
+import '../local_database/hive_boxes.dart';
 import '../services/database/database_service.dart';
 
 class BodyHome extends StatelessWidget {
@@ -34,7 +37,7 @@ class BodyHome extends StatelessWidget {
                     var uniqueID = DateTime.now().second;
                     await Workmanager().registerOneOffTask(
                       uniqueID.toString(),
-                      "test background task",
+                      BackgroundTaskName.syncHiveData,
                       initialDelay: Duration(seconds: 10),
                     );
                   },
@@ -42,12 +45,18 @@ class BodyHome extends StatelessWidget {
                 ),
                 OutlinedButton(
                   onPressed: () async {
-                    await NotificationService.instance.showNotify(
-                      id: 0,
-                      title: "message from background service",
-                      body:
-                          "I've been a rich man, I've been a poor man. And I choose rich every fucking time!",
-                    );
+                    // await NotificationService.instance.showNotify(
+                    //   id: 0,
+                    //   title: "message from background service",
+                    //   body:
+                    //       "I've been a rich man, I've been a poor man. And I choose rich every fucking time!",
+                    // );
+                    await NotificationService.instance.createNotification(
+                        title: "title",
+                        body: "body",
+                        payload: {
+                          "syncType": "fasdf",
+                        });
                   },
                   child: Text("Send Notification"),
                 ),
@@ -115,11 +124,16 @@ class BodyHome extends StatelessWidget {
   }
 }
 
-class OverView extends StatelessWidget {
-  const OverView({
+class OverView extends StatefulWidget {
+  OverView({
     super.key,
   });
 
+  @override
+  State<OverView> createState() => _OverViewState();
+}
+
+class _OverViewState extends State<OverView> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -136,34 +150,37 @@ class OverView extends StatelessWidget {
             thickness: 1,
             color: Colors.black,
           ),
+          const chatLegend(),
           OutlinedButton(
             onPressed: () async {
-              final result = await showBoardDateTimeMultiPicker(
-                context: context,
-                pickerType: DateTimePickerType.datetime,
-              );
-              log("result: ${result}");
+              try {
+                HiveBoxes.instance.syncAllData();
+              } catch (e) {
+                log("error while sync data: $e");
+              }
             },
-            child: Text(
-              "datetime picker",
-            ),
+            child: Text("sync data"),
           ),
-          chatLegend(),
+          OutlinedButton(
+            onPressed: () {
+              BackgroundService.instance.setScheduleAlarm();
+            },
+            child: Text("test alarm"),
+          ),
           Expanded(
-            child: FutureBuilder(
-              future: DatabaseService.instance
-                  .GetAllTask(uid: FirebaseAuth.instance.currentUser!.uid),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const MyLoadingIndicator();
-                }
-                if (snapshot.data == null || snapshot.data!.isEmpty) {
+            child: ValueListenableBuilder(
+              valueListenable: HiveBoxes.instance.taskHiveBox.listenable(),
+              builder: (context, box, child) {
+                if (box.isEmpty) {
                   return const Center(
-                    child: Text("Nothing to show here"),
+                    child: Text("Nothing to show here!"),
                   );
                 }
+
+                var classifiedTask = DatabaseService.instance
+                    .taskClassification(data: box.toMap());
                 return MyPieChart(
-                  taskData: snapshot.data!,
+                  taskData: classifiedTask,
                 );
               },
             ),

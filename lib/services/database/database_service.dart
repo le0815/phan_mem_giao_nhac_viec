@@ -1,10 +1,15 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
+import 'package:phan_mem_giao_nhac_viec/services/chat/chat_service.dart';
+import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
+
+import '../task/task_service.dart';
 
 class DatabaseService extends ChangeNotifier {
   static final DatabaseService instance = DatabaseService._();
@@ -30,14 +35,30 @@ class DatabaseService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // get all task
-  Future<Map> GetAllTask({required String uid}) async {
-    var result = await _firebaseFirestore
-        .collection("Task")
-        .where("uid", isEqualTo: uid)
-        .get();
-    Map data = {};
+  Future getAllDataFromUID() async {
+    var currentUID = FirebaseAuth.instance.currentUser!.uid;
+    var result = {};
+    // get all task data
+    var taskData = await TaskService.instance.GetTaskFromDb();
+    result["task"] = taskData;
 
+    // get chat data
+    var chatData =
+        await ChatService.instance.syncChatData(currentUID: currentUID);
+
+    result["chat"] = chatData;
+
+    // get workspace data
+    result["workspace"] = await WorkspaceService.instance
+        .syncWorkspaceData(currentUID: currentUID);
+
+    return result;
+    // log("sync data: $result");
+  }
+
+  // get all task
+  taskClassification({required Map<dynamic, dynamic> data}) {
+    Map result = {};
     // classification state of task by group
     // processed data will be like this
     // {
@@ -52,35 +73,37 @@ class DatabaseService extends ChangeNotifier {
     //     ....
     //   }
     // }
-    for (var element in result.docs) {
-      var tempTask = ModelTask.fromMap(element.data());
-      if (data[tempTask.state] != null) {
-        data[tempTask.state].addAll({element.id: tempTask});
-      } else {
-        data[tempTask.state] = {element.id: tempTask};
-      }
-    }
-    return data;
+    data.forEach(
+      (key, value) {
+        var modelTask = ModelTask.fromMap(value);
+        if (result[modelTask.state] != null) {
+          result[modelTask.state].addAll({key: modelTask});
+        } else {
+          result[modelTask.state] = {key: modelTask};
+        }
+      },
+    );
+    return result;
   }
 
-  taskClassification(ModelTask modelTask) {
-    // pending task
-    if (modelTask.state == MyTaskState.pending.name) {
-      return {modelTask.state: modelTask};
-    }
-    // inProgress task
-    if (modelTask.state == MyTaskState.inProgress.name) {
-      return {modelTask.state: modelTask};
-    }
-    // completed task
-    if (modelTask.state == MyTaskState.completed.name) {
-      return {modelTask.state: modelTask};
-    }
-    // overDue task
-    if (modelTask.state == MyTaskState.overDue.name) {
-      return {modelTask.state: modelTask};
-    }
-  }
+  // taskClassification(ModelTask modelTask) {
+  //   // pending task
+  //   if (modelTask.state == MyTaskState.pending.name) {
+  //     return {modelTask.state: modelTask};
+  //   }
+  //   // inProgress task
+  //   if (modelTask.state == MyTaskState.inProgress.name) {
+  //     return {modelTask.state: modelTask};
+  //   }
+  //   // completed task
+  //   if (modelTask.state == MyTaskState.completed.name) {
+  //     return {modelTask.state: modelTask};
+  //   }
+  //   // overDue task
+  //   if (modelTask.state == MyTaskState.overDue.name) {
+  //     return {modelTask.state: modelTask};
+  //   }
+  // }
 
   // get task
   Future<Map> GetTasksFromWorkspace(String workspaceID) async {

@@ -1,26 +1,31 @@
 import 'dart:developer';
 
-import 'package:calendar_view/calendar_view.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:horizontal_week_calendar/horizontal_week_calendar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_task_tile_overview.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
+import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
+import 'package:workmanager/workmanager.dart';
+
+import '../main.dart';
 
 class BodyTask extends StatefulWidget {
   const BodyTask({super.key});
 
   @override
-  State<BodyTask> createState() => _BodyTaskState();
+  State<BodyTask> createState() => BodyTaskState();
 }
 
-class _BodyTaskState extends State<BodyTask> {
-  final taskService = TaskService();
+class BodyTaskState extends State<BodyTask> {
+  // final taskService = TaskService();
   // use list object to changeable value after pass to function
   DateTime currentDate = DateTime.now();
   // @override
@@ -34,7 +39,9 @@ class _BodyTaskState extends State<BodyTask> {
 
   RemoveTaskFromDb(String taskId) async {
     try {
-      await taskService.RemoveTaskFromDb(taskId);
+      await TaskService.instance.RemoveTaskFromDb(taskId);
+      // sync new data in hive
+      HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
     } catch (e) {
       if (context.mounted) {
         // show err dialog
@@ -58,11 +65,12 @@ class _BodyTaskState extends State<BodyTask> {
               context,
               msg: "Are you sure want to delete this task?",
               onOkay: () {
-                RemoveTaskFromDb(idTask);
                 // close alert dialog
                 Navigator.pop(context);
                 // switch back to right before screen
                 Navigator.pop(context);
+                // sync task in hive
+                HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
               },
             );
           },
@@ -101,17 +109,6 @@ class _BodyTaskState extends State<BodyTask> {
                     ),
                     // task overview per day
                     TaskTileOverView(),
-                    // const Expanded(
-                    //   child: DayView(
-
-                    //     startHour: 1,
-                    //     endHour: 24,
-                    //     heightPerMinute: 1,
-                    //     liveTimeIndicatorSettings:
-                    //         LiveTimeIndicatorSettings(color: Colors.red),
-                    //     dayTitleBuilder: DayHeader.hidden, // hidden header
-                    //   ),
-                    // ),
                   ],
                 ),
                 // add new task
@@ -140,42 +137,57 @@ class _BodyTaskState extends State<BodyTask> {
       ),
     );
   }
+}
 
-  Expanded TaskTileOverView() {
+class TaskTileOverView extends StatefulWidget {
+  const TaskTileOverView({super.key});
+
+  @override
+  State<TaskTileOverView> createState() => _TaskTileOverViewState();
+}
+
+class _TaskTileOverViewState extends State<TaskTileOverView> {
+  @override
+  Widget build(BuildContext context) {
     return Expanded(
-      child: FutureBuilder<Map>(
-        future: taskService.GetTaskByDay(currentDate),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const MyLoadingIndicator();
-          }
-
-          if (!snapshot.hasData) {
+      child: ValueListenableBuilder(
+        valueListenable: HiveBoxes.instance.taskHiveBox.listenable(),
+        builder: (context, value, child) {
+          // if (snapshot.connectionState == ConnectionState.waiting) {
+          //     return const MyLoadingIndicator();
+          //   }
+          if (value.isEmpty) {
             return const Center(
               child: Text("Nothing to show here!"),
             );
           }
-          var result = snapshot.data!;
+          var currentBodyTaskState = bodyTaskGlobalKey.currentState!;
+
+          var taskData = value.toMap();
+          var taskByDay = TaskService.instance.getTaskByDay(
+              time: currentBodyTaskState.currentDate, taskData: taskData);
           return ListView.builder(
-            itemCount: result.length,
+            itemCount: taskByDay.length,
             itemBuilder: (context, index) {
-              var modelTask = ModelTask.fromMap(
-                  result[index].data() as Map<String, dynamic>);
+              var modelTask = taskByDay.values.elementAt(index);
+              var idTask = taskByDay.keys.elementAt(index);
               return MyTaskTileOverview(
                 modelTask: modelTask,
                 color: myTaskColor[modelTask.state],
                 onRemove: () async {
-                  await RemoveTaskFromDb(result[index].id);
+                  await currentBodyTaskState.RemoveTaskFromDb(idTask);
                   // reload task
-                  setState(() {});
+                  // setState(() {});
                 },
                 onTap: () async {
-                  await OpenTaskDetail(
+                  await currentBodyTaskState.OpenTaskDetail(
                     modelTask,
-                    result[index].id,
+                    idTask,
                   );
-                  // reload task overview
-                  setState(() {});
+                  // sync task data
+                  HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
+
+                  // setState(() {});
                 },
               );
             },

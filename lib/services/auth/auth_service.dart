@@ -3,9 +3,11 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
+import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -38,6 +40,11 @@ class AuthService {
           modelUser.fcm.add(newFcmToken!);
           updateUserInfoToDatabase(modelUser);
         }
+
+        // clear old data
+        await HiveBoxes.instance.clearAllData();
+        // sync new data from firebase
+        HiveBoxes.instance.syncAllData();
       }
 
       return userCredential;

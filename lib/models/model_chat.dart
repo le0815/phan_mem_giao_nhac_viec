@@ -1,9 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive/hive.dart';
 
-class ModelChat {
+part "model_chat.g.dart";
+
+@HiveType(typeId: 1)
+class ModelChat extends HiveObject {
+  @HiveField(0)
   final String chatName;
+  @HiveField(1)
   final List members;
-  final Timestamp timeUpdate;
+  @HiveField(2)
+  final int timeUpdate;
 
   ModelChat({
     required this.chatName,
@@ -11,7 +18,7 @@ class ModelChat {
     required this.timeUpdate,
   });
 
-  factory ModelChat.fromMap(Map<String, dynamic> object) {
+  factory ModelChat.fromMap(Map<dynamic, dynamic> object) {
     return ModelChat(
         chatName: object["chatName"],
         members: object["members"],

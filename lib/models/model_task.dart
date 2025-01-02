@@ -1,16 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive/hive.dart';
 
+part "model_task.g.dart";
+
+@HiveType(typeId: 3)
 class ModelTask {
+  @HiveField(0)
   String title;
+  @HiveField(1)
   String description;
+  @HiveField(2)
   String state;
+  @HiveField(3)
   String? assigner;
+  @HiveField(4)
   String? workspaceID;
-  Timestamp? due;
-  Timestamp? startTime;
-  Timestamp createAt;
+  @HiveField(5)
+  int? due;
+  @HiveField(6)
+  int? startTime;
+  @HiveField(7)
+  int createAt;
+  @HiveField(8)
   String uid;
-  Timestamp timeUpdate;
+  @HiveField(9)
+  int timeUpdate;
   // final String? idTask;
 
   ModelTask({
@@ -27,7 +41,7 @@ class ModelTask {
     // this.idTask,
   });
 
-  factory ModelTask.fromMap(Map<String, dynamic> object) {
+  factory ModelTask.fromMap(Map<dynamic, dynamic> object) {
     return ModelTask(
       title: object["title"],
       description: object["description"],

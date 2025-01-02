@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_member_detail.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
 import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 
@@ -180,6 +181,54 @@ class WorkspaceService {
     var totalResult = {};
     for (var element in result.docs) {
       var modelWorkspace = ModelWorkspace.fromMap(element.data());
+
+      /// get MembersDetail collection inside the main collection
+      var subCollection =
+          await element.reference.collection("MembersDetail").get();
+      var membersDetail = {};
+      for (var subElement in subCollection.docs) {
+        membersDetail.addAll(
+          {
+            subElement.id: subElement.data(),
+          },
+        );
+      }
+
+      totalResult.addAll(
+        {
+          element.id: {
+            "modelWorkspace": modelWorkspace,
+            "membersDetail": membersDetail
+          }
+        },
+      );
+    }
+
+    /// the transformed data
+    // { doc id of workspace:
+    //     {
+    //     'modelWorkspace': instance of modelWorkspace,
+    //     'membersDetail': {
+    //         UID_1 : {
+    //                 role : role name 1,
+    //         },
+    //         UID_2 : {
+    //                 role : role name 2,
+    //         },
+    //     }
+    //   }
+    // }
+    return totalResult;
+  }
+
+  Future syncWorkspaceData({required String currentUID}) async {
+    var mainCollection = await _firebaseFirestore
+        .collection(_collectionName)
+        .where("members", arrayContains: currentUID);
+    var result = await mainCollection.get();
+    var totalResult = {};
+    for (var element in result.docs) {
+      var modelWorkspace = element.data();
 
       /// get MembersDetail collection inside the main collection
       var subCollection =

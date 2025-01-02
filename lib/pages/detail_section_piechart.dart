@@ -17,7 +17,7 @@ class DetailSectionPieChart extends StatefulWidget {
 }
 
 class _DetailSectionPieChartState extends State<DetailSectionPieChart> {
-  final taskService = TaskService();
+  // final taskService = TaskService();
   // use list object to changeable value after pass to function
   // @override
   // void didChangeDependencies() {
@@ -30,7 +30,7 @@ class _DetailSectionPieChartState extends State<DetailSectionPieChart> {
 
   RemoveTaskFromDb(String taskId) async {
     try {
-      await taskService.RemoveTaskFromDb(taskId);
+      await TaskService.instance.RemoveTaskFromDb(taskId);
     } catch (e) {
       if (context.mounted) {
         // show err dialog

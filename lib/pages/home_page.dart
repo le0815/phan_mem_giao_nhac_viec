@@ -8,19 +8,23 @@ import 'package:phan_mem_giao_nhac_viec/pages/body_workspace.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/user_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 
+import '../main.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomePage> createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<Widget> bodyComponents = [
     const BodyHome(),
-    const BodyTask(),
+    BodyTask(
+      key: bodyTaskGlobalKey,
+    ),
     const BodyMessage(),
     BodyWorkspace(),
   ];

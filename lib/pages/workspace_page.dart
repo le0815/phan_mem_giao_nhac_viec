@@ -10,6 +10,8 @@ import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
+import 'package:phan_mem_giao_nhac_viec/models/model_member_detail.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
@@ -39,18 +41,9 @@ class WorkspacePage extends StatefulWidget {
 }
 
 class WorkspacePageState extends State<WorkspacePage> {
-  // final event = CalendarEventData(
-  //   date: DateTime.now(),
-  //   title: "Project meeting",
-  //   description: "Today is project meeting.",
-  //   startTime: DateTime(
-  //       DateTime.now().year, DateTime.now().month, DateTime.now().day, 18, 30),
-  //   endTime: DateTime(
-  //       DateTime.now().year, DateTime.now().month, DateTime.now().day, 22),
-  // );
   ModelWorkspace? modelWorkspace;
   Map? membersDetail;
-  final taskService = TaskService();
+  // final taskService = TaskService();
   var currentUID = FirebaseAuth.instance.currentUser!.uid;
   var currentUserRole;
   List<CalendarEventData> events = [];
@@ -81,38 +74,40 @@ class WorkspacePageState extends State<WorkspacePage> {
   getAllTasks() async {
     clearTaskResult();
 
-    Map taskResult = await DatabaseService.instance
-        .GetTasksFromWorkspace(widget.workspaceID);
     // get event form database
-    taskResult.forEach(
+    HiveBoxes.instance.taskHiveBox.toMap().forEach(
       (key, value) {
+        ModelTask modelTask = ModelTask.fromMap(value);
+        // remove task was not in workspace
+        if (modelTask.workspaceID == null) {
+          return;
+        }
+        if (modelTask.workspaceID != widget.workspaceID) {
+          return;
+        }
         CalendarEventData event;
         // if task have due
-        if (value.data()["startTime"] != null) {
+        if (modelTask.startTime != null) {
           event = CalendarEventData(
-            color: myTaskColor[value.data()["state"]],
-            title: value.data()["title"],
+            color: myTaskColor[modelTask.state],
+            title: modelTask.title,
             // startTime: value.data()["startTime"],
-            date: DateTime.fromMillisecondsSinceEpoch(
-                (value.data()["startTime"] as Timestamp)
-                    .millisecondsSinceEpoch),
-            endDate: DateTime.fromMillisecondsSinceEpoch(
-                (value.data()["due"] as Timestamp).millisecondsSinceEpoch),
+            date: DateTime.fromMillisecondsSinceEpoch(modelTask.startTime!),
+            endDate: DateTime.fromMillisecondsSinceEpoch(modelTask.due!),
             event: {
-              "modelTask": value.data(),
-              "id": value.id,
+              "modelTask": modelTask,
+              "id": key,
             },
           );
         } else {
           // if task have no due
           event = CalendarEventData(
-            color: myTaskColor[value.data()["state"]],
-            title: value.data()["title"],
-            date: DateTime.fromMillisecondsSinceEpoch(
-                (value.data()["createAt"] as Timestamp).millisecondsSinceEpoch),
+            color: myTaskColor[modelTask.state],
+            title: modelTask.title,
+            date: DateTime.fromMillisecondsSinceEpoch(modelTask.createAt),
             event: {
-              "modelTask": value.data(),
-              "id": value.id,
+              "modelTask": modelTask,
+              "id": key,
             },
           );
         }
@@ -125,7 +120,7 @@ class WorkspacePageState extends State<WorkspacePage> {
 
   RemoveTaskFromDb(String taskId) async {
     try {
-      await taskService.RemoveTaskFromDb(taskId);
+      await TaskService.instance.RemoveTaskFromDb(taskId);
     } catch (e) {
       if (context.mounted) {
         // show err dialog
@@ -165,7 +160,8 @@ class WorkspacePageState extends State<WorkspacePage> {
 
   @override
   void didChangeDependencies() {
-    modelWorkspace = widget.workspaceData.entries.first.value;
+    modelWorkspace =
+        ModelWorkspace.fromMap(widget.workspaceData.entries.first.value);
     membersDetail = widget.workspaceData.entries.last.value;
     calendarController = CalendarControllerProvider.of(context).controller;
     getAllTasks();
@@ -196,12 +192,15 @@ class WorkspacePageState extends State<WorkspacePage> {
                   MyAlertDialog(
                     context,
                     msg: "Are you sure want to delete this workspace?",
-                    onOkay: () {
+                    onOkay: () async {
                       deleteWorkspace(widget.workspaceID);
                       // close alert dialog
                       Navigator.pop(context);
                       // close workspace page
                       Navigator.pop(context);
+                      // sync workspace data
+                      HiveBoxes.instance
+                          .syncData(syncType: SyncTypes.syncWorkSpace);
                     },
                   );
                 } else {
@@ -215,6 +214,9 @@ class WorkspacePageState extends State<WorkspacePage> {
                       Navigator.pop(context);
                       // close workspace page
                       Navigator.pop(context);
+                      // sync workspace data
+                      HiveBoxes.instance
+                          .syncData(syncType: SyncTypes.syncWorkSpace);
                     },
                   );
                 }
@@ -248,57 +250,7 @@ class WorkspacePageState extends State<WorkspacePage> {
             // show workspace task overview
             SizedBox(
               height: 500,
-              child: MonthView(
-                onEventTap: (event, date) async {
-                  log("event: ${event.event as Map}");
-                  // navigation to detail task page
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DetailTaskPage(
-                        onRemove: () {
-                          // show alert
-                          MyAlertDialog(
-                            context,
-                            msg: "Are you sure want to delete this task?",
-                            onOkay: () {
-                              RemoveTaskFromDb((event.event as Map)["id"]);
-                              // close alert dialog
-                              Navigator.pop(context);
-                              // switch back to right before screen
-                              Navigator.pop(context);
-                            },
-                          );
-                        },
-                        modelTask: ModelTask.fromMap(
-                            (event.event as Map)["modelTask"]),
-                        idTask: (event.event as Map)["id"],
-                        isWorkspace: true,
-                        workspaceName: modelWorkspace!.workspaceName,
-                        memberList: membersOfWorkspace,
-                      ),
-                    ),
-                  );
-                  // reload task overview
-                  getAllTasks();
-                },
-                onDateLongPress: (date) async {
-                  // navigation to add task page
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AddTask(
-                        memberList: membersOfWorkspace,
-                        workspaceID: widget.workspaceID,
-                        isWorkspace: true,
-                      ),
-                    ),
-                  );
-                  // reload task overview
-                  getAllTasks();
-                  log("cell long press date: $date");
-                },
-              ),
+              child: monthCalendar(context),
             ),
             // show annotation for the calendar
             AddVerticalSpace(8),
@@ -370,10 +322,20 @@ class WorkspacePageState extends State<WorkspacePage> {
                               userName: modelUser.userName,
                               msg: modelUser.email,
                               onRemove: () async {
-                                // remove user has the same logic as leaveWorkspace
+                                // remove user have the same logic as leaveWorkspace
                                 await leaveWorkspace(
                                     workspaceID: widget.workspaceID,
                                     uid: modelUser.uid);
+
+                                // send notification to user
+                                NotificationService.instance.sendNotification(
+                                    receiverToken: modelUser.fcm,
+                                    title:
+                                        "You was removed from ${modelWorkspace!.workspaceName} workspace!",
+                                    payload: {
+                                      0: SyncTypes.syncWorkSpace,
+                                      1: SyncTypes.syncTask,
+                                    });
 
                                 // reload data
                                 setState(() {});
@@ -391,6 +353,63 @@ class WorkspacePageState extends State<WorkspacePage> {
           ],
         ),
       ),
+    );
+  }
+
+  MonthView<Object?> monthCalendar(BuildContext context) {
+    return MonthView(
+      onEventTap: (event, date) async {
+        log("event: ${event.event as Map}");
+        // navigation to detail task page
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailTaskPage(
+              onRemove: () {
+                // show alert
+                MyAlertDialog(
+                  context,
+                  msg: "Are you sure want to delete this task?",
+                  onOkay: () {
+                    RemoveTaskFromDb((event.event as Map)["id"]);
+                    // close alert dialog
+                    Navigator.pop(context);
+                    // switch back to right before screen
+                    Navigator.pop(context);
+                  },
+                );
+              },
+              modelTask: (event.event as Map)["modelTask"],
+              idTask: (event.event as Map)["id"],
+              isWorkspace: true,
+              workspaceName: modelWorkspace!.workspaceName,
+              memberList: membersOfWorkspace,
+            ),
+          ),
+        );
+        // sync workspace data
+        await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
+        // reload task overview
+        getAllTasks();
+      },
+      onDateLongPress: (date) async {
+        // navigation to add task page
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AddTask(
+              memberList: membersOfWorkspace,
+              workspaceID: widget.workspaceID,
+              isWorkspace: true,
+            ),
+          ),
+        );
+        // sync task data
+        await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
+        // reload task overview
+        getAllTasks();
+        log("cell long press date: $date");
+      },
     );
   }
 
@@ -481,7 +500,7 @@ class WorkspacePageState extends State<WorkspacePage> {
               child: const Text("Cancel"),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 var userTile = _userTileGlobalKey.currentState;
 
                 /// if user was not selected -> show alert
@@ -505,11 +524,18 @@ class WorkspacePageState extends State<WorkspacePage> {
                   // notify to user was recently added
                   NotificationService.instance.sendNotification(
                     receiverToken: userModel.fcm,
-                    title: "You was added to ${modelWorkspace.workspaceName}",
+                    title:
+                        "You was added to ${modelWorkspace.workspaceName} workspace",
+                    payload: {
+                      0: SyncTypes.syncWorkSpace,
+                    },
                   );
-                  // reload to get latest data
-                  setState(() {});
                   Navigator.pop(context);
+                  // sync workspace data
+                  await HiveBoxes.instance
+                      .syncData(syncType: SyncTypes.syncTask);
+                  // reload UI
+                  setState(() {});
                 }
               },
               child: const Text("Add"),

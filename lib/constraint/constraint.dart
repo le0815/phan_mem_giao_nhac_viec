@@ -12,6 +12,33 @@ enum MyTaskState {
   overDue,
 }
 
+@pragma("vm:entry-point")
+class BackgroundTaskName {
+  static const String syncHiveData = "syncHiveData";
+  static const String sendDataFromIsolate = "sendDataFromIsolate";
+}
+
+class SyncTypes {
+  static const String syncTask = "syncTask";
+  static const String syncMessage = "syncMessage";
+  static const String syncWorkSpace = "syncWorkSpace";
+}
+
+class HiveBoxName {
+  static const String chatHiveBox = "chatHiveBox";
+  static const String messageHiveBox = "messageHiveBox";
+  static const String taskHiveBox = "taskHiveBox";
+  static const String userHiveBox = "userHiveBox";
+  static const String workspaceHiveBox = "workspaceHiveBox";
+  static const String memberDetailHiveBox = "memberDetailHiveBox";
+}
+
+enum NotificationPayloadType {
+  task,
+  chat,
+  workspace,
+}
+
 Map myTaskColor = {
   MyTaskState.pending.name: Colors.yellow,
   MyTaskState.inProgress.name: Colors.blue,

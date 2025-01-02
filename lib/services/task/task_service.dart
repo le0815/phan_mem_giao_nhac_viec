@@ -7,7 +7,8 @@ import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 
 class TaskService extends ChangeNotifier {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
-
+  static final TaskService instance = TaskService._();
+  TaskService._();
   // add task
   Future<void> AddTaskToDb(ModelTask task) async {
     try {
@@ -21,15 +22,32 @@ class TaskService extends ChangeNotifier {
   // get task
   Future<Map> GetTaskFromDb() async {
     // get task of current user by uid
-    var data = await _firebaseFirestore
-        .collection('Task')
-        .where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-        .get();
+    // var data = await _firebaseFirestore
+    //     .collection('Task')
+    //     .where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+    //     .get();
 
+    var currentUID = FirebaseAuth.instance.currentUser!.uid;
+
+    var data = _firebaseFirestore.collection('Task');
+    // query1 to get task of current user
+    // query 2 to get task was assigned by current user
+    var query1 = await data.where("uid", isEqualTo: currentUID).get();
+    var query2 = await data.where("assigner", isEqualTo: currentUID).get();
     var result = {};
-    for (var element in data.docs) {
-      result[result.length] = element;
-      log("data: $element");
+    for (var element in query1.docs) {
+      result.addAll(
+        {
+          element.id: element.data(),
+        },
+      );
+    }
+    for (var element in query2.docs) {
+      result.addAll(
+        {
+          element.id: element.data(),
+        },
+      );
     }
     return result;
   }
@@ -45,7 +63,7 @@ class TaskService extends ChangeNotifier {
   }
 
   // delete task
-  Future<void> UpdateTaskFromDb(String taskId, ModelTask modelTask) async {
+  Future<void> UpdateTaskToDb(String taskId, ModelTask modelTask) async {
     try {
       await _firebaseFirestore
           .collection("Task")
@@ -59,25 +77,41 @@ class TaskService extends ChangeNotifier {
     }
   }
 
-  Future<Map> GetTaskByDay(DateTime time) async {
-    // get latest update task from db
-    var result = await GetTaskFromDb();
-    var resultByDate = {};
+  Map<String, ModelTask> getTaskByDay(
+      {required DateTime time, required Map<dynamic, dynamic> taskData}) {
+    var resultByDate = <String, ModelTask>{};
+    var dateOnlyCurrentTime = ConvertToDateOnly(time);
 
-    // loop for get task with createAt itself match to the current time
-    for (var element in result.values) {
-      // element
-      Timestamp timeCreateOfTask = element.data()["createAt"];
-      // convert to date only
-      var dateOnlyTimeCreateOfTask = ConvertToDateOnly(
-          DateTime.fromMillisecondsSinceEpoch(
-              timeCreateOfTask.millisecondsSinceEpoch));
-      var dateOnlyCurrentTime = ConvertToDateOnly(time);
-
-      if (dateOnlyCurrentTime.compareTo(dateOnlyTimeCreateOfTask) == 0) {
-        resultByDate[resultByDate.length] = element;
-      }
-    }
+    // loop to get task with due time is bigger or equal to the current time
+    taskData.forEach(
+      (key, value) {
+        ModelTask modelTask = ModelTask.fromMap(value);
+        // if the task was not provide due time -> add
+        if (modelTask.due == null) {
+          resultByDate.addAll(
+            {
+              key: modelTask,
+            },
+          );
+        } else {
+          // convert due time to date only
+          var dateOnlyDueTimeOfTask = ConvertToDateOnly(
+              DateTime.fromMillisecondsSinceEpoch(modelTask.due!));
+          // convert due time to date only
+          var dateOnlyCreateTimeOfTask = ConvertToDateOnly(
+              DateTime.fromMillisecondsSinceEpoch(modelTask.startTime!));
+          // if due, create time is greater or equal than current day
+          if (dateOnlyCurrentTime.compareTo(dateOnlyDueTimeOfTask) != 1 &&
+              dateOnlyCurrentTime.compareTo(dateOnlyCreateTimeOfTask) != -1) {
+            resultByDate.addAll(
+              {
+                key: modelTask,
+              },
+            );
+          }
+        }
+      },
+    );
     return resultByDate;
     // notifyListeners();
   }

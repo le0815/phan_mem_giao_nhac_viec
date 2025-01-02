@@ -7,10 +7,14 @@ import 'package:phan_mem_giao_nhac_viec/components/my_date_time_select.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_snackbar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
+
+import '../services/database/database_service.dart';
+import '../services/notification_service/notification_service.dart';
 
 class DetailTaskPage extends StatefulWidget {
   final ModelTask modelTask;
@@ -37,9 +41,9 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
   final TextEditingController textTitleController = TextEditingController();
   final TextEditingController textDescriptionController =
       TextEditingController();
-  final TaskService taskService = TaskService();
-  Timestamp? startTime;
-  Timestamp? due;
+  // final TaskService taskService = TaskService();
+  int? startTime;
+  int? due;
   final workSpaceFiledGlobalKey = GlobalKey<WorkspaceFieldState>();
 
   bool isEdit = false;
@@ -76,9 +80,27 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
         }
 
         // update timeUpdate
-        widget.modelTask.timeUpdate = Timestamp.now();
+        widget.modelTask.timeUpdate = DateTime.now().millisecondsSinceEpoch;
 
-        await taskService.UpdateTaskFromDb(widget.idTask, widget.modelTask);
+        await TaskService.instance
+            .UpdateTaskToDb(widget.idTask, widget.modelTask);
+
+        if (widget.isWorkspace) {
+          // send to assignees
+          ModelUser modelMember =
+              await DatabaseService.instance.getUserByUID(widget.modelTask.uid);
+          NotificationService.instance.sendNotification(
+              receiverToken: modelMember.fcm,
+              title:
+                  "Your ${widget.modelTask.title} workspace task was edited!",
+              payload: {
+                0: SyncTypes.syncTask,
+              });
+          await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
+        } else {
+          await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
+        }
+
         if (context.mounted) {
           MySnackBar(context, "Task Modified");
         }
@@ -124,8 +146,8 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
             icon: isEdit ? const Icon(Icons.check) : const Icon(Icons.edit),
           ),
           IconButton(
-            onPressed: () {
-              widget.onRemove();
+            onPressed: () async {
+              await widget.onRemove();
             },
             icon: const Icon(Icons.delete_outline),
           )
@@ -178,7 +200,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
               AddVerticalSpace(10),
               // created at
               Text(
-                "Created at: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.createAt.millisecondsSinceEpoch)}",
+                "Created at: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.createAt)}",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -260,14 +282,14 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
               Text(startTime == null
                   ? widget.modelTask.startTime == null
                       ? ""
-                      : "Start: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.startTime!.millisecondsSinceEpoch).toLocal()}"
-                  : "Start: ${DateTime.fromMillisecondsSinceEpoch(startTime!.millisecondsSinceEpoch).toLocal()}"),
+                      : "Start: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.startTime!).toLocal()}"
+                  : "Start: ${DateTime.fromMillisecondsSinceEpoch(startTime!).toLocal()}"),
               // due
               Text(due == null
                   ? widget.modelTask.due == null
                       ? ""
-                      : "Due: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.due!.millisecondsSinceEpoch).toLocal()}"
-                  : "Due: ${DateTime.fromMillisecondsSinceEpoch(due!.millisecondsSinceEpoch).toLocal()}"),
+                      : "Due: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.due!).toLocal()}"
+                  : "Due: ${DateTime.fromMillisecondsSinceEpoch(due!).toLocal()}"),
             ],
           ),
         ],
