@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -12,7 +11,6 @@ import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../components/my_legend_chart.dart';
-
 import '../local_database/hive_boxes.dart';
 import '../services/database/database_service.dart';
 
@@ -21,52 +19,10 @@ class BodyHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Column(
         children: [
-          // search box
-          // SearchBox(),
-          // test btn
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                OutlinedButton(
-                  onPressed: () async {
-                    var uniqueID = DateTime.now().second;
-                    await Workmanager().registerOneOffTask(
-                      uniqueID.toString(),
-                      BackgroundTaskName.syncHiveData,
-                      initialDelay: Duration(seconds: 10),
-                    );
-                  },
-                  child: Text("Background service"),
-                ),
-                OutlinedButton(
-                  onPressed: () async {
-                    // await NotificationService.instance.showNotify(
-                    //   id: 0,
-                    //   title: "message from background service",
-                    //   body:
-                    //       "I've been a rich man, I've been a poor man. And I choose rich every fucking time!",
-                    // );
-                    await NotificationService.instance.createNotification(
-                        title: "title",
-                        body: "body",
-                        payload: {
-                          "syncType": "fasdf",
-                        });
-                  },
-                  child: Text("Send Notification"),
-                ),
-              ],
-            ),
-          ),
-          AddVerticalSpace(20),
-          // today task
-          // TodayTask(),
-          AddVerticalSpace(16),
           // Overview
           OverView(),
         ],
@@ -125,7 +81,7 @@ class BodyHome extends StatelessWidget {
 }
 
 class OverView extends StatefulWidget {
-  OverView({
+  const OverView({
     super.key,
   });
 
@@ -151,22 +107,6 @@ class _OverViewState extends State<OverView> {
             color: Colors.black,
           ),
           const chatLegend(),
-          OutlinedButton(
-            onPressed: () async {
-              try {
-                HiveBoxes.instance.syncAllData();
-              } catch (e) {
-                log("error while sync data: $e");
-              }
-            },
-            child: Text("sync data"),
-          ),
-          OutlinedButton(
-            onPressed: () {
-              BackgroundService.instance.setScheduleAlarm();
-            },
-            child: Text("test alarm"),
-          ),
           Expanded(
             child: ValueListenableBuilder(
               valueListenable: HiveBoxes.instance.taskHiveBox.listenable(),
