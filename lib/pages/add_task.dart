@@ -12,6 +12,7 @@ import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
+import 'package:phan_mem_giao_nhac_viec/services/background_service/background_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
@@ -87,11 +88,7 @@ class _AddTaskState extends State<AddTask> {
           await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
         }
         // create alarm for the task
-        // NotificationService.instance.scheduleBackgroundNotify(
-        //   DateTime.fromMillisecondsSinceEpoch(
-        //     widget.startTime!.millisecondsSinceEpoch,
-        //   ),
-        // );
+        BackgroundService.instance.setScheduleAlarm();
 
         // close loading indicator
         if (context.mounted) {

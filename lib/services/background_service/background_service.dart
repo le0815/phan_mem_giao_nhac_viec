@@ -27,6 +27,7 @@ class BackgroundService {
   }
 
   setScheduleAlarm() async {
+    log("setting schedule alarm");
     var taskHiveBox = HiveBoxes.instance.taskHiveBox.toMap();
     NotificationService notificationService = NotificationService.instance;
 

@@ -13,6 +13,7 @@ import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
 
+import '../services/background_service/background_service.dart';
 import '../services/database/database_service.dart';
 import '../services/notification_service/notification_service.dart';
 
@@ -100,7 +101,8 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
         } else {
           await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
         }
-
+        // update schedule alarm
+        BackgroundService.instance.setScheduleAlarm();
         if (context.mounted) {
           MySnackBar(context, "Task Modified");
         }
