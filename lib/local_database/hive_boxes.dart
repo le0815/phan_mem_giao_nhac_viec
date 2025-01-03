@@ -44,6 +44,7 @@ class HiveBoxes {
   }
 
   syncAllData() async {
+    log("syncing all data from firebase");
     // get data from database
     var data = await DatabaseService.instance.getAllDataFromUID();
     // clear all previous data
@@ -58,6 +59,7 @@ class HiveBoxes {
 
   syncData({required String syncType}) async {
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
+    log("syncing $syncType data from firebase");
     switch (syncType) {
       case SyncTypes.syncTask:
         // get data from database

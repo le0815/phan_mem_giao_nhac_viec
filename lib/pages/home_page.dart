@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_drawer.dart';
@@ -8,6 +10,7 @@ import 'package:phan_mem_giao_nhac_viec/pages/body_workspace.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/user_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 
+import '../local_database/hive_boxes.dart';
 import '../main.dart';
 
 class HomePage extends StatefulWidget {
@@ -38,6 +41,14 @@ class HomePageState extends State<HomePage> {
   int btmNavIdx = 0;
   refreshHomePage() {
     setState(() {});
+  }
+
+  Future _refresh() async {
+    try {
+      await HiveBoxes.instance.syncAllData();
+    } catch (e) {
+      log("error while sync data: $e");
+    }
   }
 
   @override
@@ -83,7 +94,16 @@ class HomePageState extends State<HomePage> {
         ],
       ),
       drawer: const MyDrawer(),
-      body: bodyComponents[btmNavIdx],
+      // use stack cause RefreshIndicator only works with ListView by design
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        child: Stack(
+          children: [
+            ListView(),
+            bodyComponents[btmNavIdx],
+          ],
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: btmNavIdx,
