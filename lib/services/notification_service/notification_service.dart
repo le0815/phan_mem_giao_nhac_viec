@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
-import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/services/auth/auth_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/background_service/background_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/ultis.dart';
@@ -20,7 +19,6 @@ import 'package:workmanager/workmanager.dart';
 import '../../constraint/constraint.dart';
 import '../../models/model_user.dart';
 import '../database/database_service.dart';
-import '../task/task_service.dart';
 
 class NotificationService {
   static final NotificationService instance = NotificationService._();
@@ -126,7 +124,7 @@ class NotificationService {
         title: title,
         body: body,
         payload: payload,
-        category: NotificationCategory.Alarm,
+        category: NotificationCategory.Reminder,
       ),
       schedule: NotificationCalendar(
         second: 0,
