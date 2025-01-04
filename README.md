@@ -1,5 +1,6 @@
 ## This is Flutter task managerment android application 
-### First of all, I want to say special thanks to these wonderful tester. This project would not have been completed without you guys:
+### First of all, I want to say special thanks to these wonderful people. This project would not have been completed without you guys:
+- [LuuChinh](https://github.com/LuuChinh)
 - [NBC](https://web.facebook.com/coldbrew1206)
 - ` Nguyen Trung Hoa `
 ### The following technologies this project
