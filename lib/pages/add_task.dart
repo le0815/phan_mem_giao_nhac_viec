@@ -81,7 +81,8 @@ class _AddTaskState extends State<AddTask> {
               receiverToken: modelMember.fcm,
               title: "You have a new task in your workspace!",
               payload: {
-                0: SyncTypes.syncTask,
+                "notificationType": "remote",
+                "0": SyncTypes.syncTask,
               });
           await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
         } else {
