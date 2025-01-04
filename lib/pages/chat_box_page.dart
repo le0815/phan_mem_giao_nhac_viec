@@ -31,6 +31,7 @@ class ChatBoxPage extends StatefulWidget {
 class _ChatBoxPageState extends State<ChatBoxPage> {
   final String currentUID = FirebaseAuth.instance.currentUser!.uid;
   final ScrollController _scrollController = ScrollController();
+  bool isSending = false;
   ModelUser? modelMember;
   getModelMember() async {
     var memberUID = widget.modelChat.members
@@ -50,6 +51,11 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
   }
 
   Future<void> sendMessage(String message) async {
+    // set state to show the loading indicator
+    setState(() {
+      isSending = true;
+    });
+    // store message to firebase
     await ChatService.instance.sendMessage(
       chatDocID: widget.chatDocId,
       modelMessage: ModelMessage(
@@ -58,6 +64,25 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
         senderUID: currentUID,
       ),
     );
+    log("fcm member: ${modelMember!.fcm}");
+
+    // notify to user in chat box
+    NotificationService.instance.sendNotification(
+        receiverToken: modelMember!.fcm,
+        title: "You have new message from ${modelMember!.userName}",
+        body: message,
+        payload: {
+          "notificationType": "remote",
+          '0': SyncTypes.syncMessage,
+        });
+
+    // sync message into hive
+    log("sync new message sent");
+    await HiveBoxes.instance.syncData(syncType: SyncTypes.syncMessage);
+
+    setState(() {
+      isSending = false;
+    });
   }
 
   scrollDown() {
@@ -124,35 +149,23 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
             ),
           ),
           // send message button
-          IconButton(
-              onPressed: () async {
-                if (messageTextController.text.isNotEmpty) {
-                  await sendMessage(messageTextController.text);
-                  log("fcm member: ${modelMember!.fcm}");
-
-                  // notify to user in chat box
-                  NotificationService.instance.sendNotification(
-                      receiverToken: modelMember!.fcm,
-                      title:
-                          "You have new message from ${modelMember!.userName}",
-                      body: messageTextController.text,
-                      payload: {
-                        "notificationType": "remote",
-                        '0': SyncTypes.syncMessage,
-                      });
-
-                  // sync message into hive
-                  log("sync new message sent");
-                  await HiveBoxes.instance
-                      .syncData(syncType: SyncTypes.syncMessage);
-
-                  messageTextController.clear();
-
-                  // scroll down
-                  scrollDown();
-                }
-              },
-              icon: Icon(Icons.send_outlined))
+          isSending
+              ? const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(),
+                )
+              : IconButton(
+                  onPressed: () async {
+                    if (messageTextController.text.isNotEmpty) {
+                      await sendMessage(messageTextController.text);
+                      // clear the text in textfield
+                      messageTextController.clear();
+                      // scroll down
+                      scrollDown();
+                    }
+                  },
+                  icon: const Icon(Icons.send_outlined),
+                ),
         ],
       ),
     );
