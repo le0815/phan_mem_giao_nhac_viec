@@ -20,4 +20,4 @@
 ![chat_box_screenshot](https://github.com/user-attachments/assets/10662f90-22b4-4535-9a7f-b43dd72a70c6)
 ![workspace_detail_screenshot](https://github.com/user-attachments/assets/42dfd7f3-48e7-414e-b274-600d0a922559)
 
-## If you discover any bugs, please open an ` issue `, and I will address it. Thank you.
+## If you discover any bugs, please open an ` issue ` and I will address it. Thank you.
