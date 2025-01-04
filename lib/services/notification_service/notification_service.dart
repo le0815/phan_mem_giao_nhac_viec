@@ -204,6 +204,7 @@ class NotificationService {
           Uri.parse(fcmApiUrl),
           headers: headers,
           body: jsonEncode(message),
+          // body: message,
         );
 
         if (response.statusCode == 200) {
@@ -219,6 +220,7 @@ class NotificationService {
   }
 
   Future removeFcmToken() async {
+    log("removing fcm token");
     // get current user info
     ModelUser modelUser = await DatabaseService.instance
         .getUserByUID(FirebaseAuth.instance.currentUser!.uid);
@@ -235,20 +237,36 @@ class NotificationService {
     log("handling notification data in alive mode");
     Map? payload = notificationData["payload"];
     if (payload != null && payload.isNotEmpty) {
-      // sync data
-      if (payload["syncType"] != null) {
-        payload.forEach(
-          (key, value) {
-            HiveBoxes.instance.syncData(syncType: value);
-          },
-        );
-        // set schedule alarm for task
-        BackgroundService.instance.setScheduleAlarm();
-      }
+      // form of the payload
+      // {
+      //   "notificationType": 'schedule' or 'remote'
+      //   "0": syncTask1,
+      //   "1": syncTask2,
+      // }
 
-      // if notification is schedule alarm -> update task state
+      // handle notification
       if (payload["notificationType"] != null) {
-        BackgroundService.instance.updateTaskState(payload);
+        // if is local schedule notification
+        if (payload["notificationType"] == "schedule") {
+          BackgroundService.instance.updateTaskState(payload);
+        }
+        // if is remote notification
+        if (payload["notificationType"] == "remote") {
+          payload.forEach(
+            (key, value) {
+              // skip if value of payload id notification type
+              if (key == "notificationType") {
+                return;
+              }
+              // sync data
+              HiveBoxes.instance.syncData(syncType: value);
+              // if sync type is syncTask -> update schedule notification
+              if (value == SyncTypes.syncTask) {
+                BackgroundService.instance.setScheduleAlarm();
+              }
+            },
+          );
+        }
       }
     }
   }
@@ -258,18 +276,41 @@ class NotificationService {
     log("handling notification data in terminated mode");
     Map? payload = notificationData["payload"];
     if (payload != null && payload.isNotEmpty) {
-      // use workmanager to sync data
-      if (payload["syncType"] != null) {
-        Workmanager().registerOneOffTask(
-          const Uuid().v1().toString(),
-          BackgroundTaskName.syncHiveData,
-          inputData: {"syncType": payload},
-        );
-      }
+      // form of the payload
+      // {
+      //   "notificationType": 'schedule' or 'remote'
+      //   "0": syncTask1,
+      //   "1": syncTask2,
+      // }
 
-      // if notification is schedule alarm -> update task state
+      // handle notification
       if (payload["notificationType"] != null) {
-        BackgroundService.instance.updateTaskState(payload);
+        // if is local schedule notification
+        if (payload["notificationType"] == "schedule") {
+          // use workmanager to sync data
+          Workmanager().registerOneOffTask(
+            const Uuid().v1().toString(),
+            BackgroundTaskName.syncHiveData,
+            inputData: {"syncType": SyncTypes.syncTask},
+          );
+        }
+        // if is remote notification
+        if (payload["notificationType"] == "remote") {
+          payload.forEach(
+            (key, value) {
+              // skip if value of payload id notification type
+              if (key == "notificationType") {
+                return;
+              }
+              // use workmanager to sync data
+              Workmanager().registerOneOffTask(
+                const Uuid().v1().toString(),
+                BackgroundTaskName.syncHiveData,
+                inputData: {"syncType": payload},
+              );
+            },
+          );
+        }
       }
     }
   }

@@ -333,8 +333,9 @@ class WorkspacePageState extends State<WorkspacePage> {
                                     title:
                                         "You was removed from ${modelWorkspace!.workspaceName} workspace!",
                                     payload: {
-                                      0: SyncTypes.syncWorkSpace,
-                                      1: SyncTypes.syncTask,
+                                      "notificationType": "remote",
+                                      "0": SyncTypes.syncWorkSpace,
+                                      "1": SyncTypes.syncTask,
                                     });
 
                                 // reload data
@@ -527,7 +528,8 @@ class WorkspacePageState extends State<WorkspacePage> {
                     title:
                         "You was added to ${modelWorkspace.workspaceName} workspace",
                     payload: {
-                      0: SyncTypes.syncWorkSpace,
+                      "notificationType": "remote",
+                      "0": SyncTypes.syncWorkSpace,
                     },
                   );
                   Navigator.pop(context);

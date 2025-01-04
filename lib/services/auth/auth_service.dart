@@ -57,6 +57,7 @@ class AuthService {
   // sign out
   Future<void> SignOut() async {
     try {
+      log("signing out");
       // remove fcmToken
       await NotificationService.instance.removeFcmToken();
       await _firebaseAuth.signOut();

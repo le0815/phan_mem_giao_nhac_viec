@@ -163,7 +163,13 @@ class WorkspaceService {
       },
     );
     NotificationService.instance.sendNotification(
-        receiverToken: ownerModelUser!.fcm, title: "$uid just left group");
+      receiverToken: ownerModelUser!.fcm,
+      title: "$uid just left group",
+      payload: {
+        "notificationType": "remote",
+        "0": SyncTypes.syncWorkSpace,
+      },
+    );
   }
 
   Stream<QuerySnapshot> workspaceStream(String currentUID) {

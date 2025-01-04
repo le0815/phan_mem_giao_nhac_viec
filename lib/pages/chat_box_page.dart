@@ -137,7 +137,8 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
                           "You have new message from ${modelMember!.userName}",
                       body: messageTextController.text,
                       payload: {
-                        0: SyncTypes.syncMessage,
+                        "notificationType": "remote",
+                        '0': SyncTypes.syncMessage,
                       });
 
                   // sync message into hive
