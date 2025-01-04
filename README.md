@@ -3,7 +3,7 @@
 - [LuuChinh](https://github.com/LuuChinh)
 - [NBC](https://web.facebook.com/coldbrew1206)
 - ` Nguyen Trung Hoa `
-### The following technologies this project
+### The technologies utilized in this project include the following.
 - Firebase
   - [firebase_core](https://pub.dev/packages/firebase_core)
   - [firebase_messaging](https://pub.dev/packages/firebase_messaging)
