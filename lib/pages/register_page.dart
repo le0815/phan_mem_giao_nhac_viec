@@ -1,8 +1,7 @@
 import 'dart:developer';
-
-import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/services/auth/auth_service.dart';
@@ -24,7 +23,7 @@ class RegisterPage extends StatelessWidget {
         log("pwd must match");
         MyAlertDialog(
           context,
-          msg: "Password must match!",
+          msg: AppLocalizations.of(context)!.pwdMustMatch,
           onOkay: () => Navigator.pop(context),
         );
         return;
@@ -65,38 +64,42 @@ class RegisterPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "Register Page",
-                    style: TextStyle(fontSize: 24),
+                  Text(
+                    AppLocalizations.of(context)!.register,
+                    style: const TextStyle(fontSize: 24),
                   ),
                   AddVerticalSpace(40),
                   // User Name
                   MyTextfield(
-                    textFieldHint: "User Name",
+                    textFieldHint: AppLocalizations.of(context)!.userName,
                     textController: userNameTextController,
                   ),
                   AddVerticalSpace(20),
                   // Email Address
                   MyTextfield(
-                    textFieldHint: "Email Address",
+                    textFieldHint: AppLocalizations.of(context)!.emailAddress,
                     textController: emailTextController,
                   ),
                   AddVerticalSpace(20),
                   // pwd
                   MyTextfield(
-                    textFieldHint: "Password",
+                    textFieldHint: AppLocalizations.of(context)!.password,
                     textController: pwdTextController,
                   ),
                   AddVerticalSpace(20),
                   // confirm
                   MyTextfield(
-                    textFieldHint: "Confirm Password",
+                    textFieldHint:
+                        AppLocalizations.of(context)!.confirmPassword,
                     textController: confirmTextController,
                   ),
                   // register btn
                   AddVerticalSpace(20),
-                  RegisterButton(emailTextController, pwdTextController,
-                      confirmTextController, OnRegister),
+                  RegisterButton(
+                      emailTextController: emailTextController,
+                      pwdTextController: pwdTextController,
+                      confirmTextController: confirmTextController,
+                      OnRegister: OnRegister),
                   AddVerticalSpace(20),
                   // Have an account? Login now.
                   Row(
@@ -104,9 +107,9 @@ class RegisterPage extends StatelessWidget {
                     children: [
                       GestureDetector(
                         onTap: onTap,
-                        child: const Text(
-                          "Have an account? Login now.",
-                          style: TextStyle(
+                        child: Text(
+                          AppLocalizations.of(context)!.haveAnAccountLoginNow,
+                          style: const TextStyle(
                             color: Colors.blue,
                             decoration: TextDecoration.underline,
                           ),
@@ -122,12 +125,24 @@ class RegisterPage extends StatelessWidget {
       ),
     );
   }
+}
 
-  Row RegisterButton(
-      TextEditingController emailTextController,
-      TextEditingController pwdTextController,
-      TextEditingController confirmTextController,
-      Future<Null> OnRegister()) {
+class RegisterButton extends StatelessWidget {
+  const RegisterButton({
+    super.key,
+    required this.emailTextController,
+    required this.pwdTextController,
+    required this.confirmTextController,
+    required this.OnRegister,
+  });
+
+  final TextEditingController emailTextController;
+  final TextEditingController pwdTextController;
+  final TextEditingController confirmTextController;
+  final Future<Null> Function() OnRegister;
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       children: [
         Expanded(
@@ -145,11 +160,11 @@ class RegisterPage extends StatelessWidget {
               log("confirm: ${confirmTextController.text}");
               OnRegister();
             },
-            child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 14),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 14),
               child: Text(
-                "Register",
-                style: TextStyle(fontSize: 18),
+                AppLocalizations.of(context)!.register,
+                style: const TextStyle(fontSize: 18),
               ),
             ),
           ),

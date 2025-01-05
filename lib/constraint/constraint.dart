@@ -31,6 +31,7 @@ class HiveBoxName {
   static const String userHiveBox = "userHiveBox";
   static const String workspaceHiveBox = "workspaceHiveBox";
   static const String memberDetailHiveBox = "memberDetailHiveBox";
+  static const String userSettingHiveBox = "memberDetailHiveBox";
 }
 
 enum NotificationPayloadType {

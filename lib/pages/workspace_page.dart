@@ -1,17 +1,17 @@
 import 'dart:developer';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:calendar_view/calendar_view.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:provider/provider.dart';
+
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
-import 'package:phan_mem_giao_nhac_viec/models/model_member_detail.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
@@ -22,7 +22,6 @@ import 'package:phan_mem_giao_nhac_viec/services/notification_service/notificati
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
-import 'package:provider/provider.dart';
 
 import '../components/my_legend_chart.dart';
 
@@ -191,7 +190,8 @@ class WorkspacePageState extends State<WorkspacePage> {
                 if (MyWorkspaceRole.values.first.name == currentUserRole) {
                   MyAlertDialog(
                     context,
-                    msg: "Are you sure want to delete this workspace?",
+                    msg: AppLocalizations.of(context)!
+                        .areYouSureWantToDeleteThisWorkspace,
                     onOkay: () async {
                       deleteWorkspace(widget.workspaceID);
                       // close alert dialog
@@ -206,7 +206,8 @@ class WorkspacePageState extends State<WorkspacePage> {
                 } else {
                   MyAlertDialog(
                     context,
-                    msg: "Are you sure want to leave this workspace?",
+                    msg: AppLocalizations.of(context)!
+                        .areYouSureWantToLeaveThisWorkspace,
                     onOkay: () async {
                       await leaveWorkspace(
                           workspaceID: widget.workspaceID, uid: currentUID);
@@ -223,9 +224,9 @@ class WorkspacePageState extends State<WorkspacePage> {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 0,
-                child: Text('Add member'),
+                child: Text(AppLocalizations.of(context)!.addMember),
               ),
               // if user is owner => delete workspace
               // if user is member => leave workspace
@@ -233,8 +234,8 @@ class WorkspacePageState extends State<WorkspacePage> {
                 value: 1,
                 child: Text(
                   MyWorkspaceRole.values.first.name == currentUserRole
-                      ? 'Delete workspace'
-                      : "Leave Workspace",
+                      ? AppLocalizations.of(context)!.deleteWorkspace
+                      : AppLocalizations.of(context)!.leaveWorkspace,
                   style: const TextStyle(
                     color: Colors.red,
                   ),
@@ -262,9 +263,11 @@ class WorkspacePageState extends State<WorkspacePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       myLegendChart(
-                          annotation: "Pending", color: Colors.yellow),
+                          annotation: AppLocalizations.of(context)!.pending,
+                          color: Colors.yellow),
                       myLegendChart(
-                          annotation: "In progress", color: Colors.blue),
+                          annotation: AppLocalizations.of(context)!.inProgress,
+                          color: Colors.blue),
                     ],
                   ),
                   AddHorizontalSpace(10),
@@ -272,8 +275,11 @@ class WorkspacePageState extends State<WorkspacePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       myLegendChart(
-                          annotation: "Completed", color: Colors.green),
-                      myLegendChart(annotation: "Over due", color: Colors.red),
+                          annotation: AppLocalizations.of(context)!.completed,
+                          color: Colors.green),
+                      myLegendChart(
+                          annotation: AppLocalizations.of(context)!.overDue,
+                          color: Colors.red),
                     ],
                   ),
                 ],
@@ -290,10 +296,10 @@ class WorkspacePageState extends State<WorkspacePage> {
               ),
               child: Column(
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Text("Members",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(AppLocalizations.of(context)!.members,
+                          style: const TextStyle(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   const Divider(
@@ -309,7 +315,7 @@ class WorkspacePageState extends State<WorkspacePage> {
                           return const MyLoadingIndicator();
                         }
                         if (!snapshot.hasData) {
-                          return const Text("No member");
+                          return Text(AppLocalizations.of(context)!.noMember);
                         }
 
                         var result = snapshot.data;
@@ -330,8 +336,9 @@ class WorkspacePageState extends State<WorkspacePage> {
                                 // send notification to user
                                 NotificationService.instance.sendNotification(
                                     receiverToken: modelUser.fcm,
-                                    title:
-                                        "You was removed from ${modelWorkspace!.workspaceName} workspace!",
+                                    title: AppLocalizations.of(context)!
+                                        .youWasRemovedFromWorkspace(
+                                            modelWorkspace!.workspaceName),
                                     payload: {
                                       "notificationType": "remote",
                                       "0": SyncTypes.syncWorkSpace,
@@ -370,7 +377,8 @@ class WorkspacePageState extends State<WorkspacePage> {
                 // show alert
                 MyAlertDialog(
                   context,
-                  msg: "Are you sure want to delete this task?",
+                  msg: AppLocalizations.of(context)!
+                      .areYouSureWantToDeleteThisTask,
                   onOkay: () {
                     RemoveTaskFromDb((event.event as Map)["id"]);
                     // close alert dialog
@@ -432,7 +440,8 @@ class WorkspacePageState extends State<WorkspacePage> {
                   builder: (context, value, child) {
                     return MyTextfield(
                       textController: searchPhaseController,
-                      textFieldHint: "Search user to add",
+                      textFieldHint:
+                          AppLocalizations.of(context)!.searchUserToAdd,
                       prefixIcon: const Icon(Icons.search_outlined),
                       onPressed: () {
                         value.searchUser(searchPhaseController.text);
@@ -448,7 +457,7 @@ class WorkspacePageState extends State<WorkspacePage> {
                   child: Consumer<DatabaseService>(
                     builder: (context, value, child) {
                       return value.result.isEmpty
-                          ? const Text("Not found!")
+                          ? Text(AppLocalizations.of(context)!.notFound)
                           : ListView.builder(
                               itemCount: value.result.length,
                               itemBuilder: (context, index) {
@@ -461,12 +470,13 @@ class WorkspacePageState extends State<WorkspacePage> {
                                       .addPostFrameCallback((_) {
                                     MyAlertDialog(
                                       context,
-                                      msg: "User was existed in the workspace",
+                                      msg: AppLocalizations.of(context)!
+                                          .userWasExistedInTheWorkspace,
                                       onOkay: () => Navigator.pop(context),
                                     );
                                   });
-                                  return const Text(
-                                      "User was existed in the workspace");
+                                  return Text(AppLocalizations.of(context)!
+                                      .userWasExistedInTheWorkspace);
                                 }
                                 return GestureDetector(
                                   onTap: () {
@@ -498,7 +508,7 @@ class WorkspacePageState extends State<WorkspacePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () async {
@@ -508,7 +518,7 @@ class WorkspacePageState extends State<WorkspacePage> {
                 if (userTile == null || userTile.widget.isSelected == false) {
                   MyAlertDialog(
                     context,
-                    msg: "User must be selected",
+                    msg: AppLocalizations.of(context)!.userMustBeSelected,
                     onOkay: () => Navigator.pop(context),
                   );
                 } else {
@@ -525,8 +535,8 @@ class WorkspacePageState extends State<WorkspacePage> {
                   // notify to user was recently added
                   NotificationService.instance.sendNotification(
                     receiverToken: userModel.fcm,
-                    title:
-                        "You was added to ${modelWorkspace.workspaceName} workspace",
+                    title: AppLocalizations.of(context)!
+                        .youWasAddedToWorkspace(modelWorkspace.workspaceName),
                     payload: {
                       "notificationType": "remote",
                       "0": SyncTypes.syncWorkSpace,
@@ -540,7 +550,7 @@ class WorkspacePageState extends State<WorkspacePage> {
                   setState(() {});
                 }
               },
-              child: const Text("Add"),
+              child: Text(AppLocalizations.of(context)!.add),
             ),
           ],
         );

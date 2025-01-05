@@ -1,5 +1,5 @@
 import 'dart:developer';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_elevated_button_long.dart';
@@ -49,20 +49,20 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "Login Page",
+                  Text(
+                    AppLocalizations.of(context)!.login,
                     style: TextStyle(fontSize: 24),
                   ),
                   AddVerticalSpace(40),
                   // usr name
                   MyTextfield(
-                    textFieldHint: "User Name",
+                    textFieldHint: AppLocalizations.of(context)!.userName,
                     textController: usrNameTextController,
                   ),
                   AddVerticalSpace(20),
                   // pwd
                   MyTextfield(
-                    textFieldHint: "Password",
+                    textFieldHint: AppLocalizations.of(context)!.password,
                     textController: pwdTextController,
                   ),
 
@@ -75,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                           onPress: () {
                             OnSignIn();
                           },
-                          title: "Sign In",
+                          title: AppLocalizations.of(context)!.signIn,
                         ),
                       ),
                     ],
@@ -87,9 +87,9 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       GestureDetector(
                         onTap: widget.onTap,
-                        child: const Text(
-                          "Not have an account yet? Register now.",
-                          style: TextStyle(
+                        child: Text(
+                          AppLocalizations.of(context)!.notHaveAnAccountYet,
+                          style: const TextStyle(
                             color: Colors.blue,
                             decoration: TextDecoration.underline,
                           ),

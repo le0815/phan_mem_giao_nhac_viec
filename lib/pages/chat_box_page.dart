@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
@@ -31,6 +31,7 @@ class ChatBoxPage extends StatefulWidget {
 class _ChatBoxPageState extends State<ChatBoxPage> {
   final String currentUID = FirebaseAuth.instance.currentUser!.uid;
   final ScrollController _scrollController = ScrollController();
+  bool isSending = false;
   ModelUser? modelMember;
   getModelMember() async {
     var memberUID = widget.modelChat.members
@@ -50,6 +51,11 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
   }
 
   Future<void> sendMessage(String message) async {
+    // set state to show the loading indicator
+    setState(() {
+      isSending = true;
+    });
+    // store message to firebase
     await ChatService.instance.sendMessage(
       chatDocID: widget.chatDocId,
       modelMessage: ModelMessage(
@@ -58,13 +64,33 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
         senderUID: currentUID,
       ),
     );
+    log("fcm member: ${modelMember!.fcm}");
+
+    // notify to user in chat box
+    NotificationService.instance.sendNotification(
+        receiverToken: modelMember!.fcm,
+        title:
+            "${AppLocalizations.of(context)!.youHaveNewMessageFrom} ${modelMember!.userName}",
+        body: message,
+        payload: {
+          "notificationType": "remote",
+          '0': SyncTypes.syncMessage,
+        });
+
+    // sync message into hive
+    log("sync new message sent");
+    await HiveBoxes.instance.syncData(syncType: SyncTypes.syncMessage);
+
+    setState(() {
+      isSending = false;
+    });
   }
 
   scrollDown() {
     _scrollController.animateTo(
       _scrollController.position.maxScrollExtent,
       duration: const Duration(seconds: 1),
-      curve: Curves.fastOutSlowIn,
+      curve: Curves.easeInOutSine,
     );
   }
 
@@ -74,7 +100,7 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Chat name"),
+        title: const Text("Chat name"),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -120,39 +146,28 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
           Expanded(
             child: MyTextfield(
               textController: messageTextController,
-              textFieldHint: "Enter message here",
+              textFieldHint: AppLocalizations.of(context)!.enterMessageHere,
             ),
           ),
           // send message button
-          IconButton(
-              onPressed: () async {
-                if (messageTextController.text.isNotEmpty) {
-                  await sendMessage(messageTextController.text);
-                  log("fcm member: ${modelMember!.fcm}");
-
-                  // notify to user in chat box
-                  NotificationService.instance.sendNotification(
-                      receiverToken: modelMember!.fcm,
-                      title:
-                          "You have new message from ${modelMember!.userName}",
-                      body: messageTextController.text,
-                      payload: {
-                        "notificationType": "remote",
-                        '0': SyncTypes.syncMessage,
-                      });
-
-                  // sync message into hive
-                  log("sync new message sent");
-                  await HiveBoxes.instance
-                      .syncData(syncType: SyncTypes.syncMessage);
-
-                  messageTextController.clear();
-
-                  // scroll down
-                  scrollDown();
-                }
-              },
-              icon: Icon(Icons.send_outlined))
+          // if message is sending -> the send button will be replaced by loading indicator
+          isSending
+              ? const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(),
+                )
+              : IconButton(
+                  onPressed: () async {
+                    if (messageTextController.text.isNotEmpty) {
+                      await sendMessage(messageTextController.text);
+                      // clear the text in textfield
+                      messageTextController.clear();
+                      // scroll down
+                      scrollDown();
+                    }
+                  },
+                  icon: const Icon(Icons.send_outlined),
+                ),
         ],
       ),
     );
@@ -176,8 +191,8 @@ class MessageHiveStream extends StatelessWidget {
       builder: (context, value, child) {
         Map messageData = value.toMap()[chatDocId]["modelMessages"];
         if (messageData.isEmpty) {
-          return const Center(
-            child: Text("Empty message!"),
+          return Center(
+            child: Text(AppLocalizations.of(context)!.emptyMessage),
           );
         }
 

@@ -1,6 +1,4 @@
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -73,19 +71,19 @@ class PopupDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text(
-        "Create new workspace",
-        style: TextStyle(fontSize: 16),
+      title: Text(
+        AppLocalizations.of(context)!.createNewWorkspace,
+        style: const TextStyle(fontSize: 16),
       ),
       // workspace name text field
       content: MyTextfield(
         textController: workspaceNameController,
-        textFieldHint: "Enter workspace name",
+        textFieldHint: AppLocalizations.of(context)!.enterWorkspaceName,
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text("Cancel"),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         TextButton(
           onPressed: () async {
@@ -103,7 +101,7 @@ class PopupDialog extends StatelessWidget {
             // sync workspace data
             HiveBoxes.instance.syncData(syncType: SyncTypes.syncWorkSpace);
           },
-          child: const Text("Add"),
+          child: Text(AppLocalizations.of(context)!.add),
         ),
       ],
     );
@@ -131,10 +129,10 @@ class HiveWorkspaceStreamState extends State<HiveWorkspaceStream> {
       valueListenable: HiveBoxes.instance.workspaceHiveBox.listenable(),
       builder: (context, value, child) {
         if (value.isEmpty) {
-          return const Center(
+          return Center(
             child: Text(
-              'No workspace here!',
-              style: TextStyle(
+              AppLocalizations.of(context)!.noWorkspaceHere,
+              style: const TextStyle(
                 fontSize: 20,
                 color: Colors.black54,
               ),
