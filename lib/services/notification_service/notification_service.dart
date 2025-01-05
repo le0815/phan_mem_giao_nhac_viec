@@ -31,7 +31,16 @@ class NotificationService {
     await _awesomeNotifications.isNotificationAllowed().then(
       (isAllowed) async {
         if (!isAllowed) {
-          await _awesomeNotifications.requestPermissionToSendNotifications();
+          await _awesomeNotifications.requestPermissionToSendNotifications(
+            permissions: const [
+              NotificationPermission.Alert,
+              NotificationPermission.Sound,
+              NotificationPermission.Badge,
+              NotificationPermission.Vibration,
+              NotificationPermission.Light,
+              NotificationPermission.PreciseAlarms,
+            ],
+          );
         }
       },
     );

@@ -21,6 +21,7 @@ import 'package:workmanager/workmanager.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import 'pages/home_page.dart';
+import 'services/network_state_service/network_state_service.dart';
 
 final bodyTaskGlobalKey = GlobalKey<BodyTaskState>();
 final homePageGlobalKey = GlobalKey<HomePageState>();
@@ -99,6 +100,9 @@ void main() async {
   tz.initializeTimeZones();
 
   runApp(const MyApp());
+
+  // check the connection state
+  NetworkStateService();
 }
 
 class MyApp extends StatelessWidget {
@@ -116,7 +120,7 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           // key: navigatorKey,
           navigatorKey: navigatorKey,
-          // scaffoldMessengerKey: scaffoldMessengerKey,
+          scaffoldMessengerKey: scaffoldMessengerKey,
           debugShowCheckedModeBanner: false,
           // theme: ThemeData(
           //     scaffoldBackgroundColor: const Color.fromARGB(217, 217, 217, 217),

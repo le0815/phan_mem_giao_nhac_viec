@@ -89,7 +89,7 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
     _scrollController.animateTo(
       _scrollController.position.maxScrollExtent,
       duration: const Duration(seconds: 1),
-      curve: Curves.fastOutSlowIn,
+      curve: Curves.easeInOutSine,
     );
   }
 
@@ -149,6 +149,7 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
             ),
           ),
           // send message button
+          // if message is sending -> the send button will be replaced by loading indicator
           isSending
               ? const Padding(
                   padding: EdgeInsets.all(8.0),
