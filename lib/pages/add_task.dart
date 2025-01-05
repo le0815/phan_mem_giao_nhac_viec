@@ -1,6 +1,5 @@
 import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
@@ -79,7 +78,8 @@ class _AddTaskState extends State<AddTask> {
               await DatabaseService.instance.getUserByUID(uid!);
           NotificationService.instance.sendNotification(
               receiverToken: modelMember.fcm,
-              title: "You have a new task in your workspace!",
+              title:
+                  AppLocalizations.of(context)!.youHaveANewTaskInYourWorkSpace,
               payload: {
                 "notificationType": "remote",
                 "0": SyncTypes.syncTask,
@@ -127,7 +127,7 @@ class _AddTaskState extends State<AddTask> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Add New Task"),
+        title: Text(AppLocalizations.of(context)!.addNewTask),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -145,7 +145,7 @@ class _AddTaskState extends State<AddTask> {
                     ? // assign task to the member
                     Row(
                         children: [
-                          Text("Assign to: "),
+                          Text(AppLocalizations.of(context)!.assignTo),
                           DropdownButton(
                             value: selectedUser,
                             items: List.generate(
@@ -179,7 +179,10 @@ class _AddTaskState extends State<AddTask> {
                           // if user was not selected -> show error
                           if (widget.isWorkspace) {
                             if (selectedUser == null) {
-                              MySnackBar(context, "User must be selected");
+                              MySnackBar(
+                                  context,
+                                  AppLocalizations.of(context)!
+                                      .userMustBeSelected);
                               return;
                             }
                             UploadTask(uid: selectedUser!);
@@ -220,11 +223,11 @@ class _AddTaskState extends State<AddTask> {
               // createAt
               Text(widget.startTime == null
                   ? ""
-                  : "Start: ${DateTime.fromMillisecondsSinceEpoch(widget.startTime!).toLocal()}"),
+                  : "${AppLocalizations.of(context)!.start}: ${DateTime.fromMillisecondsSinceEpoch(widget.startTime!).toLocal()}"),
               // due
               Text(widget.due == null
                   ? ""
-                  : "Due: ${DateTime.fromMillisecondsSinceEpoch(widget.due!).toLocal()}"),
+                  : "${AppLocalizations.of(context)!.due}: ${DateTime.fromMillisecondsSinceEpoch(widget.due!).toLocal()}"),
             ],
           ),
         ],
@@ -238,11 +241,12 @@ class _AddTaskState extends State<AddTask> {
       children: [
         // title
         MyTextfield(
-            textFieldHint: "Title", textController: taskTitleController),
+            textFieldHint: AppLocalizations.of(context)!.title,
+            textController: taskTitleController),
         AddVerticalSpace(12),
         // description
         MyTextfield(
-          textFieldHint: "Description",
+          textFieldHint: AppLocalizations.of(context)!.description,
           textController: taskDescriptionController,
           maxLines: 6,
         ),

@@ -1,0 +1,94 @@
+{
+    "helloWorld": "Hello World!",
+    "login": "Log In",
+    "userName": "User Name",
+    "password": "Password",
+    "signIn": "Sign In",
+    "notHaveAnAccountYet": "Not have an account yet? Register now.",
+    "pwdMustMatch": "Password must match!",
+    "register": "Register",
+    "emailAddress": "Email Address",
+    "confirmPassword": "Confirm Password",
+    "haveAnAccountLoginNow": "Have an account? Login now.",
+    "overView": "Overview",
+    "nothingToShowHere": "Nothing to show here!",
+    "pending": "Pending",
+    "inProgress": "In progress",
+    "completed": "Completed",
+    "overDue": "Over due",
+    "areYouSureWantToDeleteThisTask": "Are you sure want to delete this task?",
+    "youHaveANewTaskInYourWorkSpace": "You have a new task in your workspace!",
+    "addNewTask": "Add New Task",
+    "assignTo": "Assign to: ",
+    "userMustBeSelected": "User must be selected",
+    "submit": "Submit",
+    "start": "Start",
+    "due": "Due",
+    "title": "Title",
+    "description": "Description",
+    "yourWorkspaceTaskWasEdited": "Your {taskTitle}  workspace task was edited!",
+    "@yourWorkspaceTaskWasEdited": {
+        "placeholders": {
+            "taskTitle": {
+                "type": "String"
+            }
+        }
+    },
+    "taskModified": "Task Modified",
+    "taskDetails": "Task details",
+    "assigner": "Assigner",
+    "assignee": "Assignee",
+    "state": "State",
+    "createdAt": "Created at",
+    "workspace": "Workspace",
+    "addNewChat": "Add new Chat!",
+    "enterChatName": "Enter chat name",    
+    "trySearchSomething": "Try search something!",
+    "cancel": "Cancel",    
+    "youHaveANewChatWith": "You have a new chat with",
+    "add": "Add",
+    "noMessageHere": "No message here",
+    "youHaveNewMessageFrom" : "You have new message from",
+    "enterMessageHere" : "Enter message here",
+    "emptyMessage" : "Empty message!",
+    "createNewWorkspace" : "Create new workspace",
+    "enterWorkspaceName" : "Enter workspace name",
+    "noWorkspaceHere" : "No workspace here!",
+    "areYouSureWantToDeleteThisWorkspace": "Are you sure want to delete this workspace?",
+    "areYouSureWantToLeaveThisWorkspace" : "Are you sure want to leave this workspace?",
+    "addMember" : "Add member",
+    "deleteWorkspace" : "Delete workspace",
+    "leaveWorkspace" : "Leave Workspace",
+    "members" : "Members",
+    "noMember" : "No member",
+    "youWasRemovedFromWorkspace" : "You was removed from {workspaceName} workspace!",
+    "@youWasRemovedFromWorkspace": {
+        "placeholders": {
+            "workspaceName":{
+                "type": "String"
+            }
+        }
+    },    
+    "searchUserToAdd" : "Search user to add",
+    "notFound" : "Not found!",
+    "userWasExistedInTheWorkspace" : "User was existed in the workspace",
+    "youWasAddedToWorkspace" : "You was added to {workspaceName} workspace",
+    "@youWasAddedToWorkspace": {
+        "placeholders": {
+            "workspaceName":{
+                "type": "String"
+            }
+        }
+    },
+    "detailSection" : "Detail section",
+    "home" : "Home",
+    "tasks" : "Tasks",
+    "message" : "Message",
+    "settings" : "Settings",
+    "exit" : "Exit",
+    "myProfile": "My profile",
+    "changeYourPassword" : "Change your password",
+    "deleteAccount" : "Delete account?",
+    "switchLanguage" : "Switch language"
+
+}

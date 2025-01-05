@@ -1,5 +1,5 @@
 import 'dart:developer';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_drawer.dart';
@@ -112,22 +112,22 @@ class HomePageState extends State<HomePage> {
             btmNavIdx = value;
           });
         },
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled),
-            label: "Home",
+            icon: const Icon(Icons.home_filled),
+            label: AppLocalizations.of(context)!.home,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add_box_outlined),
-            label: "Tasks",
+            icon: const Icon(Icons.add_box_outlined),
+            label: AppLocalizations.of(context)!.tasks,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.inbox_outlined),
-            label: "Message",
+            icon: const Icon(Icons.inbox_outlined),
+            label: AppLocalizations.of(context)!.message,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.groups_2_outlined),
-            label: "Workspace",
+            icon: const Icon(Icons.groups_2_outlined),
+            label: AppLocalizations.of(context)!.workspace,
           ),
         ],
       ),

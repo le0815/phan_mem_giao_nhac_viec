@@ -1,6 +1,4 @@
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_date_time_select.dart';
@@ -92,8 +90,8 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
               await DatabaseService.instance.getUserByUID(widget.modelTask.uid);
           NotificationService.instance.sendNotification(
               receiverToken: modelMember.fcm,
-              title:
-                  "Your ${widget.modelTask.title} workspace task was edited!",
+              title: AppLocalizations.of(context)!
+                  .yourWorkspaceTaskWasEdited(widget.modelTask.title),
               payload: {
                 "notificationType": "remote",
                 "0": SyncTypes.syncTask,
@@ -105,7 +103,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
         // update schedule alarm
         BackgroundService.instance.setScheduleAlarm();
         if (context.mounted) {
-          MySnackBar(context, "Task Modified");
+          MySnackBar(context, AppLocalizations.of(context)!.taskModified);
         }
       } catch (e) {
         MyAlertDialog(
@@ -142,7 +140,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Task details"),
+        title: Text(AppLocalizations.of(context)!.taskDetails),
         actions: [
           IconButton(
             onPressed: OnEdit,
@@ -163,9 +161,9 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // task title
-              const Text(
-                "Title",
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.title,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -176,9 +174,9 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
               ),
               AddVerticalSpace(10),
               // task description
-              const Text(
-                "Description",
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)!.description,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -192,9 +190,9 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
               // task state
               Row(
                 children: [
-                  const Text(
-                    "State",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    AppLocalizations.of(context)!.state,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   AddHorizontalSpace(10),
                   taskState(),
@@ -203,7 +201,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
               AddVerticalSpace(10),
               // created at
               Text(
-                "Created at: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.createAt)}",
+                "${AppLocalizations.of(context)!.createdAt}: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.createAt)}",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -285,14 +283,14 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
               Text(startTime == null
                   ? widget.modelTask.startTime == null
                       ? ""
-                      : "Start: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.startTime!).toLocal()}"
-                  : "Start: ${DateTime.fromMillisecondsSinceEpoch(startTime!).toLocal()}"),
+                      : "${AppLocalizations.of(context)!.start}: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.startTime!).toLocal()}"
+                  : "${AppLocalizations.of(context)!.start}: ${DateTime.fromMillisecondsSinceEpoch(startTime!).toLocal()}"),
               // due
               Text(due == null
                   ? widget.modelTask.due == null
                       ? ""
-                      : "Due: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.due!).toLocal()}"
-                  : "Due: ${DateTime.fromMillisecondsSinceEpoch(due!).toLocal()}"),
+                      : "${AppLocalizations.of(context)!.due}: ${DateTime.fromMillisecondsSinceEpoch(widget.modelTask.due!).toLocal()}"
+                  : "${AppLocalizations.of(context)!.due}: ${DateTime.fromMillisecondsSinceEpoch(due!).toLocal()}"),
             ],
           ),
         ],
@@ -336,7 +334,7 @@ class WorkspaceFieldState extends State<WorkspaceField> {
         AddVerticalSpace(10),
         // Workspace
         Text(
-          "Workspace: ${widget.workspaceName}",
+          "${AppLocalizations.of(context)!.workspace}: ${widget.workspaceName}",
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -345,7 +343,7 @@ class WorkspaceFieldState extends State<WorkspaceField> {
         AddVerticalSpace(10),
         // assigner
         Text(
-          "Assigner: ${widget.memberList.where((element) => element.uid == widget.assigner).first.userName}",
+          "${AppLocalizations.of(context)!.assigner}: ${widget.memberList.where((element) => element.uid == widget.assigner).first.userName}",
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -355,9 +353,9 @@ class WorkspaceFieldState extends State<WorkspaceField> {
         // assignee
         Row(
           children: [
-            const Text(
-              "Assignee: ",
-              style: TextStyle(
+            Text(
+              "${AppLocalizations.of(context)!.assignee}: ",
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),

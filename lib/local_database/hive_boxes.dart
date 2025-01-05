@@ -22,6 +22,7 @@ class HiveBoxes {
   late final Box chatHiveBox;
   late final Box taskHiveBox;
   late final Box workspaceHiveBox;
+  late final Box userSettingHiveBox;
 
   HiveBoxes._();
 
@@ -41,6 +42,13 @@ class HiveBoxes {
     chatHiveBox = await Hive.openBox(HiveBoxName.chatHiveBox);
     taskHiveBox = await Hive.openBox(HiveBoxName.taskHiveBox);
     workspaceHiveBox = await Hive.openBox(HiveBoxName.workspaceHiveBox);
+    userSettingHiveBox = await Hive.openBox(HiveBoxName.userSettingHiveBox);
+  }
+
+  saveUserSetting({required Map userSetting}) {
+    // save langue preference
+    log("saving user setting");
+    userSettingHiveBox.putAll(userSetting);
   }
 
   syncAllData() async {

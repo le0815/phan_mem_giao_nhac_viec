@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/body_message.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/body_task.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/home_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:phan_mem_giao_nhac_viec/pages/body_setting.dart';
 import 'package:phan_mem_giao_nhac_viec/services/auth/auth_service.dart';
 
 import '../main.dart';
@@ -37,7 +36,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   // );
                 },
                 leading: const Icon(Icons.home_outlined),
-                title: const Text("Home"),
+                title: Text(AppLocalizations.of(context)!.home),
               ),
               ListTile(
                 onTap: () {
@@ -47,7 +46,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   Navigator.pop(context); // Close the drawer
                 },
                 leading: const Icon(Icons.add_box_outlined),
-                title: const Text("Task"),
+                title: Text(AppLocalizations.of(context)!.tasks),
               ),
               ListTile(
                 onTap: () {
@@ -57,7 +56,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   Navigator.pop(context); // Close the drawer
                 },
                 leading: const Icon(Icons.message_outlined),
-                title: const Text("Messages"),
+                title: Text(AppLocalizations.of(context)!.message),
               ),
               ListTile(
                 onTap: () {
@@ -67,11 +66,18 @@ class _MyDrawerState extends State<MyDrawer> {
                   Navigator.pop(context); // Close the drawer
                 },
                 leading: const Icon(Icons.groups_2_outlined),
-                title: const Text("Workspace"),
+                title: Text(AppLocalizations.of(context)!.workspace),
               ),
-              const ListTile(
+              ListTile(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const BodySetting()),
+                  );
+                },
                 leading: Icon(Icons.settings_sharp),
-                title: Text("Settings"),
+                title: Text(AppLocalizations.of(context)!.settings),
               ),
             ],
           ),
@@ -81,7 +87,7 @@ class _MyDrawerState extends State<MyDrawer> {
               await authService.SignOut();
             },
             leading: const Icon(Icons.exit_to_app_outlined),
-            title: const Text("Exit"),
+            title: Text(AppLocalizations.of(context)!.exit),
           ),
         ],
       ),

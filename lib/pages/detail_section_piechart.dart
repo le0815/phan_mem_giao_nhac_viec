@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
@@ -7,6 +6,7 @@ import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_task_tile_overview.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DetailSectionPieChart extends StatefulWidget {
   final Map<String, dynamic> modelTasks;
@@ -52,7 +52,7 @@ class _DetailSectionPieChartState extends State<DetailSectionPieChart> {
             // show alert
             MyAlertDialog(
               context,
-              msg: "Are you sure want to delete this task?",
+              msg: AppLocalizations.of(context)!.areYouSureWantToDeleteThisTask,
               onOkay: () {
                 RemoveTaskFromDb(idTask);
                 // close alert dialog
@@ -73,7 +73,7 @@ class _DetailSectionPieChartState extends State<DetailSectionPieChart> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Detail section"),
+        title: Text(AppLocalizations.of(context)!.detailSection),
       ),
       body: Container(
         color: Colors.white,

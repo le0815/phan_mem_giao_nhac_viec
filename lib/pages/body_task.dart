@@ -1,19 +1,16 @@
 import 'dart:developer';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:horizontal_week_calendar/horizontal_week_calendar.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_task_tile_overview.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
-import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
-import 'package:workmanager/workmanager.dart';
 
 import '../main.dart';
 
@@ -63,7 +60,7 @@ class BodyTaskState extends State<BodyTask> {
             // show alert
             MyAlertDialog(
               context,
-              msg: "Are you sure want to delete this task?",
+              msg: AppLocalizations.of(context)!.areYouSureWantToDeleteThisTask,
               onOkay: () {
                 // close alert dialog
                 Navigator.pop(context);
@@ -157,8 +154,8 @@ class _TaskTileOverViewState extends State<TaskTileOverView> {
           //     return const MyLoadingIndicator();
           //   }
           if (value.isEmpty) {
-            return const Center(
-              child: Text("Nothing to show here!"),
+            return Center(
+              child: Text(AppLocalizations.of(context)!.nothingToShowHere),
             );
           }
           var currentBodyTaskState = bodyTaskGlobalKey.currentState!;

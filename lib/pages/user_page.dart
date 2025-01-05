@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UserPage extends StatelessWidget {
   final ModelUser modelUser;
@@ -9,7 +10,7 @@ class UserPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("My profile"),
+        title: Text(AppLocalizations.of(context)!.myProfile),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -23,13 +24,13 @@ class UserPage extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Text(
-                    "User name: ",
-                    style: TextStyle(fontSize: 18),
+                  Text(
+                    "${AppLocalizations.of(context)!.userName}: ",
+                    style: const TextStyle(fontSize: 18),
                   ),
                   Text(
                     modelUser.userName,
-                    style: TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 18),
                   ),
                 ],
               ),
@@ -38,13 +39,13 @@ class UserPage extends StatelessWidget {
               ),
               Row(
                 children: [
-                  const Text(
-                    "Email: ",
-                    style: TextStyle(fontSize: 18),
+                  Text(
+                    "${AppLocalizations.of(context)!.emailAddress}: ",
+                    style: const TextStyle(fontSize: 18),
                   ),
                   Text(
                     modelUser.email,
-                    style: TextStyle(fontSize: 18),
+                    style: const TextStyle(fontSize: 18),
                   ),
                 ],
               ),
@@ -52,14 +53,14 @@ class UserPage extends StatelessWidget {
                 thickness: 1,
               ),
               GestureDetector(
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Change your password ",
-                      style: TextStyle(fontSize: 18),
+                      AppLocalizations.of(context)!.changeYourPassword,
+                      style: const TextStyle(fontSize: 18),
                     ),
-                    Icon(Icons.arrow_forward_ios_outlined)
+                    const Icon(Icons.arrow_forward_ios_outlined)
                   ],
                 ),
               ),
@@ -67,14 +68,14 @@ class UserPage extends StatelessWidget {
                 thickness: 1,
               ),
               GestureDetector(
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Delete account?",
-                      style: TextStyle(fontSize: 18, color: Colors.red),
+                      AppLocalizations.of(context)!.deleteAccount,
+                      style: const TextStyle(fontSize: 18, color: Colors.red),
                     ),
-                    Icon(Icons.arrow_forward_ios_outlined)
+                    const Icon(Icons.arrow_forward_ios_outlined)
                   ],
                 ),
               ),

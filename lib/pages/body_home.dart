@@ -1,14 +1,9 @@
-import 'dart:developer';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:intl/intl.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_pie_chart.dart';
-import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
-import 'package:phan_mem_giao_nhac_viec/services/background_service/background_service.dart';
-import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
-import 'package:workmanager/workmanager.dart';
 
 import '../components/my_legend_chart.dart';
 import '../local_database/hive_boxes.dart';
@@ -97,9 +92,12 @@ class _OverViewState extends State<OverView> {
       // color: Colors.blue,
       child: Column(
         children: [
-          const Row(
+          Row(
             children: [
-              Text("Overview", style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(
+                AppLocalizations.of(context)!.overView,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ],
           ),
           const Divider(
@@ -112,8 +110,9 @@ class _OverViewState extends State<OverView> {
               valueListenable: HiveBoxes.instance.taskHiveBox.listenable(),
               builder: (context, box, child) {
                 if (box.isEmpty) {
-                  return const Center(
-                    child: Text("Nothing to show here!"),
+                  return Center(
+                    child:
+                        Text(AppLocalizations.of(context)!.nothingToShowHere),
                   );
                 }
 
@@ -143,16 +142,24 @@ class chatLegend extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            myLegendChart(annotation: "Pending", color: Colors.yellow),
-            myLegendChart(annotation: "In progress", color: Colors.blue),
+            myLegendChart(
+                annotation: AppLocalizations.of(context)!.pending,
+                color: Colors.yellow),
+            myLegendChart(
+                annotation: AppLocalizations.of(context)!.inProgress,
+                color: Colors.blue),
           ],
         ),
         AddHorizontalSpace(10),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            myLegendChart(annotation: "Completed", color: Colors.green),
-            myLegendChart(annotation: "Over due", color: Colors.red),
+            myLegendChart(
+                annotation: AppLocalizations.of(context)!.completed,
+                color: Colors.green),
+            myLegendChart(
+                annotation: AppLocalizations.of(context)!.overDue,
+                color: Colors.red),
           ],
         ),
       ],

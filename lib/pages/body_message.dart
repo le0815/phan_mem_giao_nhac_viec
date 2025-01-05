@@ -1,9 +1,8 @@
 import 'dart:developer';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_message_overview_tile.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
@@ -57,14 +56,14 @@ class BodyMessage extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Add new Chat!"),
+          title: Text(AppLocalizations.of(context)!.addNewChat),
           content: SingleChildScrollView(
             child: Column(
               children: [
                 // chat name text field
                 MyTextfield(
                   textController: chatNameController,
-                  textFieldHint: "Enter chat name",
+                  textFieldHint: AppLocalizations.of(context)!.enterChatName,
                 ),
                 AddVerticalSpace(10),
                 // enter user searchPhase
@@ -72,7 +71,8 @@ class BodyMessage extends StatelessWidget {
                   builder: (context, value, child) {
                     return MyTextfield(
                       textController: searchPhaseController,
-                      textFieldHint: "Search user to add",
+                      textFieldHint:
+                          AppLocalizations.of(context)!.searchUserToAdd,
                       prefixIcon: const Icon(Icons.search_outlined),
                       onPressed: () {
                         value.searchUser(searchPhaseController.text);
@@ -88,7 +88,8 @@ class BodyMessage extends StatelessWidget {
                   child: Consumer<DatabaseService>(
                     builder: (context, value, child) {
                       return value.result.isEmpty
-                          ? const Text("Try search something!")
+                          ? Text(
+                              AppLocalizations.of(context)!.trySearchSomething)
                           : ListView.builder(
                               itemCount: value.result.length,
                               itemBuilder: (context, index) {
@@ -123,7 +124,7 @@ class BodyMessage extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             TextButton(
               onPressed: () async {
@@ -133,7 +134,7 @@ class BodyMessage extends StatelessWidget {
                 if (userTile == null || userTile.widget.isSelected == false) {
                   MyAlertDialog(
                     context,
-                    msg: "User must be selected",
+                    msg: AppLocalizations.of(context)!.userMustBeSelected,
                     onOkay: () => Navigator.pop(context),
                   );
                 } else {
@@ -150,14 +151,14 @@ class BodyMessage extends StatelessWidget {
                   NotificationService.instance.sendNotification(
                       receiverToken: modelUserMemberChat!.fcm,
                       title:
-                          "You have a new chat with ${modelUserMemberChat!.userName}!",
+                          "${AppLocalizations.of(context)!.youHaveANewChatWith} ${modelUserMemberChat!.userName}!",
                       payload: {
                         "notificationType": "remote",
                         "0": SyncTypes.syncMessage,
                       });
                 }
               },
-              child: const Text("Add"),
+              child: Text(AppLocalizations.of(context)!.add),
             ),
           ],
         );
@@ -180,10 +181,10 @@ class _GetChatGroupState extends State<GetChatGroup> {
       valueListenable: HiveBoxes.instance.chatHiveBox.listenable(),
       builder: (context, value, child) {
         if (value.isEmpty) {
-          return const Center(
+          return Center(
             child: Text(
-              'No message here',
-              style: TextStyle(
+              AppLocalizations.of(context)!.noMessageHere,
+              style: const TextStyle(
                 fontSize: 20,
                 color: Colors.black54,
               ),

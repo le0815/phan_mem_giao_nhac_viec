@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
@@ -69,7 +69,8 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
     // notify to user in chat box
     NotificationService.instance.sendNotification(
         receiverToken: modelMember!.fcm,
-        title: "You have new message from ${modelMember!.userName}",
+        title:
+            "${AppLocalizations.of(context)!.youHaveNewMessageFrom} ${modelMember!.userName}",
         body: message,
         payload: {
           "notificationType": "remote",
@@ -99,7 +100,7 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Chat name"),
+        title: const Text("Chat name"),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -145,7 +146,7 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
           Expanded(
             child: MyTextfield(
               textController: messageTextController,
-              textFieldHint: "Enter message here",
+              textFieldHint: AppLocalizations.of(context)!.enterMessageHere,
             ),
           ),
           // send message button
@@ -190,8 +191,8 @@ class MessageHiveStream extends StatelessWidget {
       builder: (context, value, child) {
         Map messageData = value.toMap()[chatDocId]["modelMessages"];
         if (messageData.isEmpty) {
-          return const Center(
-            child: Text("Empty message!"),
+          return Center(
+            child: Text(AppLocalizations.of(context)!.emptyMessage),
           );
         }
 

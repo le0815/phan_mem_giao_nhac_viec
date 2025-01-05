@@ -1,9 +1,10 @@
 import 'dart:developer';
 import 'dart:ui';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:calendar_view/calendar_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/firebase_options.dart';
@@ -15,6 +16,7 @@ import 'package:phan_mem_giao_nhac_viec/pages/body_message.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:phan_mem_giao_nhac_viec/services/background_service/background_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
+import 'package:phan_mem_giao_nhac_viec/services/language_service/language_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
 import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
@@ -114,27 +116,44 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<DatabaseService>(
             create: (context) => DatabaseService.instance),
+        ChangeNotifierProvider<LanguageService>(
+            create: (context) => LanguageService.instance),
       ],
       child: CalendarControllerProvider(
         controller: EventController(),
-        child: MaterialApp(
-          // key: navigatorKey,
-          navigatorKey: navigatorKey,
-          scaffoldMessengerKey: scaffoldMessengerKey,
-          debugShowCheckedModeBanner: false,
-          // theme: ThemeData(
-          //     scaffoldBackgroundColor: const Color.fromARGB(217, 217, 217, 217),
-          //     colorScheme: ColorScheme.light(
-          //       // primary: Colors.white,
-          //       surface: Colors.white,
-          //     )),
-          home: const AuthPage(),
-          //route for navigation page
-          routes: {
-            "/body_home": (context) => const BodyHome(),
-            "/body_task": (context) => const BodyTask(),
-            "/body_message": (context) => const BodyMessage(),
-          },
+        child: ChangeNotifierProvider(
+          create: (context) => LanguageService.instance,
+          child: Consumer<LanguageService>(
+            builder: (context, value, child) {
+              int? currentLanguagePreference =
+                  HiveBoxes.instance.userSettingHiveBox.toMap()["language"] ??
+                      0;
+              return MaterialApp(
+                // key: navigatorKey,
+                navigatorKey: navigatorKey,
+                scaffoldMessengerKey: scaffoldMessengerKey,
+                debugShowCheckedModeBanner: false,
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                locale: currentLanguagePreference == 0
+                    ? const Locale("en")
+                    : const Locale("vi"),
+                // theme: ThemeData(
+                //     scaffoldBackgroundColor: const Color.fromARGB(217, 217, 217, 217),
+                //     colorScheme: ColorScheme.light(
+                //       // primary: Colors.white,
+                //       surface: Colors.white,
+                //     )),
+                home: const AuthPage(),
+                //route for navigation page
+                routes: {
+                  "/body_home": (context) => const BodyHome(),
+                  "/body_task": (context) => const BodyTask(),
+                  "/body_message": (context) => const BodyMessage(),
+                },
+              );
+            },
+          ),
         ),
       ),
     );
