@@ -74,7 +74,7 @@ class BodyMessage extends StatelessWidget {
                       textFieldHint:
                           AppLocalizations.of(context)!.searchUserToAdd,
                       prefixIcon: const Icon(Icons.search_outlined),
-                      onPressed: () {
+                      onPrefixIconPressed: () {
                         value.searchUser(searchPhaseController.text);
                       },
                     );

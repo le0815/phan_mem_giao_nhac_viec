@@ -2,14 +2,13 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:phan_mem_giao_nhac_viec/features/auth/view/pages/signin_page.dart';
+import 'package:phan_mem_giao_nhac_viec/main.dart';
 
 import 'package:phan_mem_giao_nhac_viec/pages/home_page.dart';
-import 'package:phan_mem_giao_nhac_viec/services/auth/login_or_register.dart';
 
-import '../../main.dart';
-
-class AuthPage extends StatelessWidget {
-  const AuthPage({super.key});
+class AuthGateViewModel extends StatelessWidget {
+  const AuthGateViewModel({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +28,7 @@ class AuthPage extends StatelessWidget {
             key: homePageGlobalKey,
           );
         } else {
-          return const LoginOrRegisterPage();
+          return const SigninPage();
         }
       },
     );

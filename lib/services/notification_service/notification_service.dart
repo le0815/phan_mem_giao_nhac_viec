@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
-import 'package:phan_mem_giao_nhac_viec/services/auth/auth_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/background_service/background_service.dart';
 import 'package:phan_mem_giao_nhac_viec/ultis/ultis.dart';
 import 'package:uuid/uuid.dart';
@@ -239,7 +238,7 @@ class NotificationService {
     // remove fcm token of device
     modelUser.fcm.removeWhere((element) => element == fcmToken);
 
-    AuthService().updateUserInfoToDatabase(modelUser);
+    // AuthService().updateUserInfoToDatabase(modelUser);
   }
 
   static appAliveNotificationHandle(Map<String, dynamic> notificationData) {

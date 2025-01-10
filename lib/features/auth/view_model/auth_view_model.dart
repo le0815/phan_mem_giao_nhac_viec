@@ -7,12 +7,11 @@ import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
-import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
 
-class AuthService {
+class AuthViewModel {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
-
+  bool isLogin = true;
   String? password;
 
   User? _user;
@@ -20,10 +19,10 @@ class AuthService {
   User? get user => _user;
 
   // sign in
-  Future<UserCredential> SignInWithEmailAndPassword(
-    String email,
-    String password,
-  ) async {
+  Future<UserCredential> SignInWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
     try {
       UserCredential userCredential = await _firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
@@ -48,9 +47,9 @@ class AuthService {
       }
 
       return userCredential;
-    } on FirebaseAuthException catch (e) {
-      log('error while signin: ${e.code}.');
-      throw Exception(e.code);
+    } catch (e) {
+      log('error while signin: ${e.toString()}.');
+      throw Exception(e.toString());
     }
   }
 
