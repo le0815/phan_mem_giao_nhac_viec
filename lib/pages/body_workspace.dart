@@ -2,10 +2,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_workspace_overview_tile.dart';
-import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
-import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
+import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/core/repositories/local_repo.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/workspace_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
@@ -99,7 +99,7 @@ class PopupDialog extends StatelessWidget {
 
             Navigator.pop(context);
             // sync workspace data
-            HiveBoxes.instance.syncData(syncType: SyncTypes.syncWorkSpace);
+            // HiveBoxes.instance.syncData(syncType: SyncTypes.syncWorkSpace);
           },
           child: Text(AppLocalizations.of(context)!.add),
         ),
@@ -126,7 +126,7 @@ class HiveWorkspaceStreamState extends State<HiveWorkspaceStream> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: HiveBoxes.instance.workspaceHiveBox.listenable(),
+      valueListenable: LocalRepo.instance.workspaceHiveBox.listenable(),
       builder: (context, value, child) {
         if (value.isEmpty) {
           return Center(

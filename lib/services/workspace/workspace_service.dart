@@ -1,12 +1,11 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/features/user/model/user_model.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_member_detail.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
-import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
-
-import '../../models/model_user.dart';
+import 'package:phan_mem_giao_nhac_viec/core/services/notification_service.dart';
 
 class WorkspaceService {
   static final WorkspaceService instance = WorkspaceService._();
@@ -109,7 +108,7 @@ class WorkspaceService {
     required String uid,
     required ModelWorkspace modelWorkspace,
     required Map membersDetail,
-    required List<ModelUser> membersOfWorkspace,
+    required List<UserModel> membersOfWorkspace,
   }) async {
     // remove uid from database
     modelWorkspace.members.removeWhere((element) => element == uid);
@@ -153,7 +152,7 @@ class WorkspaceService {
     );
     // get fcm key
     log("sending notification to device");
-    ModelUser? ownerModelUser;
+    UserModel? ownerModelUser;
     membersOfWorkspace.forEach(
       (element) {
         if (element.uid == ownerUID) {

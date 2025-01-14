@@ -3,10 +3,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view/pages/signin_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view_model/auth_view_model.dart';
-import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
 
 class SignupPage extends StatelessWidget {
   const SignupPage({super.key});

@@ -2,10 +2,9 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:phan_mem_giao_nhac_viec/core/view/pages/app_ui.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view/pages/signin_page.dart';
 import 'package:phan_mem_giao_nhac_viec/main.dart';
-
-import 'package:phan_mem_giao_nhac_viec/pages/home_page.dart';
 
 class AuthGateViewModel extends StatelessWidget {
   const AuthGateViewModel({super.key});
@@ -24,8 +23,8 @@ class AuthGateViewModel extends StatelessWidget {
         }
         if (snapshot.hasData) {
           log("redirect to home page: - ${DateTime.now()}");
-          return HomePage(
-            key: homePageGlobalKey,
+          return AppUi(
+            key: appUIGlobalKey,
           );
         } else {
           return const SigninPage();

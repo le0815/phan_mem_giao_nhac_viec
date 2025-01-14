@@ -3,10 +3,10 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
-import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
+import 'package:phan_mem_giao_nhac_viec/core/repositories/local_repo.dart';
+import 'package:phan_mem_giao_nhac_viec/features/user/model/user_model.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
-import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
+import 'package:phan_mem_giao_nhac_viec/core/services/notification_service.dart';
 
 class AuthViewModel {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -31,7 +31,7 @@ class AuthViewModel {
 
       if (_user?.uid != null) {
         // add new fcm token to database
-        ModelUser modelUser =
+        UserModel modelUser =
             await DatabaseService.instance.getUserByUID(_user!.uid);
         var newFcmToken = await FirebaseMessaging.instance.getToken();
         // if the fcm token already exist in the database -> return
@@ -41,9 +41,9 @@ class AuthViewModel {
         }
 
         // clear old data
-        await HiveBoxes.instance.clearAllData();
+        await LocalRepo.instance.clearAllData();
         // sync new data from firebase
-        HiveBoxes.instance.syncAllData();
+        LocalRepo.instance.syncAllData();
       }
 
       return userCredential;
@@ -95,7 +95,7 @@ class AuthViewModel {
   }
 
   // save usr info to database with id of the doc is uid
-  Future<void> updateUserInfoToDatabase(ModelUser modelUser) async {
+  Future<void> updateUserInfoToDatabase(UserModel modelUser) async {
     try {
       log("start uploading user info to database");
       await _firebaseFirestore
@@ -114,7 +114,7 @@ class AuthViewModel {
     try {
       log("start uploading user info to database");
       String uid = userCredential.user!.uid;
-      await _firebaseFirestore.collection("User").doc(uid).set(ModelUser(
+      await _firebaseFirestore.collection("User").doc(uid).set(UserModel(
             email: userCredential.user!.email.toString(),
             userName: userName,
             uid: uid,

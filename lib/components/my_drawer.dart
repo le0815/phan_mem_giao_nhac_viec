@@ -26,7 +26,7 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               ListTile(
                 onTap: () {
-                  var homePageSate = homePageGlobalKey.currentState!;
+                  var homePageSate = appUIGlobalKey.currentState!;
                   homePageSate.btmNavIdx = 0;
                   homePageSate.refreshHomePage();
                   Navigator.pop(context); // Close the drawer
@@ -40,7 +40,7 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               ListTile(
                 onTap: () {
-                  var homePageSate = homePageGlobalKey.currentState!;
+                  var homePageSate = appUIGlobalKey.currentState!;
                   homePageSate.btmNavIdx = 1;
                   homePageSate.refreshHomePage();
                   Navigator.pop(context); // Close the drawer
@@ -50,7 +50,7 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               ListTile(
                 onTap: () {
-                  var homePageSate = homePageGlobalKey.currentState!;
+                  var homePageSate = appUIGlobalKey.currentState!;
                   homePageSate.btmNavIdx = 2;
                   homePageSate.refreshHomePage();
                   Navigator.pop(context); // Close the drawer
@@ -60,7 +60,7 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               ListTile(
                 onTap: () {
-                  var homePageSate = homePageGlobalKey.currentState!;
+                  var homePageSate = appUIGlobalKey.currentState!;
                   homePageSate.btmNavIdx = 3;
                   homePageSate.refreshHomePage();
                   Navigator.pop(context); // Close the drawer

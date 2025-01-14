@@ -1,12 +1,11 @@
-import 'dart:developer';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
+import 'package:phan_mem_giao_nhac_viec/features/auth/view/animations/animations.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view/pages/signup_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view/widgets/my_loading_indicator.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view_model/auth_view_model.dart';
-import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
 
 class SigninPage extends StatefulWidget {
   const SigninPage({super.key});
@@ -60,14 +59,36 @@ class SectionOneBody extends StatelessWidget {
   }
 }
 
-class SectionTwoBody extends StatelessWidget {
+class SectionTwoBody extends StatefulWidget {
   SectionTwoBody({
     super.key,
   });
 
+  @override
+  State<SectionTwoBody> createState() => _SectionTwoBodyState();
+}
+
+class _SectionTwoBodyState extends State<SectionTwoBody> {
   var emailTextController = TextEditingController();
+
   var pwdTextController = TextEditingController();
-  // final LogInPage widget;
+
+  Route _createRoute(Widget destinationPage) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => destinationPage,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        final tween = Tween(begin: begin, end: end);
+        final offsetAnimation = animation.drive(tween);
+
+        return SlideTransition(
+          position: offsetAnimation,
+          child: child,
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +135,7 @@ class SectionTwoBody extends StatelessWidget {
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
+                              const SnackBar(
                                   content: Text("sddsf"),
                                   margin: EdgeInsets.only(bottom: 500.0),
                                   behavior: SnackBarBehavior.floating,
@@ -151,11 +172,7 @@ class SectionTwoBody extends StatelessWidget {
                 const Text("Don't have account? "),
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SignupPage()),
-                    );
+                    Navigator.push(context, _createRoute(const SignupPage()));
                   },
                   child: const Text(
                     "Register!",

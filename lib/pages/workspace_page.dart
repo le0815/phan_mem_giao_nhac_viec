@@ -4,26 +4,26 @@ import 'package:calendar_view/calendar_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:phan_mem_giao_nhac_viec/core/repositories/local_repo.dart';
+import 'package:phan_mem_giao_nhac_viec/features/task/model/task_model.dart';
+import 'package:phan_mem_giao_nhac_viec/features/task/repositories/task_remote_repo.dart';
+import 'package:phan_mem_giao_nhac_viec/features/user/model/user_model.dart';
 import 'package:provider/provider.dart';
 
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_loading_indicator.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_textfield.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_user_tile_overview.dart';
-import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
-import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
-import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
-import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_textfield.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_user_tile_overview.dart';
+import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/models/model_workspace.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/add_task.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
+import 'package:phan_mem_giao_nhac_viec/features/task/view/pages/add_task.dart';
+import 'package:phan_mem_giao_nhac_viec/features/task/view/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
-import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
-import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
+import 'package:phan_mem_giao_nhac_viec/core/services/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
-import 'package:phan_mem_giao_nhac_viec/ultis/add_space.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
 
-import '../components/my_legend_chart.dart';
+import '../core/widgets/my_legend_chart.dart';
 
 class WorkspacePage extends StatefulWidget {
   final Map workspaceData;
@@ -46,10 +46,10 @@ class WorkspacePageState extends State<WorkspacePage> {
   var currentUID = FirebaseAuth.instance.currentUser!.uid;
   var currentUserRole;
   List<CalendarEventData> events = [];
-  List<ModelUser> membersOfWorkspace = [];
+  List<UserModel> membersOfWorkspace = [];
   var calendarController;
   Future<List> getUsers() async {
-    final List<ModelUser> userList = [];
+    final List<UserModel> userList = [];
     for (var element in modelWorkspace!.members) {
       var result = await DatabaseService.instance.getUserByUID(element);
       userList.add(result);
@@ -74,9 +74,9 @@ class WorkspacePageState extends State<WorkspacePage> {
     clearTaskResult();
 
     // get event form database
-    HiveBoxes.instance.taskHiveBox.toMap().forEach(
+    LocalRepo.instance.taskHiveBox.toMap().forEach(
       (key, value) {
-        ModelTask modelTask = ModelTask.fromMap(value);
+        TaskModel modelTask = TaskModel.fromMap(value);
         // remove task was not in workspace
         if (modelTask.workspaceID == null) {
           return;
@@ -119,7 +119,7 @@ class WorkspacePageState extends State<WorkspacePage> {
 
   RemoveTaskFromDb(String taskId) async {
     try {
-      await TaskService.instance.RemoveTaskFromDb(taskId);
+      await TaskRemoteRepo.instance.RemoveTaskFromDb(taskId);
     } catch (e) {
       if (context.mounted) {
         // show err dialog
@@ -199,8 +199,8 @@ class WorkspacePageState extends State<WorkspacePage> {
                       // close workspace page
                       Navigator.pop(context);
                       // sync workspace data
-                      HiveBoxes.instance
-                          .syncData(syncType: SyncTypes.syncWorkSpace);
+                      // HiveBoxes.instance
+                      //     .syncData(syncType: SyncTypes.syncWorkSpace);
                     },
                   );
                 } else {
@@ -216,8 +216,8 @@ class WorkspacePageState extends State<WorkspacePage> {
                       // close workspace page
                       Navigator.pop(context);
                       // sync workspace data
-                      HiveBoxes.instance
-                          .syncData(syncType: SyncTypes.syncWorkSpace);
+                      // HiveBoxes.instance
+                      //     .syncData(syncType: SyncTypes.syncWorkSpace);
                     },
                   );
                 }
@@ -323,7 +323,7 @@ class WorkspacePageState extends State<WorkspacePage> {
                         return ListView.builder(
                           itemCount: result!.length,
                           itemBuilder: (context, index) {
-                            ModelUser modelUser = result[index];
+                            UserModel modelUser = result[index];
                             return MyUserTileOverview(
                               userName: modelUser.userName,
                               msg: modelUser.email,
@@ -397,7 +397,7 @@ class WorkspacePageState extends State<WorkspacePage> {
           ),
         );
         // sync workspace data
-        await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
+        // await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
         // reload task overview
         getAllTasks();
       },
@@ -414,7 +414,7 @@ class WorkspacePageState extends State<WorkspacePage> {
           ),
         );
         // sync task data
-        await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
+        // await HiveBoxes.instance.syncData(syncType: SyncTypes.syncTask);
         // reload task overview
         getAllTasks();
         log("cell long press date: $date");
@@ -461,7 +461,7 @@ class WorkspacePageState extends State<WorkspacePage> {
                           : ListView.builder(
                               itemCount: value.result.length,
                               itemBuilder: (context, index) {
-                                ModelUser searchedUser = ModelUser.fromMap(
+                                UserModel searchedUser = UserModel.fromMap(
                                     value.result[index].data());
                                 // if member already exist-> show error
                                 if (currentMemberUID
@@ -530,7 +530,7 @@ class WorkspacePageState extends State<WorkspacePage> {
                   // get model user was recently added
                   final myModel =
                       Provider.of<DatabaseService>(context, listen: false);
-                  var userModel = ModelUser.fromMap(
+                  var userModel = UserModel.fromMap(
                       myModel.result[0].data() as Map<String, dynamic>);
                   // notify to user was recently added
                   NotificationService.instance.sendNotification(
@@ -544,8 +544,8 @@ class WorkspacePageState extends State<WorkspacePage> {
                   );
                   Navigator.pop(context);
                   // sync workspace data
-                  await HiveBoxes.instance
-                      .syncData(syncType: SyncTypes.syncTask);
+                  // await HiveBoxes.instance
+                  //     .syncData(syncType: SyncTypes.syncTask);
                   // reload UI
                   setState(() {});
                 }

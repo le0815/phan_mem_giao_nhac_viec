@@ -1,5 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
+import 'package:phan_mem_giao_nhac_viec/core/services/notification_service.dart';
 
 class NetworkStateService {
   final Connectivity _connectivity = Connectivity();

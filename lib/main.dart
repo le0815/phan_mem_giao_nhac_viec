@@ -6,30 +6,29 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:phan_mem_giao_nhac_viec/core/repositories/local_repo.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view_model/auth_gate_view_model.dart';
+import 'package:phan_mem_giao_nhac_viec/features/home/view/pages/home_page.dart';
+import 'package:phan_mem_giao_nhac_viec/features/task/view/pages/task_page.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:workmanager/workmanager.dart';
 
-import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/firebase_options.dart';
-import 'package:phan_mem_giao_nhac_viec/local_database/hive_boxes.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/body_home.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/body_message.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/body_task.dart';
-import 'package:phan_mem_giao_nhac_viec/services/background_service/background_service.dart';
+import 'package:phan_mem_giao_nhac_viec/features/message/view/pages/message_page.dart';
+import 'package:phan_mem_giao_nhac_viec/core/services/background_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/language_service/language_service.dart';
-import 'package:phan_mem_giao_nhac_viec/services/notification_service/notification_service.dart';
+import 'package:phan_mem_giao_nhac_viec/core/services/notification_service.dart';
 
 import 'core/theme/theme_config.dart';
-import 'pages/home_page.dart';
+import 'core/view/pages/app_ui.dart';
 import 'services/network_state_service/network_state_service.dart';
 
-final bodyTaskGlobalKey = GlobalKey<BodyTaskState>();
-final homePageGlobalKey = GlobalKey<HomePageState>();
+final taskPageGlobalKey = GlobalKey<TaskPageState>();
+final appUIGlobalKey = GlobalKey<AppUiState>();
 final navigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -42,11 +41,10 @@ void callbackDispatcher() {
         log("Initializing Hive in background task");
         await Hive.initFlutter();
         log("Hive initialized");
-        HiveBoxes.instance.registerAllAdapters();
         log("Adapters registered");
-        await HiveBoxes.instance.openAllBoxes();
+        await LocalRepo.instance.openAllBoxes();
         log("Hive boxes opened");
-        log("hive box task data: ${HiveBoxes.instance.taskHiveBox}");
+        log("hive box task data: ${LocalRepo.instance.taskHiveBox}");
         await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform,
         );
@@ -90,11 +88,11 @@ void main() async {
 
   // hive
   await Hive.initFlutter();
-  HiveBoxes.instance.registerAllAdapters();
-  await HiveBoxes.instance.openAllBoxes();
+
+  await LocalRepo.instance.openAllBoxes();
   // sync hive data if user logged in
   if (FirebaseAuth.instance.currentUser != null) {
-    HiveBoxes.instance.syncAllData();
+    LocalRepo.instance.syncAllData();
   }
 
   // notification
@@ -129,7 +127,7 @@ class MyApp extends StatelessWidget {
           child: Consumer<LanguageService>(
             builder: (context, value, child) {
               int? currentLanguagePreference =
-                  HiveBoxes.instance.userSettingHiveBox.toMap()["language"] ??
+                  LocalRepo.instance.userSettingHiveBox.toMap()["language"] ??
                       0;
               return MaterialApp(
                 // key: navigatorKey,
@@ -145,9 +143,9 @@ class MyApp extends StatelessWidget {
                 home: const AuthGateViewModel(),
                 //route for navigation page
                 routes: {
-                  "/body_home": (context) => const BodyHome(),
-                  "/body_task": (context) => const BodyTask(),
-                  "/body_message": (context) => const BodyMessage(),
+                  "/body_home": (context) => const HomePage(),
+                  "/body_task": (context) => const TaskPage(),
+                  "/body_message": (context) => const MessagePage(),
                 },
               );
             },

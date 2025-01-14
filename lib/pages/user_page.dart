@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:phan_mem_giao_nhac_viec/features/user/model/user_model.dart';
 
 class UserPage extends StatelessWidget {
-  final ModelUser modelUser;
+  final UserModel modelUser;
   const UserPage({super.key, required this.modelUser});
 
   @override
