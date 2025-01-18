@@ -3,13 +3,12 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
-import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
-import 'package:phan_mem_giao_nhac_viec/models/model_user.dart';
+import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/features/task/model/task_model.dart';
+import 'package:phan_mem_giao_nhac_viec/features/task/repositories/task_remote_repo.dart';
+import 'package:phan_mem_giao_nhac_viec/features/user/model/user_model.dart';
 import 'package:phan_mem_giao_nhac_viec/services/chat/chat_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/workspace/workspace_service.dart';
-
-import '../task/task_service.dart';
 
 class DatabaseService extends ChangeNotifier {
   static final DatabaseService instance = DatabaseService._();
@@ -39,7 +38,7 @@ class DatabaseService extends ChangeNotifier {
     var currentUID = FirebaseAuth.instance.currentUser!.uid;
     var result = {};
     // get all task data
-    var taskData = await TaskService.instance.GetTaskFromDb();
+    var taskData = await TaskRemoteRepo.instance.GetTaskFromDb();
     result["task"] = taskData;
 
     // get chat data
@@ -75,7 +74,7 @@ class DatabaseService extends ChangeNotifier {
     // }
     data.forEach(
       (key, value) {
-        var modelTask = ModelTask.fromMap(value);
+        var modelTask = TaskModel.fromMap(value);
         if (result[modelTask.state] != null) {
           result[modelTask.state].addAll({key: modelTask});
         } else {
@@ -121,10 +120,10 @@ class DatabaseService extends ChangeNotifier {
     return result;
   }
 
-  Future<ModelUser> getUserByUID(String uid) async {
+  Future<UserModel> getUserByUID(String uid) async {
     var result =
         await _firebaseFirestore.collection(_userCollectionPath).doc(uid).get();
-    return ModelUser(
+    return UserModel(
       email: result.data()!["email"],
       userName: result.data()!["userName"],
       uid: result.data()!["uid"],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:phan_mem_giao_nhac_viec/features/auth/view_model/auth_view_model.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_setting.dart';
-import 'package:phan_mem_giao_nhac_viec/services/auth/auth_service.dart';
 
 import '../main.dart';
 
@@ -26,7 +26,7 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               ListTile(
                 onTap: () {
-                  var homePageSate = homePageGlobalKey.currentState!;
+                  var homePageSate = appUIGlobalKey.currentState!;
                   homePageSate.btmNavIdx = 0;
                   homePageSate.refreshHomePage();
                   Navigator.pop(context); // Close the drawer
@@ -40,7 +40,7 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               ListTile(
                 onTap: () {
-                  var homePageSate = homePageGlobalKey.currentState!;
+                  var homePageSate = appUIGlobalKey.currentState!;
                   homePageSate.btmNavIdx = 1;
                   homePageSate.refreshHomePage();
                   Navigator.pop(context); // Close the drawer
@@ -50,7 +50,7 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               ListTile(
                 onTap: () {
-                  var homePageSate = homePageGlobalKey.currentState!;
+                  var homePageSate = appUIGlobalKey.currentState!;
                   homePageSate.btmNavIdx = 2;
                   homePageSate.refreshHomePage();
                   Navigator.pop(context); // Close the drawer
@@ -60,7 +60,7 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               ListTile(
                 onTap: () {
-                  var homePageSate = homePageGlobalKey.currentState!;
+                  var homePageSate = appUIGlobalKey.currentState!;
                   homePageSate.btmNavIdx = 3;
                   homePageSate.refreshHomePage();
                   Navigator.pop(context); // Close the drawer
@@ -83,7 +83,7 @@ class _MyDrawerState extends State<MyDrawer> {
           ),
           ListTile(
             onTap: () async {
-              var authService = AuthService();
+              var authService = AuthViewModel();
               await authService.SignOut();
             },
             leading: const Icon(Icons.exit_to_app_outlined),

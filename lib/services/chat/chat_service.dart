@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:phan_mem_giao_nhac_viec/models/model_chat.dart';
-import 'package:phan_mem_giao_nhac_viec/models/model_member_detail.dart';
-import 'package:phan_mem_giao_nhac_viec/models/model_message.dart';
+import 'package:phan_mem_giao_nhac_viec/features/message/models/model_chat.dart';
+import 'package:phan_mem_giao_nhac_viec/features/workspace/models/model_member_detail.dart';
+import 'package:phan_mem_giao_nhac_viec/features/message/models/model_message.dart';
 
 class ChatService {
   static final ChatService instance = ChatService._();

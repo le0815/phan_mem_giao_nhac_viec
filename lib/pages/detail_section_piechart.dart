@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
-import 'package:phan_mem_giao_nhac_viec/constraint/constraint.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/detail_task_page.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_task_tile_overview.dart';
-import 'package:phan_mem_giao_nhac_viec/models/model_task.dart';
-import 'package:phan_mem_giao_nhac_viec/services/task/task_service.dart';
+import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
+import 'package:phan_mem_giao_nhac_viec/features/task/model/task_model.dart';
+import 'package:phan_mem_giao_nhac_viec/features/task/repositories/task_remote_repo.dart';
+import 'package:phan_mem_giao_nhac_viec/features/task/view/pages/detail_task_page.dart';
+import 'package:phan_mem_giao_nhac_viec/features/task/view/widgets/my_task_tile_overview.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DetailSectionPieChart extends StatefulWidget {
@@ -30,7 +30,7 @@ class _DetailSectionPieChartState extends State<DetailSectionPieChart> {
 
   RemoveTaskFromDb(String taskId) async {
     try {
-      await TaskService.instance.RemoveTaskFromDb(taskId);
+      await TaskRemoteRepo.instance.RemoveTaskFromDb(taskId);
     } catch (e) {
       if (context.mounted) {
         // show err dialog
@@ -43,7 +43,7 @@ class _DetailSectionPieChartState extends State<DetailSectionPieChart> {
     }
   }
 
-  OpenTaskDetail(ModelTask modelTask, String idTask) async {
+  OpenTaskDetail(TaskModel modelTask, String idTask) async {
     await Navigator.push(
       context,
       MaterialPageRoute(
