@@ -10,7 +10,11 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:phan_mem_giao_nhac_viec/core/repositories/local_repo.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view_model/auth_gate_view_model.dart';
 import 'package:phan_mem_giao_nhac_viec/features/home/view/pages/home_page.dart';
+import 'package:phan_mem_giao_nhac_viec/features/message/view_model/message_view_model.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/pages/task_page.dart';
+import 'package:phan_mem_giao_nhac_viec/features/task/view/widgets/workspace_section.dart';
+import 'package:phan_mem_giao_nhac_viec/features/task/view_model/task_view_model.dart';
+import 'package:phan_mem_giao_nhac_viec/features/workspace/view/pages/detail_workspace_page.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:workmanager/workmanager.dart';
@@ -27,7 +31,9 @@ import 'core/theme/theme_config.dart';
 import 'core/view/pages/app_ui.dart';
 import 'services/network_state_service/network_state_service.dart';
 
+final workspaceSectionGlobalKey = GlobalKey<WorkspaceSectionState>();
 final taskPageGlobalKey = GlobalKey<TaskPageState>();
+final detailWorkspacePageGlobalKey = GlobalKey<DetailWorkspacePageState>();
 final appUIGlobalKey = GlobalKey<AppUiState>();
 final navigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
@@ -119,6 +125,10 @@ class MyApp extends StatelessWidget {
             create: (context) => DatabaseService.instance),
         ChangeNotifierProvider<LanguageService>(
             create: (context) => LanguageService.instance),
+        ChangeNotifierProvider<MessageViewModel>(
+            create: (context) => MessageViewModel.instance),
+        ChangeNotifierProvider<TaskViewModel>(
+            create: (context) => TaskViewModel.instance),
       ],
       child: CalendarControllerProvider(
         controller: EventController(),

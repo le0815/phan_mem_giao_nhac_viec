@@ -1,18 +1,17 @@
 import 'dart:developer';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'package:phan_mem_giao_nhac_viec/components/my_drawer.dart';
 import 'package:phan_mem_giao_nhac_viec/core/repositories/local_repo.dart';
 import 'package:phan_mem_giao_nhac_viec/core/view/widgets/my_bottom_app_bar.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
 import 'package:phan_mem_giao_nhac_viec/features/home/view/pages/home_page.dart';
-import 'package:phan_mem_giao_nhac_viec/features/task/view/pages/task_page.dart';
-import 'package:phan_mem_giao_nhac_viec/main.dart';
-
 import 'package:phan_mem_giao_nhac_viec/features/message/view/pages/message_page.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/body_workspace.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/user_page.dart';
-import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
+import 'package:phan_mem_giao_nhac_viec/features/task/view/pages/task_page.dart';
+import 'package:phan_mem_giao_nhac_viec/features/workspace/view/pages/workspace_page.dart';
+import 'package:phan_mem_giao_nhac_viec/main.dart';
 
 class AppUi extends StatefulWidget {
   const AppUi({super.key});
@@ -30,7 +29,7 @@ class AppUiState extends State<AppUi> {
       key: taskPageGlobalKey,
     ),
     const MessagePage(),
-    BodyWorkspace(),
+    WorkspacePage(),
   ];
 
   var appBarTitles = {
@@ -61,37 +60,8 @@ class AppUiState extends State<AppUi> {
         title: appBarTitles[btmNavIdx],
         actions: [
           // usr button
-          Tooltip(
-            triggerMode: TooltipTriggerMode.longPress,
-            message: FirebaseAuth.instance.currentUser!.uid,
-            child: GestureDetector(
-              onTap: () async {
-                // get user info
-                var modelUser = await DatabaseService.instance
-                    .getUserByUID(FirebaseAuth.instance.currentUser!.uid);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => UserPage(
-                      modelUser: modelUser,
-                    ),
-                  ),
-                );
-              },
-              child: Container(
-                width: 30,
-                height: 30,
-                // padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                    color: const Color.fromARGB(217, 217, 217, 217),
-                    borderRadius: BorderRadius.circular(16)),
-                child: const Center(child: Text("H")),
-              ),
-            ),
-          ),
-          const SizedBox(
-            width: 10,
-          )
+          // const UserAppbarButton(),
+          AddHorizontalSpace(10)
         ],
       ),
       drawer: const MyDrawer(),

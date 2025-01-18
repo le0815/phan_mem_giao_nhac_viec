@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phan_mem_giao_nhac_viec/core/theme/theme_config.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
 
 class MyWorkspaceOverviewTile extends StatelessWidget {
@@ -15,8 +16,8 @@ class MyWorkspaceOverviewTile extends StatelessWidget {
       child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
+            color: ThemeConfig.secondaryColor,
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
             children: [
@@ -26,13 +27,8 @@ class MyWorkspaceOverviewTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    workspaceName,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
+                  Text(workspaceName,
+                      style: Theme.of(context).textTheme.titleMedium),
                 ],
               )
             ],

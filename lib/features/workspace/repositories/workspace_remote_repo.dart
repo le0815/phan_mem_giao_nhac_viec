@@ -2,17 +2,15 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
-import 'package:phan_mem_giao_nhac_viec/features/user/model/user_model.dart';
-import 'package:phan_mem_giao_nhac_viec/features/workspace/models/model_member_detail.dart';
-import 'package:phan_mem_giao_nhac_viec/features/workspace/models/model_workspace.dart';
 import 'package:phan_mem_giao_nhac_viec/core/services/notification_service.dart';
+import 'package:phan_mem_giao_nhac_viec/features/user/model/user_model.dart';
+import 'package:phan_mem_giao_nhac_viec/features/workspace/models/model_workspace.dart';
 
-class WorkspaceService {
-  static final WorkspaceService instance = WorkspaceService._();
+class WorkspaceRemoteRepo {
+  static final WorkspaceRemoteRepo instance = WorkspaceRemoteRepo._();
+  WorkspaceRemoteRepo._();
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
-  static final String _collectionName = "Workspace";
-
-  WorkspaceService._();
+  final String _collectionName = "Workspace";
 
   Future createWorkspace({
     required String currentUID,
@@ -64,20 +62,21 @@ class WorkspaceService {
       required List newMemberList}) async {
     // first get doc ref
     var mainCollection =
-        await _firebaseFirestore.collection(_collectionName).doc(docID);
+        _firebaseFirestore.collection(_collectionName).doc(docID);
 
     // update member
     await mainCollection.update({
       "members": newMemberList,
     });
 
-    // add 'MembersDetail' subcollection after create main docs
+    // add 'MembersDetail' sub collection after create main docs
     await mainCollection.collection("MembersDetail").doc(uid).set({
       "role": MyWorkspaceRole.member.name,
     });
   }
 
   Future<void> deleteWorkspace(String workspaceID) async {
+    log("removing workspace from firebase");
     // get workspace doc
     var workspaceDoc =
         _firebaseFirestore.collection("Workspace").doc(workspaceID);
@@ -108,15 +107,15 @@ class WorkspaceService {
     required String uid,
     required ModelWorkspace modelWorkspace,
     required Map membersDetail,
-    required List<UserModel> membersOfWorkspace,
   }) async {
+    log("leaving workspace from firebase");
     // remove uid from database
     modelWorkspace.members.removeWhere((element) => element == uid);
     membersDetail.remove(uid);
 
     // update to database
     var mainCollection =
-        await _firebaseFirestore.collection(_collectionName).doc(workspaceID);
+        _firebaseFirestore.collection(_collectionName).doc(workspaceID);
 
     // update main collection
     await mainCollection.set(modelWorkspace.toMap());
@@ -140,98 +139,17 @@ class WorkspaceService {
     for (var element in tasks.docs) {
       await _firebaseFirestore.collection("Task").doc(element.id).delete();
     }
-    // send notification to owner
-    String? ownerUID;
-    membersDetail.forEach(
-      (key, value) {
-        if ((value as Map).containsValue(MyWorkspaceRole.owner.name)) {
-          ownerUID = key;
-          return;
-        }
-      },
-    );
-    // get fcm key
-    log("sending notification to device");
-    UserModel? ownerModelUser;
-    membersOfWorkspace.forEach(
-      (element) {
-        if (element.uid == ownerUID) {
-          ownerModelUser = element;
-          return;
-        }
-      },
-    );
-    NotificationService.instance.sendNotification(
-      receiverToken: ownerModelUser!.fcm,
-      title: "$uid just left group",
-      payload: {
-        "notificationType": "remote",
-        "0": SyncTypes.syncWorkSpace,
-      },
-    );
   }
 
-  Stream<QuerySnapshot> workspaceStream(String currentUID) {
-    return _firebaseFirestore
-        .collection(_collectionName)
-        .where("members", arrayContains: currentUID)
-        .snapshots();
-  }
+  Future syncData({required String currentUID}) async {
+    log("fetching data from firebase");
 
-  Future workspaceFuture({required String currentUID}) async {
-    var mainCollection = await _firebaseFirestore
+    var mainCollection = _firebaseFirestore
         .collection(_collectionName)
         .where("members", arrayContains: currentUID);
     var result = await mainCollection.get();
     var totalResult = {};
-    for (var element in result.docs) {
-      var modelWorkspace = ModelWorkspace.fromMap(element.data());
-
-      /// get MembersDetail collection inside the main collection
-      var subCollection =
-          await element.reference.collection("MembersDetail").get();
-      var membersDetail = {};
-      for (var subElement in subCollection.docs) {
-        membersDetail.addAll(
-          {
-            subElement.id: subElement.data(),
-          },
-        );
-      }
-
-      totalResult.addAll(
-        {
-          element.id: {
-            "modelWorkspace": modelWorkspace,
-            "membersDetail": membersDetail
-          }
-        },
-      );
-    }
-
-    /// the transformed data
-    // { doc id of workspace:
-    //     {
-    //     'modelWorkspace': instance of modelWorkspace,
-    //     'membersDetail': {
-    //         UID_1 : {
-    //                 role : role name 1,
-    //         },
-    //         UID_2 : {
-    //                 role : role name 2,
-    //         },
-    //     }
-    //   }
-    // }
-    return totalResult;
-  }
-
-  Future syncWorkspaceData({required String currentUID}) async {
-    var mainCollection = await _firebaseFirestore
-        .collection(_collectionName)
-        .where("members", arrayContains: currentUID);
-    var result = await mainCollection.get();
-    var totalResult = {};
+    // get the main collection
     for (var element in result.docs) {
       var modelWorkspace = element.data();
 

@@ -14,8 +14,9 @@ class AuthViewModel {
   bool isLogin = true;
   String? password;
 
-  User? _user;
+  bool isFullyLoading = false;
 
+  User? _user;
   User? get user => _user;
 
   // sign in
@@ -43,7 +44,7 @@ class AuthViewModel {
         // clear old data
         await LocalRepo.instance.clearAllData();
         // sync new data from firebase
-        LocalRepo.instance.syncAllData();
+        await LocalRepo.instance.syncAllData();
       }
 
       return userCredential;

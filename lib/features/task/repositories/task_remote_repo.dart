@@ -10,6 +10,7 @@ class TaskRemoteRepo {
   TaskRemoteRepo._();
   // add task
   Future<void> AddTaskToDb(TaskModel task) async {
+    log("uploading task to firebase");
     try {
       await _firebaseFirestore.collection("Task").add(task.ToMap());
     } catch (e) {

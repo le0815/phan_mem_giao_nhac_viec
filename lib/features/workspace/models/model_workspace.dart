@@ -1,15 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hive/hive.dart';
-
-part "model_workspace.g.dart";
-
-@HiveType(typeId: 0)
 class ModelWorkspace {
-  @HiveField(0)
   final String workspaceName;
-  @HiveField(1)
   final int createAt;
-  @HiveField(2)
   final List members;
 
   ModelWorkspace({

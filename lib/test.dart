@@ -1,5 +1,8 @@
 void main() async {
-  var a = null;
-  var b = a == null ? 3 : 5;
+  List a = [1, 2, 5];
+  List b = List.generate(
+    a.length,
+    (index) => false,
+  );
   print(b);
 }

@@ -2,7 +2,6 @@ import 'package:board_datetime_picker/board_datetime_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/components/my_snackbar.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
-import 'package:phan_mem_giao_nhac_viec/features/task/view/pages/detail_task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/widgets/my_datetime_result.dart';
 import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view_model/task_view_model.dart';
@@ -10,11 +9,12 @@ import 'package:phan_mem_giao_nhac_viec/features/task/view_model/task_view_model
 class DatetimeSection extends StatefulWidget {
   DatetimeSection({
     super.key,
-    required this.detailTaskPageWidget,
+    this.isAddTaskPage = false,
+    required this.pageWidget,
   });
 
-  final DetailTaskPage detailTaskPageWidget;
-
+  final pageWidget;
+  bool isAddTaskPage;
   @override
   State<DatetimeSection> createState() => _DatetimeSectionState();
 }
@@ -30,8 +30,8 @@ class _DatetimeSectionState extends State<DatetimeSection> {
         );
         var resultValidated = TaskViewModel.instance
             .dateTimeValidate(startTime: result?.start, due: result?.end);
-        widget.detailTaskPageWidget.startTime = resultValidated[0];
-        widget.detailTaskPageWidget.due = resultValidated[1];
+        widget.pageWidget.startTime = resultValidated[0];
+        widget.pageWidget.due = resultValidated[1];
       } catch (e) {
         // if datetime was not set => switch back to screen
         if (e.toString() == myDateTimeException[1].toString()) {
@@ -73,16 +73,20 @@ class _DatetimeSectionState extends State<DatetimeSection> {
             children: [
               Expanded(
                 child: MyDatetimeResult(
-                  newTime: widget.detailTaskPageWidget.startTime,
-                  oldTime: widget.detailTaskPageWidget.modelTask.startTime,
+                  newTime: widget.pageWidget.startTime,
+                  oldTime: widget.isAddTaskPage
+                      ? null
+                      : widget.pageWidget.modelTask.startTime,
                   title: "Start Time",
                 ),
               ),
               AddHorizontalSpace(10),
               Expanded(
                 child: MyDatetimeResult(
-                  newTime: widget.detailTaskPageWidget.due,
-                  oldTime: widget.detailTaskPageWidget.modelTask.due,
+                  newTime: widget.pageWidget.due,
+                  oldTime: widget.isAddTaskPage
+                      ? null
+                      : widget.pageWidget.modelTask.due,
                   title: "Due Time",
                 ),
               ),
