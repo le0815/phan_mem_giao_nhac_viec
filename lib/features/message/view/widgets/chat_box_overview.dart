@@ -37,6 +37,7 @@ class ChatBoxOverview extends StatelessWidget {
                 Text(
                   modelMessage?.message ?? "",
                   style: Theme.of(context).textTheme.bodySmall,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

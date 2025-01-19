@@ -8,6 +8,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:http/http.dart' as http;
+import 'package:phan_mem_giao_nhac_viec/core/view/pages/app_ui.dart';
+import 'package:phan_mem_giao_nhac_viec/features/message/view/pages/message_page.dart';
+import 'package:phan_mem_giao_nhac_viec/main.dart';
 import 'package:uuid/uuid.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -330,8 +333,78 @@ class NotificationService {
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(
       ReceivedAction receivedAction) async {
-    log("onActionReceivedMethod: ${receivedAction.title}");
-    log("onActionReceivedMethod: ${receivedAction.body}");
-    log("onActionReceivedMethod: ${receivedAction.payload}");
+    Map? payload = receivedAction.payload;
+    // handle notification
+    if (payload?["notificationType"] != null) {
+      // redirect to certain page when user tapped
+      // the 'pageIndex' can be find in appUI.dart
+      Route createRoute(Widget destinationPage) {
+        return PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              destinationPage,
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = Offset(1.0, 0.0);
+            const end = Offset.zero;
+            final tween = Tween(begin: begin, end: end);
+            final offsetAnimation = animation.drive(tween);
+
+            return SlideTransition(
+              position: offsetAnimation,
+              child: child,
+            );
+          },
+        );
+      }
+
+      // if is local schedule notification
+      if (payload!["notificationType"] == "schedule") {
+        navigatorKey.currentState!.push(
+          (createRoute(
+            const AppUi(
+              pageIndex: 1,
+            ),
+          )),
+        );
+      }
+      // if is remote notification
+      if (payload["notificationType"] == "remote") {
+        payload.forEach(
+          (key, value) {
+            // skip if value of payload id notification type
+            if (key == "notificationType") {
+              return;
+            }
+            // if sync type is syncTask -> update schedule notification
+            if (value == SyncTypes.syncMessage) {
+              navigatorKey.currentState!.push(
+                (createRoute(
+                  const AppUi(
+                    pageIndex: 2,
+                  ),
+                )),
+              );
+            }
+            if (value == SyncTypes.syncTask) {
+              navigatorKey.currentState!.push(
+                (createRoute(
+                  const AppUi(
+                    pageIndex: 1,
+                  ),
+                )),
+              );
+            }
+            if (value == SyncTypes.syncWorkSpace) {
+              navigatorKey.currentState!.push(
+                (createRoute(
+                  const AppUi(
+                    pageIndex: 3,
+                  ),
+                )),
+              );
+            }
+          },
+        );
+      }
+    }
   }
 }
