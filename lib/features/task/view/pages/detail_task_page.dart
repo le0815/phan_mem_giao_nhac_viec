@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_snackbar.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_alert_dialog.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_snackbar.dart';
 import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/model/task_model.dart';
@@ -73,9 +73,8 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
       }
     } catch (e) {
       MyAlertDialog(
-        context,
+        context: context,
         msg: e.toString(),
-        onOkay: () => Navigator.pop(context),
       );
     }
   }
@@ -93,7 +92,10 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.taskDetails),
+        title: Text(
+          AppLocalizations.of(context)!.taskDetails,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
         actions: [
           IconButton(
             onPressed: () async {
@@ -119,7 +121,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
                   AddVerticalSpace(10),
                   // task title
                   MyInputSection(
-                    sectionName: "Title",
+                    sectionName: AppLocalizations.of(context)!.title,
                     textEditingController: widget.textTitleController,
                     maxLine: 1,
                     textStyle: Theme.of(context).textTheme.titleMedium,
@@ -127,7 +129,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
                   AddVerticalSpace(10),
                   // task description
                   MyInputSection(
-                    sectionName: "Description",
+                    sectionName: AppLocalizations.of(context)!.description,
                     textEditingController: widget.textDescriptionController,
                     maxLine: 5,
                   ),
@@ -178,7 +180,8 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
                       onPressed: () async {
                         await OnEdit();
                       },
-                      child: const Text("Save Change"),
+                      child: Text(
+                          "\n${AppLocalizations.of(context)!.saveChange}\n"),
                     ),
                   ),
                 ],

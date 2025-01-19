@@ -3,13 +3,14 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'package:phan_mem_giao_nhac_viec/components/my_drawer.dart';
+import 'package:phan_mem_giao_nhac_viec/core/view/widgets/my_drawer.dart';
 import 'package:phan_mem_giao_nhac_viec/core/repositories/local_repo.dart';
 import 'package:phan_mem_giao_nhac_viec/core/view/widgets/my_bottom_app_bar.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
 import 'package:phan_mem_giao_nhac_viec/features/home/view/pages/home_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/message/view/pages/message_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/pages/task_page.dart';
+import 'package:phan_mem_giao_nhac_viec/features/user/view/widgets/user_appbar_button.dart';
 import 'package:phan_mem_giao_nhac_viec/features/workspace/view/pages/workspace_page.dart';
 import 'package:phan_mem_giao_nhac_viec/main.dart';
 
@@ -32,12 +33,6 @@ class AppUiState extends State<AppUi> {
     WorkspacePage(),
   ];
 
-  var appBarTitles = {
-    0: const Text('Workspace Name'),
-    1: const Text('My task'),
-    2: const Text('Messages'),
-    3: const Text('My workspace'),
-  };
   int btmNavIdx = 0;
   refreshHomePage() {
     setState(() {});
@@ -52,7 +47,31 @@ class AppUiState extends State<AppUi> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _refresh();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    var appBarTitles = {
+      0: Text(
+        AppLocalizations.of(context)!.home,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      1: Text(
+        AppLocalizations.of(context)!.tasks,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      2: Text(
+        AppLocalizations.of(context)!.message,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      3: Text(
+        AppLocalizations.of(context)!.workspace,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+    };
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -60,7 +79,7 @@ class AppUiState extends State<AppUi> {
         title: appBarTitles[btmNavIdx],
         actions: [
           // usr button
-          // const UserAppbarButton(),
+          const UserAppbarButton(),
           AddHorizontalSpace(10)
         ],
       ),

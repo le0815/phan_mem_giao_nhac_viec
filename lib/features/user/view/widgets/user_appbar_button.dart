@@ -17,10 +17,17 @@ class _UserAppbarButtonState extends State<UserAppbarButton> {
   late final UserModel modelUser;
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
-    modelUser =
-        UserModel.fromMap(await UserViewModel.instance.getCurrentUser());
+    modelUser = UserModel.fromMap(
+      UserLocalRepo.instance.getModelUser(uid: currentUID) ??
+          {
+            "email": "sample@email.com",
+            "userName": "sample@email.com",
+            "uid": "sampleUID",
+            "fcm": ["sampleFCM"],
+          },
+    );
   }
 
   @override

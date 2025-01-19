@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/widgets/workspace_section.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/widgets/datetime_section.dart';
@@ -58,9 +58,8 @@ class _AddTaskState extends State<AddTask> {
         }
       } catch (e) {
         MyAlertDialog(
-          context,
+          context: context,
           msg: e.toString(),
-          onOkay: () => Navigator.pop(context),
         );
         log(e.toString());
       }
@@ -83,7 +82,7 @@ class _AddTaskState extends State<AddTask> {
               AddVerticalSpace(10),
               // task title
               MyInputSection(
-                sectionName: "Title",
+                sectionName: AppLocalizations.of(context)!.title,
                 textEditingController: widget.taskTitleController,
                 maxLine: 1,
                 textStyle: Theme.of(context).textTheme.titleMedium,
@@ -91,7 +90,7 @@ class _AddTaskState extends State<AddTask> {
               AddVerticalSpace(10),
               // task description
               MyInputSection(
-                sectionName: "Description",
+                sectionName: AppLocalizations.of(context)!.description,
                 textEditingController: widget.taskDescriptionController,
                 maxLine: 5,
               ),
@@ -109,26 +108,26 @@ class _AddTaskState extends State<AddTask> {
                   : AddVerticalSpace(1),
 
               // submit
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          await UploadTask();
+                        },
+                        child: Text(
+                            "\n" + AppLocalizations.of(context)!.submit + "\n"),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () async {
-                  await UploadTask();
-                },
-                child: const Text("Submit"),
-              ),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

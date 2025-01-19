@@ -46,24 +46,19 @@ class MyTaskTileOverview extends StatelessWidget {
                     children: [
                       Text(
                         modelTask.title,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Text(
                         modelTask.description,
-                        style: const TextStyle(),
-                        maxLines: 3,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
                         modelTask.due == null
                             ? ""
                             : "\nDue: ${DateFormat("HH:mm").format(DateTime.fromMillisecondsSinceEpoch(modelTask.due!))}",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ],
                   ),

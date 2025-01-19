@@ -9,6 +9,7 @@ import 'package:phan_mem_giao_nhac_viec/features/task/view_model/task_view_model
 import 'package:phan_mem_giao_nhac_viec/features/user/model/user_model.dart';
 import 'package:phan_mem_giao_nhac_viec/features/user/view/widgets/my_user_tile_overview.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WorkspaceSection extends StatefulWidget {
   const WorkspaceSection({
@@ -84,7 +85,7 @@ class WorkspaceSectionState extends State<WorkspaceSection> {
             : AddVerticalSpace(1),
 
         Text(
-          "Assign To",
+          AppLocalizations.of(context)!.assignTo,
           style: Theme.of(context).textTheme.titleMedium,
         ),
         Container(
@@ -98,7 +99,7 @@ class WorkspaceSectionState extends State<WorkspaceSection> {
               // search bar
               MyTextfield(
                 textController: textController,
-                textFieldHint: "Search Member",
+                textFieldHint: AppLocalizations.of(context)!.searchMember,
                 // display users are match with search phrase
                 onChanged: (value) {
                   taskViewModel.searchMember(searchPhrase: value);
@@ -169,7 +170,7 @@ class DetailTaskMode extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "Workspace",
+              AppLocalizations.of(context)!.workspace,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             Text(
@@ -183,7 +184,7 @@ class DetailTaskMode extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "Assigner",
+              AppLocalizations.of(context)!.assigner,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             Text(

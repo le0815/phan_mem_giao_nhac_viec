@@ -15,6 +15,36 @@ class TaskLocalRepo {
     taskHiveBox.putAll(data);
   }
 
+// get all task
+  taskClassification({required Map<dynamic, dynamic> data}) {
+    Map result = {};
+    // classification state of task by group
+    // processed data will be like this
+    // {
+    //   taskState1: {
+    //     docIDTask1: modelTask1,
+    //     docIDTask2: modelTask2,
+    //     ....
+    //   }
+    //   taskState2: {
+    //     docIDTask3: modelTask3,
+    //     docIDTask4: modelTask4,
+    //     ....
+    //   }
+    // }
+    data.forEach(
+      (key, value) {
+        var modelTask = TaskModel.fromMap(value);
+        if (result[modelTask.state] != null) {
+          result[modelTask.state].addAll({key: modelTask});
+        } else {
+          result[modelTask.state] = {key: modelTask};
+        }
+      },
+    );
+    return result;
+  }
+
   Map<String, TaskModel> getTaskByDay({required DateTime currentDay}) {
     var resultByDate = <String, TaskModel>{};
     var dateOnlyCurrentTime = ConvertToDateOnly(currentDay);

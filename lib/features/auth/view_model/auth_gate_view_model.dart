@@ -1,27 +1,42 @@
 import 'dart:developer';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:phan_mem_giao_nhac_viec/core/view/pages/app_ui.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view/pages/signin_page.dart';
+import 'package:phan_mem_giao_nhac_viec/features/auth/view_model/auth_view_model.dart';
 import 'package:phan_mem_giao_nhac_viec/main.dart';
+import 'package:provider/provider.dart';
 
-class AuthGateViewModel extends StatelessWidget {
+class AuthGateViewModel extends StatefulWidget {
   const AuthGateViewModel({super.key});
 
   @override
+  State<AuthGateViewModel> createState() => _AuthGateViewModelState();
+}
+
+class _AuthGateViewModelState extends State<AuthGateViewModel> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Ensure the widget is fully initialized
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      // Defer showing the dialog until after the current frame
+      // check login state
+      AuthViewModel.instance.checkLoginState();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          log("connecting: - ${DateTime.now()}");
-          // show loading indicator
+    return Consumer<AuthViewModel>(
+      builder: (context, value, child) {
+        if (value.isLoading) {
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
-        if (snapshot.hasData) {
+        if (value.isLogin) {
           log("redirect to home page: - ${DateTime.now()}");
           return AppUi(
             key: appUIGlobalKey,

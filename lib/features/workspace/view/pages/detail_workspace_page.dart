@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/pages/add_task.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/pages/detail_task_page.dart';
@@ -85,10 +85,13 @@ class DetailWorkspacePageState extends State<DetailWorkspacePage> {
             AddVerticalSpace(8),
             const MyLegendChart(),
             // show members of workspace
-            MemberWorkspaceList(
-              workspaceID: widget.workspaceID,
-              modelWorkspace: widget.modelWorkspace,
-              membersDetail: widget.modelDetailMembers,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: MemberWorkspaceList(
+                workspaceID: widget.workspaceID,
+                modelWorkspace: widget.modelWorkspace,
+                membersDetail: widget.modelDetailMembers,
+              ),
             )
           ],
         ),
@@ -108,16 +111,20 @@ class DetailWorkspacePageState extends State<DetailWorkspacePage> {
               onRemove: () {
                 // show alert
                 MyAlertDialog(
-                  context,
+                  context: context,
                   msg: AppLocalizations.of(context)!
                       .areYouSureWantToDeleteThisTask,
-                  onOkay: () {
-                    WorkspaceViewModel.instance
+                  onPressed: () async {
+                    await WorkspaceViewModel.instance
                         .removeTask(taskID: (event.event as Map)["id"]);
                     // close alert dialog
                     Navigator.pop(context);
                     // switch back to right before screen
                     Navigator.pop(context);
+
+                    // reload task overview
+                    WorkspaceViewModel.instance
+                        .addEvents(workspaceID: widget.workspaceID);
                   },
                 );
               },
@@ -129,8 +136,6 @@ class DetailWorkspacePageState extends State<DetailWorkspacePage> {
             ),
           ),
         );
-        // reload task overview
-        WorkspaceViewModel.instance.addEvents(workspaceID: widget.workspaceID);
       },
       onDateLongPress: (date) async {
         // navigation to add task page

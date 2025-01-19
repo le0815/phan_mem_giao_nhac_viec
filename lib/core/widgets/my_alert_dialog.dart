@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
-MyAlertDialog(BuildContext context,
-    {required String msg, required Function()? onOkay}) async {
+MyAlertDialog({
+  required BuildContext context,
+  required String msg,
+  Function()? onPressed,
+}) async {
   await showDialog(
     context: context,
     builder: (context) {
@@ -10,7 +13,10 @@ MyAlertDialog(BuildContext context,
         title: Text(msg),
         actions: [
           TextButton(
-            onPressed: onOkay,
+            onPressed: onPressed ??
+                () {
+                  Navigator.pop(context);
+                },
             child: const Text("Okay"),
           )
         ],

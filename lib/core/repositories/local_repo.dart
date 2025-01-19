@@ -8,7 +8,6 @@ import 'package:phan_mem_giao_nhac_viec/features/message/repositories/message_lo
 import 'package:phan_mem_giao_nhac_viec/features/task/repositories/task_local_repo.dart';
 import 'package:phan_mem_giao_nhac_viec/features/user/repository/user_local_repo.dart';
 import 'package:phan_mem_giao_nhac_viec/features/workspace/repositories/workspace_local_repo.dart';
-import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 
 class LocalRepo {
   static final LocalRepo instance = LocalRepo._();
@@ -69,6 +68,7 @@ class LocalRepo {
   }
 
   clearAllData() async {
+    log("start clear all hive data");
     await userHiveBox.clear();
     await chatHiveBox.clear();
     await taskHiveBox.clear();

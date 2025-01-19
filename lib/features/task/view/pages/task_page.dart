@@ -5,7 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:horizontal_week_calendar/horizontal_week_calendar.dart';
 
-import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/widgets/my_task_tile_overview.dart';
 import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/model/task_model.dart';
@@ -42,9 +42,8 @@ class TaskPageState extends State<TaskPage> {
       if (context.mounted) {
         // show err dialog
         MyAlertDialog(
-          context,
+          context: context,
           msg: e.toString(),
-          onOkay: () => Navigator.pop(context),
         );
       }
     }
@@ -58,9 +57,9 @@ class TaskPageState extends State<TaskPage> {
           onRemove: () {
             // show alert
             MyAlertDialog(
-              context,
+              context: context,
               msg: AppLocalizations.of(context)!.areYouSureWantToDeleteThisTask,
-              onOkay: () {
+              onPressed: () {
                 // close alert dialog
                 Navigator.pop(context);
                 // switch back to right before screen

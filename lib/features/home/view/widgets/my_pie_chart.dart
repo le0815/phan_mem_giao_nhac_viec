@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/detail_section_piechart.dart';
+import 'package:phan_mem_giao_nhac_viec/features/home/view/pages/detail_section_piechart.dart';
 
 class MyPieChart extends StatefulWidget {
   final Map<dynamic, dynamic> taskData;
