@@ -7,27 +7,26 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:workmanager/workmanager.dart';
+
+import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/core/repositories/local_repo.dart';
+import 'package:phan_mem_giao_nhac_viec/core/services/background_service.dart';
+import 'package:phan_mem_giao_nhac_viec/core/services/notification_service.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view_model/auth_gate_view_model.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view_model/auth_view_model.dart';
 import 'package:phan_mem_giao_nhac_viec/features/home/view/pages/home_page.dart';
+import 'package:phan_mem_giao_nhac_viec/features/message/view/pages/message_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/message/view_model/message_view_model.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/pages/task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/widgets/workspace_section.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view_model/task_view_model.dart';
 import 'package:phan_mem_giao_nhac_viec/features/workspace/view/pages/detail_workspace_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/workspace/view_model/workspace_viewmodel.dart';
-import 'package:provider/provider.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:workmanager/workmanager.dart';
-
-import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/firebase_options.dart';
-import 'package:phan_mem_giao_nhac_viec/features/message/view/pages/message_page.dart';
-import 'package:phan_mem_giao_nhac_viec/core/services/background_service.dart';
-import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/services/language_service/language_service.dart';
-import 'package:phan_mem_giao_nhac_viec/core/services/notification_service.dart';
 
 import 'core/theme/theme_config.dart';
 import 'core/view/pages/app_ui.dart';
@@ -123,8 +122,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<DatabaseService>(
-            create: (context) => DatabaseService.instance),
         ChangeNotifierProvider<LanguageService>(
             create: (context) => LanguageService.instance),
         ChangeNotifierProvider<MessageViewModel>(

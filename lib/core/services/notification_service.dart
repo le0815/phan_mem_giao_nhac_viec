@@ -2,22 +2,21 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:math' as math;
 import 'dart:ui';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:googleapis_auth/auth_io.dart' as auth;
-import 'package:phan_mem_giao_nhac_viec/core/repositories/local_repo.dart';
-import 'package:phan_mem_giao_nhac_viec/features/user/model/user_model.dart';
-import 'package:phan_mem_giao_nhac_viec/core/services/background_service.dart';
-import 'package:phan_mem_giao_nhac_viec/core/ultis/ultis.dart';
+import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import 'package:workmanager/workmanager.dart';
 
+import 'package:phan_mem_giao_nhac_viec/core/repositories/local_repo.dart';
+import 'package:phan_mem_giao_nhac_viec/core/services/background_service.dart';
+import 'package:phan_mem_giao_nhac_viec/core/ultis/ultis.dart';
+
 import '../constraint/constraint.dart';
-import '../../services/database/database_service.dart';
 
 class NotificationService {
   static final NotificationService instance = NotificationService._();

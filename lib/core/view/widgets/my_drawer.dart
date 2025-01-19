@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view_model/auth_view_model.dart';
-import 'package:phan_mem_giao_nhac_viec/pages/body_setting.dart';
+import 'package:phan_mem_giao_nhac_viec/features/setting/view/pages/setting_page.dart';
 
 import '../../../main.dart';
 
@@ -85,7 +85,7 @@ class _MyDrawerState extends State<MyDrawer> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const BodySetting()),
+                        builder: (context) => const SettingPage()),
                   );
                 },
                 leading: Icon(Icons.settings_sharp),

@@ -10,7 +10,6 @@ import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
 import 'package:phan_mem_giao_nhac_viec/features/home/view/pages/home_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/message/view/pages/message_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/pages/task_page.dart';
-import 'package:phan_mem_giao_nhac_viec/features/user/view/pages/user_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/user/view/widgets/user_appbar_button.dart';
 import 'package:phan_mem_giao_nhac_viec/features/workspace/view/pages/workspace_page.dart';
 import 'package:phan_mem_giao_nhac_viec/main.dart';
@@ -57,7 +56,7 @@ class AppUiState extends State<AppUi> {
   Widget build(BuildContext context) {
     var appBarTitles = {
       0: Text(
-        'Workspace Name',
+        'Home',
         style: Theme.of(context).textTheme.titleMedium,
       ),
       1: Text(
@@ -80,7 +79,7 @@ class AppUiState extends State<AppUi> {
         title: appBarTitles[btmNavIdx],
         actions: [
           // usr button
-          // const UserAppbarButton(),
+          const UserAppbarButton(),
           AddHorizontalSpace(10)
         ],
       ),

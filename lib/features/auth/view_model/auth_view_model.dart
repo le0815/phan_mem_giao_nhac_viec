@@ -36,10 +36,9 @@ class AuthViewModel extends ChangeNotifier {
           .signInWithEmailAndPassword(email: email, password: password);
       log("signing");
       isLogin = true;
-      notifyListeners();
-      _user = userCredential.user;
       isLoading = true;
       notifyListeners();
+      _user = userCredential.user;
       if (_user?.uid != null) {
         // add new fcm token to database
         var queryData =
@@ -66,6 +65,7 @@ class AuthViewModel extends ChangeNotifier {
       return userCredential;
     } catch (e) {
       isLoading = false;
+      isLogin = false;
       notifyListeners();
       log('error while signin: ${e.toString()}.');
       throw Exception(e.toString());

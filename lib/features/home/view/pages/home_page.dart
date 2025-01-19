@@ -5,7 +5,6 @@ import 'package:phan_mem_giao_nhac_viec/core/theme/theme_config.dart';
 import 'package:phan_mem_giao_nhac_viec/features/home/view/widgets/my_pie_chart.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/my_legend_chart.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/repositories/task_local_repo.dart';
-import 'package:phan_mem_giao_nhac_viec/services/database/database_service.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
 
 class HomePage extends StatelessWidget {
@@ -67,7 +66,7 @@ class _OverViewState extends State<OverView> {
                             AppLocalizations.of(context)!.nothingToShowHere),
                       );
                     }
-                    var classifiedTask = DatabaseService.instance
+                    var classifiedTask = TaskLocalRepo.instance
                         .taskClassification(data: box.toMap());
                     return MyPieChart(
                       taskData: classifiedTask,
