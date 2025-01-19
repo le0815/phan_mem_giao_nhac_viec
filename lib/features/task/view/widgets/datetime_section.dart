@@ -1,6 +1,6 @@
 import 'package:board_datetime_picker/board_datetime_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_snackbar.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_snackbar.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/widgets/my_datetime_result.dart';
 import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';

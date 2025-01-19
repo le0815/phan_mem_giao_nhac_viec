@@ -227,20 +227,6 @@ class NotificationService {
     }
   }
 
-  Future removeFcmToken() async {
-    log("removing fcm token");
-    // get current user info
-    UserModel modelUser = await DatabaseService.instance
-        .getUserByUID(FirebaseAuth.instance.currentUser!.uid);
-
-    // current fcm token
-    var fcmToken = await FirebaseMessaging.instance.getToken();
-    // remove fcm token of device
-    modelUser.fcm.removeWhere((element) => element == fcmToken);
-
-    // AuthService().updateUserInfoToDatabase(modelUser);
-  }
-
   static appAliveNotificationHandle(Map<String, dynamic> notificationData) {
     log("handling notification data in alive mode");
     Map? payload = notificationData["payload"];

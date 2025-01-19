@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:phan_mem_giao_nhac_viec/features/auth/view/widgets/my_alert_dialog.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/features/message/view/widgets/bottom_message_bar.dart';
 import 'package:phan_mem_giao_nhac_viec/features/message/view/widgets/message_list.dart';
 import 'package:phan_mem_giao_nhac_viec/features/message/view_model/message_view_model.dart';

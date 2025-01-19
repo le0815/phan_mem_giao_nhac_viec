@@ -10,7 +10,7 @@ import 'package:phan_mem_giao_nhac_viec/features/message/view/widgets/chat_box_l
 import 'package:phan_mem_giao_nhac_viec/features/message/view_model/message_view_model.dart';
 import 'package:phan_mem_giao_nhac_viec/features/user/model/user_model.dart';
 
-import '../../../../components/my_alert_dialog.dart';
+import '../../../../core/widgets/my_alert_dialog.dart';
 
 class MessagePage extends StatelessWidget {
   const MessagePage({super.key});
@@ -119,9 +119,7 @@ class MessagePage extends StatelessWidget {
                 /// if user was not selected -> show alert
                 if (userTile == null || userTile.widget.isSelected == false) {
                   MyAlertDialog(
-                    context,
                     msg: AppLocalizations.of(context)!.userMustBeSelected,
-                    onOkay: () => Navigator.pop(context),
                   );
                 } else {
                   // add chat to database

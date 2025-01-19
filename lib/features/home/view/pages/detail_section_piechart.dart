@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/model/task_model.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/repositories/task_remote_repo.dart';
@@ -35,9 +35,7 @@ class _DetailSectionPieChartState extends State<DetailSectionPieChart> {
       if (context.mounted) {
         // show err dialog
         MyAlertDialog(
-          context,
           msg: e.toString(),
-          onOkay: () => Navigator.pop(context),
         );
       }
     }
@@ -51,9 +49,8 @@ class _DetailSectionPieChartState extends State<DetailSectionPieChart> {
           onRemove: () {
             // show alert
             MyAlertDialog(
-              context,
               msg: AppLocalizations.of(context)!.areYouSureWantToDeleteThisTask,
-              onOkay: () {
+              onPressed: () {
                 RemoveTaskFromDb(idTask);
                 // close alert dialog
                 Navigator.pop(context);

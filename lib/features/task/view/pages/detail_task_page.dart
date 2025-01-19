@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_snackbar.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_alert_dialog.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_snackbar.dart';
 import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/model/task_model.dart';
@@ -73,9 +73,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
       }
     } catch (e) {
       MyAlertDialog(
-        context,
         msg: e.toString(),
-        onOkay: () => Navigator.pop(context),
       );
     }
   }
@@ -178,7 +176,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
                       onPressed: () async {
                         await OnEdit();
                       },
-                      child: const Text("Save Change"),
+                      child: const Text("\nSave Change\n"),
                     ),
                   ),
                 ],

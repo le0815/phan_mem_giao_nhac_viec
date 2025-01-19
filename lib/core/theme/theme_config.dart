@@ -23,6 +23,11 @@ class ThemeConfig {
           fontWeight: FontWeight.w300,
         ),
         // --
+        displayLarge: TextStyle(
+          fontSize: 52.0,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
         bodyMedium: TextStyle(
           fontSize: 14.0,
           color: Colors.black,
@@ -31,7 +36,7 @@ class ThemeConfig {
         titleMedium: TextStyle(
           fontSize: 16.0,
           color: Colors.black,
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.w500,
         ),
         bodySmall: TextStyle(
           fontSize: 13.0,

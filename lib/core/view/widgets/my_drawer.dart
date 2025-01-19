@@ -3,7 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view_model/auth_view_model.dart';
 import 'package:phan_mem_giao_nhac_viec/pages/body_setting.dart';
 
-import '../main.dart';
+import '../../../main.dart';
 
 class MyDrawer extends StatefulWidget {
   const MyDrawer({super.key});
@@ -36,7 +36,10 @@ class _MyDrawerState extends State<MyDrawer> {
                   // );
                 },
                 leading: const Icon(Icons.home_outlined),
-                title: Text(AppLocalizations.of(context)!.home),
+                title: Text(
+                  AppLocalizations.of(context)!.home,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
               ListTile(
                 onTap: () {
@@ -46,7 +49,10 @@ class _MyDrawerState extends State<MyDrawer> {
                   Navigator.pop(context); // Close the drawer
                 },
                 leading: const Icon(Icons.add_box_outlined),
-                title: Text(AppLocalizations.of(context)!.tasks),
+                title: Text(
+                  AppLocalizations.of(context)!.tasks,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
               ListTile(
                 onTap: () {
@@ -56,7 +62,10 @@ class _MyDrawerState extends State<MyDrawer> {
                   Navigator.pop(context); // Close the drawer
                 },
                 leading: const Icon(Icons.message_outlined),
-                title: Text(AppLocalizations.of(context)!.message),
+                title: Text(
+                  AppLocalizations.of(context)!.message,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
               ListTile(
                 onTap: () {
@@ -66,7 +75,10 @@ class _MyDrawerState extends State<MyDrawer> {
                   Navigator.pop(context); // Close the drawer
                 },
                 leading: const Icon(Icons.groups_2_outlined),
-                title: Text(AppLocalizations.of(context)!.workspace),
+                title: Text(
+                  AppLocalizations.of(context)!.workspace,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
               ListTile(
                 onTap: () {
@@ -77,17 +89,22 @@ class _MyDrawerState extends State<MyDrawer> {
                   );
                 },
                 leading: Icon(Icons.settings_sharp),
-                title: Text(AppLocalizations.of(context)!.settings),
+                title: Text(
+                  AppLocalizations.of(context)!.settings,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
             ],
           ),
           ListTile(
             onTap: () async {
-              var authService = AuthViewModel();
-              await authService.SignOut();
+              await AuthViewModel.instance.signOut();
             },
             leading: const Icon(Icons.exit_to_app_outlined),
-            title: Text(AppLocalizations.of(context)!.exit),
+            title: Text(
+              AppLocalizations.of(context)!.exit,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
           ),
         ],
       ),

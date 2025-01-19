@@ -13,8 +13,12 @@ class UserViewModel {
   getCurrentUser() async {
     String currentUID = FirebaseAuth.instance.currentUser!.uid;
     Map? result = UserLocalRepo.instance.getModelUser(uid: currentUID);
-    // if current user is not loaded
-    result ??= await UserRemoteRepo.instance.getUserByUID(uid: currentUID);
+    // if current user is not loaded yet
+    if (result == null) {
+      var remoteData =
+          await UserRemoteRepo.instance.getUserByUID(uid: currentUID);
+      result = remoteData.data();
+    }
 
     return result;
   }

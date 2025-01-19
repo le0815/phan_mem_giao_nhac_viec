@@ -69,6 +69,7 @@ class LocalRepo {
   }
 
   clearAllData() async {
+    log("start clear all hive data");
     await userHiveBox.clear();
     await chatHiveBox.clear();
     await taskHiveBox.clear();

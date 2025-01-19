@@ -9,12 +9,14 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:phan_mem_giao_nhac_viec/core/repositories/local_repo.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view_model/auth_gate_view_model.dart';
+import 'package:phan_mem_giao_nhac_viec/features/auth/view_model/auth_view_model.dart';
 import 'package:phan_mem_giao_nhac_viec/features/home/view/pages/home_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/message/view_model/message_view_model.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/pages/task_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/widgets/workspace_section.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view_model/task_view_model.dart';
 import 'package:phan_mem_giao_nhac_viec/features/workspace/view/pages/detail_workspace_page.dart';
+import 'package:phan_mem_giao_nhac_viec/features/workspace/view_model/workspace_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:workmanager/workmanager.dart';
@@ -129,6 +131,10 @@ class MyApp extends StatelessWidget {
             create: (context) => MessageViewModel.instance),
         ChangeNotifierProvider<TaskViewModel>(
             create: (context) => TaskViewModel.instance),
+        ChangeNotifierProvider<WorkspaceViewModel>(
+            create: (context) => WorkspaceViewModel.instance),
+        ChangeNotifierProvider<AuthViewModel>(
+            create: (context) => AuthViewModel.instance),
       ],
       child: CalendarControllerProvider(
         controller: EventController(),

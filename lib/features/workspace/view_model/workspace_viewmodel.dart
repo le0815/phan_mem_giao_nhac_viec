@@ -47,7 +47,7 @@ class WorkspaceViewModel extends ChangeNotifier {
     // remove task from firebase
     await TaskRemoteRepo.instance.RemoveTaskFromDb(taskID);
     // sync task data
-    TaskLocalRepo.instance.syncData();
+    await TaskLocalRepo.instance.syncData();
   }
 
   removeUser({

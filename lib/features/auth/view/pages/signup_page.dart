@@ -1,8 +1,7 @@
-import 'dart:developer';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:phan_mem_giao_nhac_viec/components/my_alert_dialog.dart';
+import 'package:phan_mem_giao_nhac_viec/core/theme/theme_config.dart';
+import 'package:phan_mem_giao_nhac_viec/core/widgets/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/my_textfield.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view/pages/signin_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view_model/auth_view_model.dart';
@@ -18,43 +17,6 @@ class SignupPage extends StatelessWidget {
     var pwdTextController = TextEditingController();
     var confirmTextController = TextEditingController();
 
-    OnRegister() async {
-      if (pwdTextController.text != confirmTextController.text) {
-        log("pwd must match");
-        MyAlertDialog(
-          context,
-          msg: AppLocalizations.of(context)!.pwdMustMatch,
-          onOkay: () => Navigator.pop(context),
-        );
-        return;
-      }
-
-      // loading indicator
-      // MyLoadingIndicator(context);
-
-      final authService = AuthViewModel();
-      var fcmToken = await FirebaseMessaging.instance.getToken();
-      try {
-        // create account
-        await authService.RegisterWithEmailAndPassword(
-          emailTextController.text,
-          pwdTextController.text,
-          userNameTextController.text,
-          [fcmToken!],
-        );
-      } catch (e) {
-        // show error
-        if (context.mounted) {
-          MyAlertDialog(
-            context,
-            msg: e.toString(),
-            onOkay: () => Navigator.pop(context),
-          );
-        }
-        log('error while register: ${e.toString()}.');
-      }
-    }
-
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       body: Column(
@@ -68,6 +30,7 @@ class SignupPage extends StatelessWidget {
           Expanded(
             flex: 7,
             child: SectionTwoBody(
+              emailTextController: emailTextController,
               usrNameTextController: userNameTextController,
               pwdTextController: pwdTextController,
               confirmPwdTextController: confirmTextController,
@@ -107,9 +70,10 @@ class SectionTwoBody extends StatelessWidget {
     required this.usrNameTextController,
     required this.pwdTextController,
     required this.confirmPwdTextController,
+    required this.emailTextController,
     // required this.widget,
   });
-
+  final TextEditingController emailTextController;
   final TextEditingController usrNameTextController;
   final TextEditingController pwdTextController;
   final TextEditingController confirmPwdTextController;
@@ -117,6 +81,20 @@ class SectionTwoBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    onRegister() async {
+      try {
+        await AuthViewModel.instance.registerWithEmailAndPassword(
+          email: emailTextController.text,
+          password: pwdTextController.text,
+          confirmPassword: confirmPwdTextController.text,
+          userName: usrNameTextController.text,
+        );
+        Navigator.of(context).pop();
+      } on Exception catch (e) {
+        MyAlertDialog(msg: e.toString());
+      }
+    }
+
     return Container(
       decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
@@ -126,72 +104,78 @@ class SectionTwoBody extends StatelessWidget {
           )),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Sign Up",
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            AddVerticalSpace(20),
-            // usr name
-            MyTextfield(
-              textFieldHint: AppLocalizations.of(context)!.userName,
-              textController: usrNameTextController,
-            ),
-            AddVerticalSpace(20),
-            // pwd
-            MyTextfield(
-              textFieldHint: AppLocalizations.of(context)!.password,
-              textController: pwdTextController,
-              isPassword: true,
-            ),
-            AddVerticalSpace(20),
-            // re-enter pwd
-            MyTextfield(
-              textFieldHint: "Confirm Password",
-              textController: confirmPwdTextController,
-              isPassword: true,
-            ),
-            // sign in btn
-            AddVerticalSpace(20),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // OnSignIn();
-                    },
-                    child: Text("Sign Up"),
-                  ),
-                ),
-              ],
-            ),
-            AddVerticalSpace(20),
-            // not have an account yet? register now.
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("Already have account? "),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SigninPage()),
-                    );
-                  },
-                  child: const Text(
-                    "Sign In!",
-                    style: TextStyle(
-                      color: Colors.blue,
-                      // decoration: TextDecoration.underline,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Sign Up",
+                style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                      color: ThemeConfig.primaryColor,
+                    ),
+              ),
+              AddVerticalSpace(20),
+              // usr name
+              MyTextfield(
+                textFieldHint: "Email",
+                textController: emailTextController,
+              ),
+              AddVerticalSpace(20),
+              // usr name
+              MyTextfield(
+                textFieldHint: AppLocalizations.of(context)!.userName,
+                textController: usrNameTextController,
+              ),
+              AddVerticalSpace(20),
+              // pwd
+              MyTextfield(
+                textFieldHint: AppLocalizations.of(context)!.password,
+                textController: pwdTextController,
+                isPassword: true,
+              ),
+              AddVerticalSpace(20),
+              // re-enter pwd
+              MyTextfield(
+                textFieldHint: "Confirm Password",
+                textController: confirmPwdTextController,
+                isPassword: true,
+              ),
+              // sign in btn
+              AddVerticalSpace(20),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        await onRegister();
+                      },
+                      child: Text("Sign Up"),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+              AddVerticalSpace(20),
+              // not have an account yet? register now.
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Already have account? "),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      "Sign In!",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        // decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
