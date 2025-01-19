@@ -42,6 +42,7 @@ class TaskPageState extends State<TaskPage> {
       if (context.mounted) {
         // show err dialog
         MyAlertDialog(
+          context: context,
           msg: e.toString(),
         );
       }
@@ -56,6 +57,7 @@ class TaskPageState extends State<TaskPage> {
           onRemove: () {
             // show alert
             MyAlertDialog(
+              context: context,
               msg: AppLocalizations.of(context)!.areYouSureWantToDeleteThisTask,
               onPressed: () {
                 // close alert dialog

@@ -119,6 +119,7 @@ class MessagePage extends StatelessWidget {
                 /// if user was not selected -> show alert
                 if (userTile == null || userTile.widget.isSelected == false) {
                   MyAlertDialog(
+                    context: context,
                     msg: AppLocalizations.of(context)!.userMustBeSelected,
                   );
                 } else {

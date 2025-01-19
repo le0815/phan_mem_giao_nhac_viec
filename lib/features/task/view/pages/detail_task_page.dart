@@ -73,6 +73,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
       }
     } catch (e) {
       MyAlertDialog(
+        context: context,
         msg: e.toString(),
       );
     }

@@ -19,8 +19,15 @@ class _UserAppbarButtonState extends State<UserAppbarButton> {
   @override
   void initState() {
     super.initState();
-    modelUser =
-        UserModel.fromMap(UserLocalRepo.instance.getModelUser(uid: currentUID));
+    modelUser = UserModel.fromMap(
+      UserLocalRepo.instance.getModelUser(uid: currentUID) ??
+          {
+            "email": "sample@email.com",
+            "userName": "sample@email.com",
+            "uid": "sampleUID",
+            "fcm": ["sampleFCM"],
+          },
+    );
   }
 
   @override

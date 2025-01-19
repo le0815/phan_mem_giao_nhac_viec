@@ -111,6 +111,7 @@ class DetailWorkspacePageState extends State<DetailWorkspacePage> {
               onRemove: () {
                 // show alert
                 MyAlertDialog(
+                  context: context,
                   msg: AppLocalizations.of(context)!
                       .areYouSureWantToDeleteThisTask,
                   onPressed: () async {

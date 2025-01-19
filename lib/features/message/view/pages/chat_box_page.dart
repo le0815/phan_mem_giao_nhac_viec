@@ -61,6 +61,7 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
       scrollDown();
     } catch (e) {
       MyAlertDialog(
+        context: context,
         msg: "error while sending message: $e",
       );
     }

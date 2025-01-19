@@ -35,6 +35,7 @@ class _DetailSectionPieChartState extends State<DetailSectionPieChart> {
       if (context.mounted) {
         // show err dialog
         MyAlertDialog(
+          context: context,
           msg: e.toString(),
         );
       }
@@ -49,6 +50,7 @@ class _DetailSectionPieChartState extends State<DetailSectionPieChart> {
           onRemove: () {
             // show alert
             MyAlertDialog(
+              context: context,
               msg: AppLocalizations.of(context)!.areYouSureWantToDeleteThisTask,
               onPressed: () {
                 RemoveTaskFromDb(idTask);

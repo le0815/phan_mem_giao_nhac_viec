@@ -26,11 +26,11 @@ import 'package:phan_mem_giao_nhac_viec/features/task/view_model/task_view_model
 import 'package:phan_mem_giao_nhac_viec/features/workspace/view/pages/detail_workspace_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/workspace/view_model/workspace_viewmodel.dart';
 import 'package:phan_mem_giao_nhac_viec/firebase_options.dart';
-import 'package:phan_mem_giao_nhac_viec/services/language_service/language_service.dart';
+import 'package:phan_mem_giao_nhac_viec/core/services/language_service.dart';
 
 import 'core/theme/theme_config.dart';
 import 'core/view/pages/app_ui.dart';
-import 'services/network_state_service/network_state_service.dart';
+import 'core/services/network_state_service.dart';
 
 final workspaceSectionGlobalKey = GlobalKey<WorkspaceSectionState>();
 final taskPageGlobalKey = GlobalKey<TaskPageState>();

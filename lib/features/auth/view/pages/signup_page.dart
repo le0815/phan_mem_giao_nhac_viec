@@ -91,7 +91,7 @@ class SectionTwoBody extends StatelessWidget {
         );
         Navigator.of(context).pop();
       } on Exception catch (e) {
-        MyAlertDialog(msg: e.toString());
+        MyAlertDialog(msg: e.toString(), context: context);
       }
     }
 

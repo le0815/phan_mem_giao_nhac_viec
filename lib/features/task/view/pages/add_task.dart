@@ -58,6 +58,7 @@ class _AddTaskState extends State<AddTask> {
         }
       } catch (e) {
         MyAlertDialog(
+          context: context,
           msg: e.toString(),
         );
         log(e.toString());

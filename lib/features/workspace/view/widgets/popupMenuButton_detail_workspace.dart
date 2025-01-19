@@ -45,6 +45,7 @@ class PopupMenuButtonDetailWorkspace extends StatelessWidget {
           // else leave
           if (MyWorkspaceRole.owner.name == currentUserRole) {
             MyAlertDialog(
+              context: context,
               msg: AppLocalizations.of(context)!
                   .areYouSureWantToDeleteThisWorkspace,
               onPressed: () async {
@@ -58,6 +59,7 @@ class PopupMenuButtonDetailWorkspace extends StatelessWidget {
             );
           } else {
             MyAlertDialog(
+              context: context,
               msg: AppLocalizations.of(context)!
                   .areYouSureWantToLeaveThisWorkspace,
               onPressed: () async {
@@ -183,6 +185,7 @@ class PopupMenuButtonDetailWorkspace extends StatelessWidget {
                 /// if user was not selected -> show alert
                 if (userTile == null || userTile.widget.isSelected == false) {
                   MyAlertDialog(
+                    context: context,
                     msg: AppLocalizations.of(context)!.userMustBeSelected,
                     onPressed: () => Navigator.pop(context),
                   );

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:phan_mem_giao_nhac_viec/services/language_service/language_service.dart';
+import 'package:phan_mem_giao_nhac_viec/core/services/language_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SettingPage extends StatelessWidget {

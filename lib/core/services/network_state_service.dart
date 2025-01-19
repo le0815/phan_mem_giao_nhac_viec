@@ -15,7 +15,7 @@ class NetworkStateService {
       NotificationService.instance.createNotification(
           title: "No connect to the internet",
           body:
-              "Please turn on internet to make the application work perfectly",
+              "Please turn on the internet to make the application work perfectly",
           payload: {});
     }
   }

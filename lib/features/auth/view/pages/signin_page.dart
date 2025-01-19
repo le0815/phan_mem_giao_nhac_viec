@@ -138,7 +138,7 @@ class _SectionTwoBodyState extends State<SectionTwoBody> {
                               email: emailTextController.text,
                               password: pwdTextController.text);
                         } on Exception catch (e) {
-                          MyAlertDialog(msg: e.toString());
+                          MyAlertDialog(msg: e.toString(), context: context);
                         }
                       },
                       child: Text(AppLocalizations.of(context)!.signIn),
