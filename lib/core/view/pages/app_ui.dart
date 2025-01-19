@@ -15,7 +15,8 @@ import 'package:phan_mem_giao_nhac_viec/features/workspace/view/pages/workspace_
 import 'package:phan_mem_giao_nhac_viec/main.dart';
 
 class AppUi extends StatefulWidget {
-  const AppUi({super.key});
+  const AppUi({super.key, this.pageIndex});
+  final int? pageIndex;
 
   @override
   State<AppUi> createState() => AppUiState();
@@ -50,6 +51,10 @@ class AppUiState extends State<AppUi> {
   void initState() {
     super.initState();
     _refresh();
+    if (widget.pageIndex != null) {
+      btmNavIdx = widget.pageIndex!;
+      setState(() {});
+    }
   }
 
   @override
