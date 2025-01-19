@@ -3,7 +3,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:phan_mem_giao_nhac_viec/core/theme/theme_config.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/my_textfield.dart';
-import 'package:phan_mem_giao_nhac_viec/features/auth/view/pages/signin_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view_model/auth_view_model.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
 
@@ -55,7 +54,7 @@ class SectionOneBody extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text(
-            "Welcome!",
+            AppLocalizations.of(context)!.welcome,
             style: Theme.of(context).textTheme.displayLarge,
           ),
         ],
@@ -109,7 +108,7 @@ class SectionTwoBody extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Sign Up",
+                AppLocalizations.of(context)!.signUp,
                 style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       color: ThemeConfig.primaryColor,
                     ),
@@ -117,7 +116,7 @@ class SectionTwoBody extends StatelessWidget {
               AddVerticalSpace(20),
               // usr name
               MyTextfield(
-                textFieldHint: "Email",
+                textFieldHint: AppLocalizations.of(context)!.email,
                 textController: emailTextController,
               ),
               AddVerticalSpace(20),
@@ -136,7 +135,7 @@ class SectionTwoBody extends StatelessWidget {
               AddVerticalSpace(20),
               // re-enter pwd
               MyTextfield(
-                textFieldHint: "Confirm Password",
+                textFieldHint: AppLocalizations.of(context)!.confirmPassword,
                 textController: confirmPwdTextController,
                 isPassword: true,
               ),
@@ -149,7 +148,7 @@ class SectionTwoBody extends StatelessWidget {
                       onPressed: () async {
                         await onRegister();
                       },
-                      child: Text("Sign Up"),
+                      child: Text(AppLocalizations.of(context)!.signUp),
                     ),
                   ),
                 ],
@@ -159,14 +158,14 @@ class SectionTwoBody extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Already have account? "),
+                  Text(AppLocalizations.of(context)!.alreadyHaveAccount),
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).pop();
                     },
-                    child: const Text(
-                      "Sign In!",
-                      style: TextStyle(
+                    child: Text(
+                      AppLocalizations.of(context)!.signIn,
+                      style: const TextStyle(
                         color: Colors.blue,
                         // decoration: TextDecoration.underline,
                       ),

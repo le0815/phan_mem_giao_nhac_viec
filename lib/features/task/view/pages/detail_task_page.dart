@@ -92,7 +92,10 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.taskDetails),
+        title: Text(
+          AppLocalizations.of(context)!.taskDetails,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
         actions: [
           IconButton(
             onPressed: () async {
@@ -118,7 +121,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
                   AddVerticalSpace(10),
                   // task title
                   MyInputSection(
-                    sectionName: "Title",
+                    sectionName: AppLocalizations.of(context)!.title,
                     textEditingController: widget.textTitleController,
                     maxLine: 1,
                     textStyle: Theme.of(context).textTheme.titleMedium,
@@ -126,7 +129,7 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
                   AddVerticalSpace(10),
                   // task description
                   MyInputSection(
-                    sectionName: "Description",
+                    sectionName: AppLocalizations.of(context)!.description,
                     textEditingController: widget.textDescriptionController,
                     maxLine: 5,
                   ),
@@ -177,7 +180,8 @@ class _DetailTaskPageState extends State<DetailTaskPage> {
                       onPressed: () async {
                         await OnEdit();
                       },
-                      child: const Text("\nSave Change\n"),
+                      child: Text(
+                          "\n${AppLocalizations.of(context)!.saveChange}\n"),
                     ),
                   ),
                 ],

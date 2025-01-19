@@ -82,7 +82,7 @@ class _AddTaskState extends State<AddTask> {
               AddVerticalSpace(10),
               // task title
               MyInputSection(
-                sectionName: "Title",
+                sectionName: AppLocalizations.of(context)!.title,
                 textEditingController: widget.taskTitleController,
                 maxLine: 1,
                 textStyle: Theme.of(context).textTheme.titleMedium,
@@ -90,7 +90,7 @@ class _AddTaskState extends State<AddTask> {
               AddVerticalSpace(10),
               // task description
               MyInputSection(
-                sectionName: "Description",
+                sectionName: AppLocalizations.of(context)!.description,
                 textEditingController: widget.taskDescriptionController,
                 maxLine: 5,
               ),
@@ -117,7 +117,8 @@ class _AddTaskState extends State<AddTask> {
                         onPressed: () async {
                           await UploadTask();
                         },
-                        child: const Text("Submit"),
+                        child: Text(
+                            "\n" + AppLocalizations.of(context)!.submit + "\n"),
                       ),
                     ),
                   ],

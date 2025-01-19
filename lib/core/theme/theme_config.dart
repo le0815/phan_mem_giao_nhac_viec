@@ -24,7 +24,7 @@ class ThemeConfig {
         ),
         // --
         displayLarge: TextStyle(
-          fontSize: 52.0,
+          fontSize: 48.0,
           color: Colors.white,
           fontWeight: FontWeight.bold,
         ),

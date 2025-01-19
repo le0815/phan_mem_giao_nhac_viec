@@ -1,9 +1,14 @@
 {
-    "helloWorld": "Hello World!",
+    "hello": "Hello!",
+    "email": "Email",
+    "welcome": "Welcome!",
+    "dontHaveAccount": "Don't have account? ",
+    "alreadyHaveAccount" : "Already have account? ",    
     "login": "Log In",
     "userName": "User Name",
     "password": "Password",
     "signIn": "Sign In",
+    "signUp": "Sign Up",
     "notHaveAnAccountYet": "Not have an account yet? Register now.",
     "pwdMustMatch": "Password must match!",
     "register": "Register",
@@ -89,6 +94,11 @@
     "myProfile": "My profile",
     "changeYourPassword" : "Change your password",
     "deleteAccount" : "Delete account?",
-    "switchLanguage" : "Switch language"
-
+    "switchLanguage" : "Switch language",
+    "schedule" : "Schedule",
+    "startTime": "Start Time",
+    "dueTime" : "Due Time",
+    "saveChange" : "Save Change",
+    "taskState" : "Task State",
+    "searchMember" : "Search Member"    
 }

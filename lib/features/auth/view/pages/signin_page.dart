@@ -51,7 +51,7 @@ class SectionOneBody extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text(
-            "Hello!",
+            AppLocalizations.of(context)!.hello,
             style: Theme.of(context).textTheme.displayLarge,
           ),
         ],
@@ -116,7 +116,7 @@ class _SectionTwoBodyState extends State<SectionTwoBody> {
               AddVerticalSpace(20),
               // usr name
               MyTextfield(
-                textFieldHint: "Email",
+                textFieldHint: AppLocalizations.of(context)!.email,
                 textController: emailTextController,
               ),
               AddVerticalSpace(20),
@@ -151,13 +151,13 @@ class _SectionTwoBodyState extends State<SectionTwoBody> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Don't have account? "),
+                  Text(AppLocalizations.of(context)!.dontHaveAccount),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(context, _createRoute(const SignupPage()));
                     },
-                    child: const Text(
-                      "Register!",
+                    child: Text(
+                      AppLocalizations.of(context)!.register,
                       style: TextStyle(
                         color: Colors.blue,
                         // decoration: TextDecoration.underline,

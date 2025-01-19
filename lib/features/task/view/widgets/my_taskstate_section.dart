@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/core/theme/theme_config.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/pages/detail_task_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MyTaskstateSection extends StatelessWidget {
   const MyTaskstateSection({
@@ -17,7 +18,7 @@ class MyTaskstateSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Task State",
+          AppLocalizations.of(context)!.taskState,
           style: Theme.of(context).textTheme.titleMedium,
         ),
         Row(
@@ -35,7 +36,7 @@ class MyTaskstateSection extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      "Completed",
+                      AppLocalizations.of(context)!.completed,
                       style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                             color: isComplete ? Colors.white : Colors.black,
                           ),

@@ -5,6 +5,7 @@ import 'package:phan_mem_giao_nhac_viec/core/widgets/add_space.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view/widgets/my_datetime_result.dart';
 import 'package:phan_mem_giao_nhac_viec/core/constraint/constraint.dart';
 import 'package:phan_mem_giao_nhac_viec/features/task/view_model/task_view_model.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DatetimeSection extends StatefulWidget {
   DatetimeSection({
@@ -59,7 +60,7 @@ class _DatetimeSectionState extends State<DatetimeSection> {
           mainAxisSize: MainAxisSize.max,
           children: [
             Text(
-              "Schedule",
+              AppLocalizations.of(context)!.schedule,
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ],
@@ -77,7 +78,7 @@ class _DatetimeSectionState extends State<DatetimeSection> {
                   oldTime: widget.isAddTaskPage
                       ? null
                       : widget.pageWidget.modelTask.startTime,
-                  title: "Start Time",
+                  title: AppLocalizations.of(context)!.startTime,
                 ),
               ),
               AddHorizontalSpace(10),
@@ -87,7 +88,7 @@ class _DatetimeSectionState extends State<DatetimeSection> {
                   oldTime: widget.isAddTaskPage
                       ? null
                       : widget.pageWidget.modelTask.due,
-                  title: "Due Time",
+                  title: AppLocalizations.of(context)!.dueTime,
                 ),
               ),
             ],

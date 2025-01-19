@@ -1,5 +1,7 @@
 {
-    "helloWorld": "Xin chào!",
+    "hello": "Xin chào!",
+    "email": "Email",
+    "dontHaveAccount": "Không có tài khoản? ",
     "login": "Đăng nhập",
     "userName": "Tên người dùng",
     "password": "Mật khẩu",
@@ -68,5 +70,14 @@
     "myProfile": "Hồ sơ của tôi",
     "changeYourPassword" : "Đổi mật khẩu",
     "deleteAccount" : "Xóa tài khoản?",
-    "switchLanguage" : "Đổi ngôn ngữ"
+    "switchLanguage" : "Đổi ngôn ngữ",
+    "schedule": "Lịch trình",
+    "startTime": "Thời gian bắt đầu",
+    "dueTime" : "Thời gian kết thúc",
+    "saveChange" : "Lưu thay đổi",
+    "taskState" : "Trạng thái nhiệm vụ",
+    "welcome": "Chào mừng!",    
+    "alreadyHaveAccount" : "Đã có tài khoản? ",   
+    "signUp": "Đăng ký",
+    "searchMember" : "Tìm kiếm thành viên"  
 }

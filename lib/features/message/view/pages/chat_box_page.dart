@@ -82,7 +82,7 @@ class _ChatBoxPageState extends State<ChatBoxPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Chat name"),
+        title: Text(widget.memberUserModel.userName),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),

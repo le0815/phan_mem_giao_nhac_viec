@@ -56,19 +56,19 @@ class AppUiState extends State<AppUi> {
   Widget build(BuildContext context) {
     var appBarTitles = {
       0: Text(
-        'Home',
+        AppLocalizations.of(context)!.home,
         style: Theme.of(context).textTheme.titleMedium,
       ),
       1: Text(
-        'My task',
+        AppLocalizations.of(context)!.tasks,
         style: Theme.of(context).textTheme.titleMedium,
       ),
       2: Text(
-        'Messages',
+        AppLocalizations.of(context)!.message,
         style: Theme.of(context).textTheme.titleMedium,
       ),
       3: Text(
-        'My workspace',
+        AppLocalizations.of(context)!.workspace,
         style: Theme.of(context).textTheme.titleMedium,
       ),
     };
