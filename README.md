@@ -1,9 +1,8 @@
 ## This is Flutter task managerment android application 
 ### First of all, I want to say special thanks to these wonderful people. This project would not have been completed without you guys:
-- [LuuChinh](https://github.com/LuuChinh)
 - [NBC](https://web.facebook.com/coldbrew1206)
 - ` Nguyen Trung Hoa `
-### The technologies utilized in this project include the following.
+### Tech Stack
 - Firebase
   - [firebase_core](https://pub.dev/packages/firebase_core)
   - [firebase_messaging](https://pub.dev/packages/firebase_messaging)
@@ -14,10 +13,10 @@
 - [awesome_notification](https://pub.dev/packages/awesome_notifications)
 
 ### Some screenshots of the application
-![home_page_screenshot](https://github.com/user-attachments/assets/e144ac0e-97ea-424e-8516-6d6f85947500)
-![task_page_screenshot](https://github.com/user-attachments/assets/428cfbc8-0c58-4f66-9f6d-4fe1d3abab23)
-![chat_page_screenshot](https://github.com/user-attachments/assets/943e5bc7-9f3e-4ec6-a759-11b12ae14047)
-![chat_box_screenshot](https://github.com/user-attachments/assets/10662f90-22b4-4535-9a7f-b43dd72a70c6)
-![workspace_detail_screenshot](https://github.com/user-attachments/assets/42dfd7f3-48e7-414e-b274-600d0a922559)
+![photo_5_2025-01-23_16-47-20](https://github.com/user-attachments/assets/167e0004-1df2-472d-8be7-a3131fff390d)
+![photo_1_2025-01-23_16-47-20](https://github.com/user-attachments/assets/0be37b04-2273-451f-9a74-7b2f052de015)
+![photo_3_2025-01-23_16-47-20](https://github.com/user-attachments/assets/ce015eea-28b7-4b12-9833-bb53523752c4)
+![photo_2_2025-01-23_16-47-20](https://github.com/user-attachments/assets/cca73ab2-07ac-451b-b927-4d6485dd538a)
+![photo_4_2025-01-23_16-47-20](https://github.com/user-attachments/assets/b3426cd1-e5cb-47eb-a366-25199f66e870)
 
 ## If you discover any bugs, please open an ` issue ` and I will address it. Thank you.
