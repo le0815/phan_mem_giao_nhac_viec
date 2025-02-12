@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:phan_mem_giao_nhac_viec/features/user/model/user_model.dart';
 import 'package:phan_mem_giao_nhac_viec/features/user/repository/user_local_repo.dart';
@@ -8,6 +9,7 @@ import 'package:phan_mem_giao_nhac_viec/features/user/repository/user_local_repo
 class UserRemoteRepo {
   static final UserRemoteRepo instance = UserRemoteRepo._();
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   UserRemoteRepo._();
 
   Future getUserByUID({required uid}) async {
@@ -70,5 +72,28 @@ class UserRemoteRepo {
     modelUser.fcm.removeWhere((element) => element == fcmToken);
 
     updateUserInfoToDatabase(modelUser: modelUser);
+  }
+
+  validatePwd({required String currentPwd}) async {
+    var currentUser = _firebaseAuth.currentUser!;
+    var credential = EmailAuthProvider.credential(
+        email: currentUser.email!, password: currentPwd);
+
+    try {
+      await _firebaseAuth.currentUser!.reauthenticateWithCredential(credential);
+    } catch (e) {
+      log("Err while validate password");
+      throw e.toString();
+    }
+  }
+
+  Future updatePwd({required String newPwd}) async {
+    var currentUser = _firebaseAuth.currentUser!;
+    try {
+      await currentUser.updatePassword(newPwd);
+    } catch (e) {
+      log("Err while validate password");
+      throw e.toString();
+    }
   }
 }

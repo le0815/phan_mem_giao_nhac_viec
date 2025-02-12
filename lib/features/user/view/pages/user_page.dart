@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:phan_mem_giao_nhac_viec/features/user/model/user_model.dart';
+import 'package:phan_mem_giao_nhac_viec/features/user/view/pages/change_pwd_page.dart';
 
 class UserPage extends StatelessWidget {
   final UserModel modelUser;
@@ -10,7 +11,10 @@ class UserPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.myProfile),
+        title: Text(
+          AppLocalizations.of(context)!.myProfile,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -60,7 +64,14 @@ class UserPage extends StatelessWidget {
                       AppLocalizations.of(context)!.changeYourPassword,
                       style: const TextStyle(fontSize: 18),
                     ),
-                    const Icon(Icons.arrow_forward_ios_outlined)
+                    IconButton(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ChangePwdPage()),
+                      ),
+                      icon: const Icon(Icons.arrow_forward_ios_outlined),
+                    ),
                   ],
                 ),
               ),
