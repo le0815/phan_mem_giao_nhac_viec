@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:phan_mem_giao_nhac_viec/features/user/model/user_model.dart';
+import 'package:phan_mem_giao_nhac_viec/features/user/repository/user_local_repo.dart';
 import 'package:phan_mem_giao_nhac_viec/features/user/repository/user_remote_repo.dart';
 
 class UserViewModel extends ChangeNotifier {
@@ -19,6 +22,15 @@ class UserViewModel extends ChangeNotifier {
   loadingOff() {
     isLoading = false;
     notifyListeners();
+  }
+
+  Future<UserModel> getUserModel() async {
+    loadingOn();
+    final currentUID = FirebaseAuth.instance.currentUser!.uid;
+    var result = await UserRemoteRepo.instance.getUserByUID(uid: currentUID);
+    UserModel userModel = UserModel.fromMap(result.data());
+    loadingOff();
+    return userModel;
   }
 
   Future validPwd(
