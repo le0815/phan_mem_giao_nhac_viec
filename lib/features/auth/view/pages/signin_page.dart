@@ -2,6 +2,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:phan_mem_giao_nhac_viec/core/theme/theme_config.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/my_textfield.dart';
+import 'package:phan_mem_giao_nhac_viec/features/auth/view/pages/forgot_password_page.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view/pages/signup_page.dart';
 import 'package:phan_mem_giao_nhac_viec/core/widgets/my_alert_dialog.dart';
 import 'package:phan_mem_giao_nhac_viec/features/auth/view_model/auth_view_model.dart';
@@ -125,6 +126,27 @@ class _SectionTwoBodyState extends State<SectionTwoBody> {
                 textFieldHint: AppLocalizations.of(context)!.password,
                 textController: pwdTextController,
                 isPassword: true,
+              ),
+              // forgot password
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ForgotPasswordPage()),
+                      );
+                    },
+                    child: const Text(
+                      "Forgot password?",
+                      style: TextStyle(
+                        color: Colors.blue,
+                      ),
+                    ),
+                  )
+                ],
               ),
               // sign in btn
               AddVerticalSpace(20),

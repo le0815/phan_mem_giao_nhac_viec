@@ -21,6 +21,16 @@ class AuthViewModel extends ChangeNotifier {
   User? _user;
   User? get user => _user;
 
+  loadingOn() {
+    isLoading = true;
+    notifyListeners();
+  }
+
+  loadingOff() {
+    isLoading = false;
+    notifyListeners();
+  }
+
   checkLoginState() {
     isLogin = FirebaseAuth.instance.currentUser == null ? false : true;
     notifyListeners();
@@ -124,6 +134,17 @@ class AuthViewModel extends ChangeNotifier {
       notifyListeners();
       log('error while register: ${e.toString()}.');
       throw Exception(e.toString());
+    }
+  }
+
+  Future<void> sendResetPasswordLink({required String email}) async {
+    try {
+      loadingOn();
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      loadingOff();
+    } catch (e) {
+      loadingOff();
+      throw e.toString();
     }
   }
 }
